@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg16
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -10,7 +10,7 @@ services:
       - POSTGRES_USER=yura_user
       - POSTGRES_PASSWORD=yura_password
     ports:
-      - "5432:5432"
+      - "5433:5432"
 
   backend:
     build: ./backend
