@@ -13,4 +13,9 @@ export class Title {
     public readonly theme: InputSignal<"primary" | "secondary" | "light"> = input<"primary" | "secondary" | "light">(
         "primary",
     );
+    public readonly align: InputSignal<"left" | "center" | "right"> = input<"left" | "center" | "right">("left");
+
+    ngOnInit() {
+        console.log(this.align());
+    }
 }

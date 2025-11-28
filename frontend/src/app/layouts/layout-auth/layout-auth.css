@@ -1,0 +1,15 @@
+.layout {
+    display: flex;
+}
+
+.layout__side-background {
+    flex-shrink: 0;
+    width: 40%;
+    height: 100vh;
+    padding-top: 30vh;
+    background-color: var(--dark-background-color);
+}
+
+.layout__main {
+    width: 100%;
+}

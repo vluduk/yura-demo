@@ -76,3 +76,15 @@
 .title_theme_light {
     color: var(--secondary-text-color);
 }
+
+.title_align_left {
+    text-align: left;
+}
+
+.title_align_center {
+    text-align: center;
+}
+
+.title_align_right {
+    text-align: right;
+}

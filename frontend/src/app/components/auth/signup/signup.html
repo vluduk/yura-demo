@@ -1,1 +1,22 @@
-<p>signup works!</p>
+<div class="signup">
+    <div class="signup__signup-wrapper">
+        <ui-logo></ui-logo>
+
+        <div class="signup__inputs">
+            <div class="inputs__row">
+                <ui-input [(value)]="name" [label]="'Ім\'я'"></ui-input>
+                <ui-input [(value)]="surname" [label]="'Прізвище'"></ui-input>
+            </div>
+            <ui-input [(value)]="email" [label]="'Електронна пошта'"></ui-input>
+            <ui-input [(value)]="password" [label]="'Пароль'" [type]="'password'"></ui-input>
+            <ui-input [(value)]="confirmPassword" [label]="'Повторіть пароль'" [type]="'password'"></ui-input>
+        </div>
+
+        <ui-button [label]="'Увійти'" [isLoading]="isLoading()" (click)="onSubmit()"></ui-button>
+
+        <span class="signup__option-text">
+            Не маєш облікового запису?
+            <ui-link [label]="'Увійти'" [type]="'primary-line'" [routerLink]="'/auth/login'"></ui-link>
+        </span>
+    </div>
+</div>

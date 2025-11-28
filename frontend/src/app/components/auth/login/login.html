@@ -1,1 +1,17 @@
-<p>login works!</p>
+<div class="login">
+    <div class="login__login-wrapper">
+        <ui-logo></ui-logo>
+
+        <div class="login__inputs">
+            <ui-input [(value)]="email" [label]="'Електронна пошта'"></ui-input>
+            <ui-input [(value)]="password" [label]="'Пароль'" [type]="'password'"></ui-input>
+        </div>
+
+        <ui-button [label]="'Увійти'" [isLoading]="isLoading()" (click)="onSubmit()"></ui-button>
+
+        <span class="login__option-text">
+            Не маєш облікового запису?
+            <ui-link [label]="'Зареєструватися'" [type]="'primary-line'" [routerLink]="'/auth/signup'"></ui-link>
+        </span>
+    </div>
+</div>
