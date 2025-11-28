@@ -1,7 +1,13 @@
 <div class="layout">
-    <app-chat-sidebar></app-chat-sidebar>
+    <aside class="layout__sidebar">
+        <chat-sidebar></chat-sidebar>
+    </aside>
 
     <main class="layout__main">
         <router-outlet></router-outlet>
     </main>
+
+    <div class="layout__header">
+        <chat-header></chat-header>
+    </div>
 </div>

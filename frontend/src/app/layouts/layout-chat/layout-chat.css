@@ -1,0 +1,8 @@
+.layout {
+    display: flex;
+}
+
+.layout__main {
+    width: 780px;
+    margin: 0 auto;
+}

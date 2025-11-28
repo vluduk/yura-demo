@@ -1,1 +1,27 @@
-<p>conversation works!</p>
+<div class="conversation">
+    <div class="conversation__message-wrapper">
+        @for (message of messages(); track message.id) {
+            @if (message.is_user) {
+                <div class="message-wrapper__message" [class.message-user]="message.is_user">
+                    <span class="message__content">{{ message.content }}</span>
+                    <div class="message__control">
+                        <span class="control__edit">edit</span>
+                        <span class="control__copy">copy</span>
+                    </div>
+                </div>
+            } @else {
+                <div class="message-wrapper__message" [class.message-ai]="!message.is_user">
+                    <span class="message__content">{{ message.content }}</span>
+                    <div class="message__control">
+                        <span class="control__edit">refresh</span>
+                        <span class="control__copy">copy</span>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="conversation__input-wrapper">
+        <conversation-chat-input></conversation-chat-input>
+    </div>
+</div>
