@@ -1,5 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
 
+:root {
+    --background-color: #4E6745;
+    --dark-background-color: #293325;
+    --light-background-color: #84B09E;
+    --card-background-color: #E3E2CD;
+
+    --secondary-text-color: #0D0D0D;
+    --primary-text-color: #FAF7F0;
+
+    --button-background-color: #327378;
+    --button-hover-color: #285D61;
+    --button-border-color: #327378;
+
+    --disabled-background-color: #787878;
+    --disabled-text-color: #E8E8E8;
+    --disabled-border-color: #787878;
+
+    --contrast-color: #D2A679;
+}
+
 * {
     box-sizing: border-box;
     padding: 0;
