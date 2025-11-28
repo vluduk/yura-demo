@@ -1,0 +1,150 @@
+:host {
+    width: 100%;
+}
+
+.label {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    user-select: none;
+}
+
+.label:has(.input_type_phone)::before {
+    position: absolute;
+    bottom: 0;
+    left: 14px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    font-size: 16px;
+    color: var(--primary-text-color);
+    content: "+38";
+}
+
+@media screen and (max-width: 1199px) {
+    .label:has(.input_type_phone)::before {
+        left: 12px;
+        height: 36px;
+        font-size: 14px;
+    }
+}
+
+.label__text {
+    padding-left: 16px;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--primary-text-color);
+}
+
+@media screen and (max-width: 565px) {
+    .label__text {
+        font-size: 14px;
+    }
+}
+
+.input {
+    width: 100%;
+    outline: none;
+    background-color: transparent;
+    border: none;
+    transition: border-color 0.3s, outline-color 0.3s;
+}
+
+.input_size_small {
+    height: 40px;
+    padding: 10px 16px;
+    font-size: 16px;
+    font-weight: 400;
+    border-radius: 20px;
+}
+
+.input_size_large {
+    height: 48px;
+    padding: 12px 24px;
+    font-size: 20px;
+    font-weight: 600;
+    border-radius: 24px;
+}
+
+@media screen and (max-width: 1199px) {
+    .input_size_small {
+        height: 36px;
+        padding: 10px 12px;
+        font-size: 14px;
+        border-radius: 18px;
+    }
+
+    .input_size_large {
+        height: 44px;
+        padding: 12px 18px;
+        font-size: 18px;
+        border-radius: 22px;
+    }
+}
+
+.input_type_phone {
+    padding-left: 42px;
+}
+
+@media screen and (max-width: 1199px) {
+    .input_type_phone {
+        padding-left: 36px;
+    }
+}
+
+.input_theme_primary {
+    color: var(--primary-text-color);
+    outline: 1px solid transparent;
+    background-color: var(--background-color);
+    border: 1px solid var(--primary-color);
+}
+
+.input_theme_primary::placeholder {
+    color: var(--gray-text-color);
+}
+
+.input_theme_primary:hover:not(:disabled) {
+    border-color: var(--primary-hover-color);
+}
+
+.input_theme_primary:focus-visible {
+    outline-color: var(--primary-color);
+}
+
+.input_align_center {
+    text-align: center;
+}
+
+.input_align_left {
+    text-align: left;
+}
+
+.input_align_right {
+    text-align: right;
+}
+
+.input_error {
+    border: 2px solid var(--error-color);
+}
+
+.input_error:hover {
+    border-color: var(--error-hover-color);
+}
+
+.input_disabled {
+    color: var(--disabled-text-color);
+    cursor: not-allowed;
+    background-color: var(--disabled-background-color);
+    border-color: var(--disabled-text-color);
+}
+
+.input_disabled::placeholder {
+    color: transparent;
+}
+
+.label:has(.input_type_phone.input_disabled)::before {
+    color: var(--disabled-text-color);
+}

@@ -1,0 +1,23 @@
+<a
+    class="link"
+    [ngClass]="{
+        'link_with_label': label(),
+        'link_with_icon': icon(),
+        'link_disabled': isDisabled(),
+        'link_width_full': isFullWidth(),
+        'link_type_primary': type() === 'primary',
+        'link_type_primary-line': type() === 'primary-line',
+        'link_type_light': type() === 'light',
+        'link_type_light-line': type() === 'light-line',
+        'link_type_light-clear': type() === 'light-clear',
+    }"
+    [attr.href]="path() ? path() : null"
+    [routerLink]="routerLink() ? routerLink() : null"
+    [target]="target()"
+>
+    @if(icon()) {
+    <i class="link__icon" [ngClass]="icon()"></i>
+    } @if(label()) {
+    <span class="link__label">{{ label() }}</span>
+    }
+</a>

@@ -1,0 +1,29 @@
+<button
+    class="button"
+    [ngClass]="{
+        'button_with_label': label(),
+        'button_with_icon': icon(),
+        'button_disabled': isDisabled() || isLoading(),
+        'button_size_small': size() === 'small',
+        'button_size_large': size() === 'large',
+        'button_width_full': isFullWidth(),
+        'button_type_primary-clear': type() === 'primary-clear',
+        'button_type_primary': type() === 'primary',
+        'button_type_primary-line': type() === 'primary-line',
+        'button_type_white-icon': type() === 'white-icon',
+    }"
+    [disabled]="isDisabled() || isLoading()"
+    (click)="handleClick($event)"
+>
+    @if (isLoading() && (type() == 'primary' || type() == 'primary-line')) {
+    <div class="button__loader-wrapper">
+        <div class="button__loader"></div>
+    </div>
+    } @if (icon()) {
+    <span class="button__icon-wrapper">
+        <i class="button__icon" [ngClass]="icon()"></i>
+    </span>
+    } @if (label()) {
+    <span class="button__label">{{ label() }}</span>
+    }
+</button>

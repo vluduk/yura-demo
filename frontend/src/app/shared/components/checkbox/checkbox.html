@@ -1,0 +1,6 @@
+<label class="label" [ngClass]="{ 'label_disabled': isDisabled() }">
+    <input class="checkbox" type="checkbox" [checked]="value()" (change)="onChange($event)" [disabled]="isDisabled()" />
+    @if (label()) {
+    <span class="label__text">{{ label() }}</span>
+    }
+</label>

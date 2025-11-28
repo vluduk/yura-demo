@@ -1,0 +1,32 @@
+<label class="label">
+    @if (label()) {
+    <span class="label__text">{{ label() }}</span>
+    }
+
+    <input
+        #input
+        class="input"
+        [placeholder]="placeholder()"
+        [ngClass]="{
+            'input_size_small': size() == 'small',
+            'input_size_large': size() == 'large',
+            'input_theme_default': theme() == 'default',
+            'input_theme_primary': theme() == 'primary',
+            'input_type_text': type() == 'text',
+            'input_type_number': type() == 'number',
+            'input_type_phone': type() == 'phone',
+            'input_error': isError(),
+            'input_align_center': align() == 'center',
+            'input_align_left': align() == 'left',
+            'input_align_right': align() == 'right',
+            'input_disabled': isDisabled()
+        }"
+        [type]="inputType()"
+        [value]="value()"
+        [disabled]="isDisabled()"
+        [name]="name()"
+        [autocomplete]="autocomplete()"
+        (input)="handleInput($event)"
+        (change)="onChange($event)"
+    />
+</label>

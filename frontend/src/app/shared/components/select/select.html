@@ -1,0 +1,28 @@
+<label
+    class="label"
+    [ngClass]="{
+        'label_width_full': isFullWidth(),
+        'label_with_text': label()
+    }"
+>
+    @if (label()) {
+    <span class="label__text">{{ label() }}</span>
+    }
+
+    <select
+        class="select"
+        [ngClass]="{
+        'select_size_small': size() == 'small',
+        'select_size_large': size() == 'large',
+        'select_theme_primary': theme() == 'primary',
+        'select_width_full': isFullWidth()
+    }"
+        [value]="value()"
+        (change)="handleChange($event)"
+        [disabled]="isDisabled()"
+    >
+        <ng-content></ng-content>
+    </select>
+
+    <span class="select-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+</label>

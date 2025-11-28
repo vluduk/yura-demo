@@ -1,0 +1,56 @@
+.link {
+    display: inline-block;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: pointer;
+    transition: filter 0.1s;
+}
+
+.link_width_full {
+    width: 100%;
+}
+
+.link_type_primary,
+.link_type_primary-line {
+    color: var(--primary-color);
+}
+
+.link_type_primary-line {
+    text-decoration: underline;
+}
+
+.link_type_primary-line:hover {
+    text-decoration: none;
+    filter: brightness(0.8);
+}
+
+.link_type_primary:hover {
+    text-decoration: underline;
+}
+
+.link_type_light,
+.link_type_light-line,
+.link_type_light-clear {
+    color: var(--secondary-text-color);
+}
+
+.link_type_light:hover,
+.link_type_light-line:hover {
+    filter: brightness(0.8);
+}
+
+.link_type_light:hover {
+    text-decoration: underline;
+}
+
+.link_type_light-line {
+    text-decoration: underline;
+}
+
+.link_type_light-line:hover {
+    text-decoration: none;
+}
+
+.link__icon {
+    margin-right: 8px;
+}
