@@ -14,8 +14,4 @@ export class Title {
         "primary",
     );
     public readonly align: InputSignal<"left" | "center" | "right"> = input<"left" | "center" | "right">("left");
-
-    ngOnInit() {
-        console.log(this.align());
-    }
 }

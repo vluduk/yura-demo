@@ -1,0 +1,3 @@
+.layout__main {
+    min-height: calc(100dvh - var(--header-height) - var(--footer-height));
+}

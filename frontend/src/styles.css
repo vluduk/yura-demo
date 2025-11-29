@@ -1,6 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root {
+    --header-height: 64px;
+    --footer-height: 200px;
+
     --background-color: #4E6745;
     --dark-background-color: #293325;
     --light-background-color: #84B09E;
@@ -33,4 +36,29 @@ html {
     font-family: Arial, sans-serif;
     color: var(--primary-text-color);
     background-color: var(--background-color);
+}
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+    padding-inline: 32px;
+    margin: 0 auto;
+}
+
+@media screen and (max-width: 991px) {
+    .container {
+        padding-inline: 16px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .container {
+        padding-inline: 12px;
+    }
+}
+
+@media screen and (max-width: 565px) {
+    .container {
+        padding-inline: 6px;
+    }
 }

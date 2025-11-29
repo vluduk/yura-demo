@@ -1,1 +1,34 @@
-<p>footer works!</p>
+<div class="footer">
+    <div class="container">
+        <div class="footer__block">
+            <ui-logo></ui-logo>
+            <span>Платформа кар'єрної навігації для українських ветеранів</span>
+        </div>
+
+        <div class="footer__block">
+            <span class="block__title">Освітні напрямки</span>
+            <div class="block__links">
+                <ui-link [label]="'Наймана праця'" [routerLink]="'/'"></ui-link>
+                <ui-link [label]="'Самозайнятість'" [routerLink]="'/'"></ui-link>
+                <ui-link [label]="'Власний бізнес'" [routerLink]="'/'"></ui-link>
+            </div>
+        </div>
+
+        <div class="footer__block">
+            <span class="block__title">Ресурси</span>
+            <div class="block__links">
+                <ui-link [label]="'ШІ-консультант'" [routerLink]="'/'"></ui-link>
+                <ui-link [label]="'Конструктор резюме'" [routerLink]="'/'"></ui-link>
+                <ui-link [label]="'Валідатор бізнес-ідей'" [routerLink]="'/'"></ui-link>
+            </div>
+        </div>
+
+        <div class="footer__block">
+            <span class="block__title">Контакти</span>
+            <div class="block__links">
+                <ui-link [label]="'email@gmail.com'" [path]="'/'"></ui-link>
+                <ui-link [label]="'+380 99 999 9999'" [path]="'/'"></ui-link>
+            </div>
+        </div>
+    </div>
+</div>
