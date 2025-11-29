@@ -3,6 +3,9 @@ import {
     computed,
     effect,
     ElementRef,
+    inject,
+    input,
+    InputSignal,
     OnInit,
     Signal,
     signal,
@@ -11,6 +14,7 @@ import {
 } from "@angular/core";
 import { MessageType } from "@shared/types/MessageType";
 import { ChatInput } from "@components/conversation/chat-input/chat-input";
+import { ConversationService } from "@shared/services/conversation.service";
 
 @Component({
     selector: "chat-conversation",
@@ -19,7 +23,11 @@ import { ChatInput } from "@components/conversation/chat-input/chat-input";
     styleUrl: "./conversation.css",
 })
 export class Conversation implements OnInit {
+    protected readonly id: InputSignal<string> = input.required<string>();
+
     protected readonly messages: WritableSignal<MessageType[]> = signal<MessageType[]>([]);
+
+    protected readonly printingMessage: WritableSignal<string> = signal<string>("");
 
     protected readonly searchInput: WritableSignal<string> = signal<string>("");
 
@@ -29,6 +37,8 @@ export class Conversation implements OnInit {
     });
 
     protected readonly messagesContainer: Signal<ElementRef> = viewChild.required<ElementRef>("scrollContainer");
+
+    private readonly conversationService: ConversationService = inject(ConversationService);
 
     constructor() {
         effect(() => {
@@ -70,5 +80,21 @@ export class Conversation implements OnInit {
                 is_user: false,
             },
         ]);
+    }
+
+    protected getResponse() {
+        this.printingMessage.set("");
+
+        this.conversationService.getMessageResponse(this.id(), "Привіт").subscribe({
+            next: (chunk) => {
+                this.printingMessage.set(this.printingMessage() + chunk);
+            },
+            complete: () => {
+                console.log("Генерація завершена");
+            },
+            error: (err) => {
+                console.error("Помилка стріму", err);
+            },
+        });
     }
 }
