@@ -1,0 +1,230 @@
+erDiagram
+    %% ==================================================
+    %% 1. USER & AUTH MODULE
+    %% ==================================================
+    USERS ||--o{ CONVERSATIONS : "has"
+    USERS ||--o{ USER_ASSESSMENTS : "receives"
+    USERS ||--o{ RESUMES : "creates"
+    USERS ||--o{ BUSINESS_IDEAS : "brainstorms"
+    USERS ||--o{ ARTICLES : "admin_authors"
+    USERS ||--o{ KNOWLEDGE_DOCUMENTS : "admin_uploads"
+
+    USERS {
+        uuid id PK
+        string email
+        string password_hash
+        string first_name
+        string last_name
+        string phone
+        string role "ENUM: USER, ADMIN, STAFF"
+        string avatar_url
+        boolean career_selected
+        timestamp created_at
+        timestamp last_login
+    }
+
+    %% ==================================================
+    %% 2. CAREER ASSESSMENTS
+    %% ==================================================
+    USER_ASSESSMENTS {
+        uuid id PK
+        uuid user_id FK
+        string career_path "ENUM: Заробітчанин, самозайнятий, QA, PM, DESIGN, DEVOPS"
+        text summary_report
+        jsonb tags
+        timestamp created_at
+    }
+
+    %% ==================================================
+    %% 3. AI CHAT & RAG MODULE
+    %% ==================================================
+    CONVERSATIONS ||--o{ MESSAGES : "contains"
+    
+    CONVERSATIONS {
+        uuid id PK
+        uuid user_id FK
+        string title
+        jsonb summary_data "{ subtitle, tags, status }"
+        timestamp created_at
+        timestamp last_active_at
+    }
+
+    MESSAGES {
+        uuid id PK
+        uuid conversation_id FK
+        text content
+        jsonb context_used
+        boolean is_user "True = User, False = AI"
+        timestamp created_at
+    }
+
+    %% ==================================================
+    %% 4. RESUME BUILDER MODULE
+    %% ==================================================
+    CV_TEMPLATES ||--o{ RESUMES : "provides_layout"
+    RESUMES ||--o{ EXPERIENCE_ENTRIES : "includes"
+    RESUMES ||--o{ EDUCATION_ENTRIES : "includes"
+    RESUMES ||--o{ SKILL_ENTRIES : "includes"
+    RESUMES ||--o{ LANGUAGE_ENTRIES : "includes"
+    RESUMES ||--o{ SOCIAL_LINKS : "includes"
+    RESUMES ||--o{ EXTRA_ACTIVITY_ENTRIES : "includes"
+
+    CV_TEMPLATES {
+        uuid id PK
+        string name
+        string slug
+        string preview_image_url
+        jsonb default_structure
+        boolean is_active
+    }
+
+    RESUMES {
+        uuid id PK
+        uuid user_id FK
+        uuid template_id FK
+        string title
+        string first_name
+        string last_name
+        text professional_summary
+        jsonb contact_details
+        jsonb layout_order
+        boolean is_primary
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    EXPERIENCE_ENTRIES {
+        uuid id PK
+        uuid resume_id FK
+        string job_title
+        string employer
+        string city
+        date start_date
+        date end_date
+        boolean is_current 
+        text description
+        int display_order
+    }
+
+    EDUCATION_ENTRIES {
+        uuid id PK
+        uuid resume_id FK
+        string institution
+        string degree 
+        string field_of_study
+        date start_date
+        date end_date
+        boolean is_current
+        text description
+        int display_order
+    }
+
+    EXTRA_ACTIVITY_ENTRIES {
+        uuid id PK
+        uuid resume_id FK
+        string title
+        string organization
+        date start_date
+        date end_date
+        boolean is_current
+        text description
+        int display_order
+    }
+
+    SOCIAL_LINKS {
+        uuid id PK
+        uuid resume_id FK
+        string platform
+        string url
+        int display_order
+    }
+
+    SKILL_ENTRIES {
+        uuid id PK
+        uuid resume_id FK
+        string name
+        string level
+        int display_order
+    }
+
+    LANGUAGE_ENTRIES {
+        uuid id PK
+        uuid resume_id FK
+        string language
+        string proficiency
+    }
+
+    %% ==================================================
+    %% 5. BUSINESS IDEA MODULE (UPDATED HYBRID LOGIC)
+    %% ==================================================
+    BUSINESS_IDEAS ||--o{ ACTION_STEPS : "has_tasks"
+
+    BUSINESS_IDEAS {
+        uuid id PK
+        uuid user_id FK
+        string title
+        string status "ENUM: BRAINSTORM, RESEARCH, VALIDATION"
+        int validation_score
+        
+        %% Static Documents (Best as JSONB)
+        jsonb business_canvas "{ customer_segments, value_prop... }"
+        jsonb market_research "{ competitors: [], swot: {} }"
+        jsonb summary_card_data "{ next_milestone, risk_level }"
+
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Interactive To-Do List (Best as Table)
+    ACTION_STEPS {
+        uuid id PK
+        uuid business_idea_id FK
+        string title
+        text details "AI advice on how to do this step"
+        string status "ENUM: PENDING, DONE"
+        int step_order
+        date deadline
+        timestamp created_at
+    }
+
+    %% ==================================================
+    %% 6. CONTENT & ADMIN KNOWLEDGE
+    %% ==================================================
+    ARTICLE_CATEGORIES ||--o{ ARTICLES : "categorizes"
+    KNOWLEDGE_CATEGORIES ||--o{ KNOWLEDGE_DOCUMENTS : "organizes"
+
+    ARTICLES {
+        uuid id PK
+        uuid author_id FK
+        uuid category_id FK
+        string title
+        string slug
+        text content
+        string cover_image_url
+        boolean is_promoted
+        boolean is_published
+        int views_count
+        timestamp created_at
+    }
+
+    ARTICLE_CATEGORIES {
+        uuid id PK
+        string name
+        string slug
+    }
+
+    KNOWLEDGE_DOCUMENTS {
+        uuid id PK
+        uuid uploader_id FK
+        uuid category_id FK
+        string title
+        text raw_text_content
+        string source_url
+        vector embedding
+        timestamp created_at
+    }
+
+    KNOWLEDGE_CATEGORIES {
+        uuid id PK
+        string name
+    }

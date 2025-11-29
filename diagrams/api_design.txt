@@ -1,0 +1,1248 @@
+openapi: 3.0.4
+info:
+  title: Swagger Yura
+  version: 1.0.0
+servers:
+  - url: https://yura.swagger.io/api/v1
+tags:
+  - name: Admin
+  - name: Articles
+  - name: Auth
+  - name: Conversations
+  - name: Ideas
+  - name: Resumes
+  - name: Users
+paths:
+  /articles:
+    get:
+      summary: Get articles with pagination
+      tags:
+        - Articles
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of articles per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search field
+          required: false
+          schema:
+            type: string
+        - name: filter
+          in: query
+          description: Filter field
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Create new article
+      tags:
+        - Articles
+        - Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /articles/promoted:
+    get:
+      summary: Get promoted articles
+      tags:
+        - Articles
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /articles/{article_id}:
+    get:
+      summary: Get article
+      tags:
+        - Articles
+      parameters:
+        - name: article_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      summary: Update article
+      tags:
+        - Articles
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: article_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      summary: Delete article
+      tags:
+        - Articles
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: article_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /articles/filters:
+    get:
+      summary: Get filters of article list
+      tags:
+        - Articles
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    post:
+      summary: Create new filter of article list
+      tags:
+        - Articles
+        - Admin
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+  
+  /articles/filters/{filter_id}:
+    put:
+      summary: Update filter of article list
+      tags:
+        - Articles
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: filter_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      summary: Delete filter of article list
+      tags:
+        - Articles
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: filter_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /auth/sign-up:
+    post:
+      summary: Register new user account
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - name
+                - surname
+                - role
+                - password
+              properties:
+                phone:
+                  type: string
+                  description: Valid Ukrainian mobile phone number
+                  example: '0991234567'
+                name:
+                  type: string
+                  description: User's first name (2-100 characters)
+                  minLength: 2
+                  maxLength: 100
+                  example: John
+                surname:
+                  type: string
+                  description: User's last name (2-100 characters)
+                  minLength: 2
+                  maxLength: 100
+                  example: Doe
+                role:
+                  type: string
+                  enum:
+                    - WHOLESALE
+                    - SERVICE_STATION
+                    - RETAIL
+                  description: User role - one of WHOLESALE, SERVICE_STATION, or RETAIL
+                  example: RETAIL
+                password:
+                  type: string
+                  description: Password (6-100 characters)
+                  minLength: 6
+                  maxLength: 100
+                  example: HardPassword123
+      responses:
+        '201':
+          description: User signed up successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: JWT access token (expires in 15 minutes)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken:
+                    type: string
+                    description: JWT refresh token (expires in 7 days)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '400':
+          description: Bad request - user already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User account with that phone number already exists
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Validation error message(s)
+                    oneOf:
+                      - example: Phone number is required
+                      - example: Please provide a valid phone number
+                      - example: Name is required
+                      - example: Name must be a string
+                      - example: Name must be between 2 and 100 characters
+                      - example: Surname is required
+                      - example: Surname must be a string
+                      - example: Surname must be between 2 and 100 characters
+                      - example: Password is required
+                      - example: Password must be a string
+                      - example: Password must be between 6 and 100 characters
+        '429':
+          description: Rate limit exceeded - too many requests
+          headers:
+            Retry-After:
+              description: Time in seconds to wait before retrying
+              schema:
+                type: integer
+                example: 120
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Too many sign up attempts, please try again later.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /auth/login:
+    post:
+      summary: Log into the user account
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - phone
+                - password
+              properties:
+                phone:
+                  type: string
+                  description: Valid Ukrainian mobile phone number
+                  example: '0991234567'
+                password:
+                  type: string
+                  description: Password (6-100 characters)
+                  minLength: 6
+                  maxLength: 100
+                  example: HardPassword123
+      responses:
+        '200':
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: JWT access token (expires in 15 minutes)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken:
+                    type: string
+                    description: JWT refresh token (expires in 7 days)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '422':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Validation error message(s)
+                    oneOf:
+                      - example: Phone number is required
+                      - example: Please provide a valid phone number
+                      - example: Password is required
+                      - example: Password must be a string
+                      - example: Password must be between 6 and 100 characters
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid credentials
+        '429':
+          description: Rate limit exceeded - too many login attempts
+          headers:
+            Retry-After:
+              description: Time in seconds to wait before retrying
+              schema:
+                type: integer
+                example: 120
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Too many login attempts, please try again later.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /auth/logout:
+    post:
+      summary: Log out of the user account
+      tags:
+        - Auth
+      security:
+        - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: User logged out successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logged out successfully
+        '401':
+          description: Unauthorized - missing or invalid Bearer token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+                  description: Valid refresh token obtained from login/signup
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        '200':
+          description: Access token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: New JWT access token (expires in 15 minutes)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '422':
+          description: Validation errors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Validation error message
+                    oneOf:
+                      - example: Refresh token is required
+                      - example: Refresh token must be a string
+        '403':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid or expired token
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /auth/create-admin:
+    post:
+      summary: Create admin account
+      tags:
+        - Auth
+        - Admin
+      responses:
+        '201':
+          description: Admin account created successfully (or already exists)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Admin account created successfully
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Internal server error
+
+  /conversations:
+    post:
+      summary: Create new conversation
+      tags:
+        - Conversations
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                chat_type:
+                  type: string
+      responses:
+        '200':
+          description: Conversation id
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /conversations/me:
+    get:
+      summary: Get authenticated user's conversation list with pagination
+      tags: 
+        - Conversations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number for pagination
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of conversations per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: search
+          in: query
+          description: Search field
+          required: false
+          schema:
+            type: string
+        - name: filter
+          in: query
+          description: Filter field
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /conversations/{conversation_id}:
+    get:
+      summary: Get messages of conversation (lazy-loading)
+      tags: 
+        - Conversations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: conversation_id
+          in: path
+          description: ID of conversation
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          description: Page number
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Number of message per page
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+            default: 5
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /conversations/{conversation_id}/messages:
+    post:
+      summary: Get response
+      tags: 
+        - Conversations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: conversation_id
+          in: path
+          description: ID of conversation
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                request:
+                  type: string
+                  description: Request
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                    description: The binary file data to be processed
+              required:
+                - request
+      responses:
+        '200':
+          description: Server-Sent Events stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /conversations/{conversation_id}/messages/{messages_id}:
+    post:
+      summary: Regenerate message
+      tags: 
+        - Conversations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: conversation_id
+          in: path
+          description: ID of conversation
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: messages_id
+          in: path
+          description: ID of message
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Server-Sent Events stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+    put:
+      summary: Update request message
+      tags: 
+        - Conversations
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: conversation_id
+          in: path
+          description: ID of conversation
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: messages_id
+          in: path
+          description: ID of message
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                request:
+                  type: string
+                  description: Request
+                file:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                    description: The binary file data to be processed
+              required:
+                - request
+      responses:
+        '200':
+          description: Server-Sent Events stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /ideas/me:
+    get:
+      summary: Get authenticated user's business ideas
+      tags: 
+        - Ideas
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+  
+  /ideas:
+    post:
+      summary: Create new business idea
+      tags: 
+        - Ideas
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /ideas/{idea_id}:
+    get:
+      summary: Get business idea info
+      tags: 
+        - Ideas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idea_id
+          in: path
+          description: ID of idea
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Update business idea
+      tags: 
+        - Ideas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idea_id
+          in: path
+          description: ID of idea
+          required: true
+          schema:
+            type: string
+            format: uuid
+          
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      summary: Delete business idea
+      tags: 
+        - Ideas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idea_id
+          in: path
+          description: ID of idea
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /resumes/me:
+    get:
+      summary: Get authenticated user's resumes
+      tags: 
+        - Resumes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+  
+  /resumes:
+    post:
+        summary: Create new resume
+        tags:
+          - Resumes
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+        responses:
+          '200':
+            description: Response
+            content:
+              application/json:
+                schema:
+                  type: object
+  
+  /resumes/{resume_id}:
+    get:
+      summary: Get resume info
+      tags: 
+        - Resumes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: resume_id
+          in: path
+          description: ID of resume
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Update resume
+      tags:
+        - Resumes
+      parameters:
+        - name: resume_id
+          in: path
+          description: ID of resume
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      summary: Delete resume
+      tags: 
+        - Resumes
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: resume_id
+          in: path
+          description: ID of resume
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+  
+  /resumes/templates:
+    get:
+      summary: Get template list
+      tags: 
+        - Resumes
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /users/me:
+    get:
+      summary: Get cabinet data
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    patch:
+      summary: Edit user info
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      summary: Delete user
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Response
+          content:
+            application/json:
+              schema:
+                type: object
+  
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT Authorization header using the Bearer scheme. Example: 'Authorization: Bearer {token}'
+
+  schemas:
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        petId:
+          type: integer
+          format: int64
+          example: 198772
+        quantity:
+          type: integer
+          format: int32
+          example: 7
+        shipDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+          description: Order Status
+          example: approved
+          enum:
+            - placed
+            - approved
+            - delivered
+        complete:
+          type: boolean
+      xml:
+        name: order
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Dogs
+      xml:
+        name: category
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        username:
+          type: string
+          example: theUser
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: '12345'
+        phone:
+          type: string
+          example: '12345'
+        userStatus:
+          type: integer
+          description: User Status
+          format: int32
+          example: 1
+      xml:
+        name: user
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      xml:
+        name: tag
+    Pet:
+      required:
+        - name
+        - photoUrls
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: doggie
+        category:
+          $ref: '#/components/schemas/Category'
+        photoUrls:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            type: string
+            xml:
+              name: photoUrl
+        tags:
+          type: array
+          xml:
+            wrapped: true
+          items:
+            $ref: '#/components/schemas/Tag'
+        status:
+          type: string
+          description: pet status in the store
+          enum:
+            - available
+            - pending
+            - sold
+      xml:
+        name: pet
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      xml:
+        name: '##default'
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+  requestBodies:
+    Pet:
+      description: Pet object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Pet'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Pet'
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+      
+      
+      
+      
+      
+      
