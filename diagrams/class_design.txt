@@ -16,7 +16,7 @@ erDiagram
         string first_name
         string last_name
         string phone
-        string role "ENUM: USER, ADMIN, STAFF"
+        string role "ENUM: USER, ADMIN"
         string avatar_url
         boolean career_selected
         timestamp created_at

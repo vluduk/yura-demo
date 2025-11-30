@@ -1,0 +1,23 @@
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, throwError } from 'rxjs';
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+    const router = inject(Router);
+
+    // Clone request to add withCredentials for all requests
+    const authReq = req.clone({
+        withCredentials: true
+    });
+
+    return next(authReq).pipe(
+        catchError((error: HttpErrorResponse) => {
+            if (error.status === 401) {
+                // Redirect to login on 401 Unauthorized
+                router.navigate(['/auth/login']);
+            }
+            return throwError(() => error);
+        })
+    );
+};
