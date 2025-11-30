@@ -52,11 +52,4 @@ class CookieJWTAuthentication(JWTAuthentication):
                 code='user_not_found'
             )
         
-        # Ensure user is active
-        if not user.is_active:
-            raise AuthenticationFailed(
-                _('User account is disabled'),
-                code='user_inactive'
-            )
-        
         return (user, validated_token)
