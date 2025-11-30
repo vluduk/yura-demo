@@ -5,6 +5,7 @@ when it imports `api.admin`.
 """
 
 from .user import *
+from .registry import *
 
 # Unregister Django's Group model so Groups do not appear in the admin.
 from django.contrib.auth.models import Group
