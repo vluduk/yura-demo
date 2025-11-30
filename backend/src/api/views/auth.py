@@ -2,17 +2,20 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, get_user_model
 from api.serializers.auth import UserRegistrationSerializer, UserLoginSerializer, UserSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+import os
 
 User = get_user_model()
 
 
 class SignUpView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
+    authentication_classes = ()
     serializer_class = UserRegistrationSerializer
 
     @swagger_auto_schema(
@@ -32,24 +35,38 @@ class SignUpView(generics.CreateAPIView):
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
             
-            response = Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+            # Get cookie settings from environment
+            secure_cookie = os.environ.get('DEBUG', 'True') != 'True'
+            access_lifetime = int(os.environ.get('JWT_ACCESS_TOKEN_LIFETIME_MINUTES', 15))
+            refresh_lifetime = int(os.environ.get('JWT_REFRESH_TOKEN_LIFETIME_DAYS', 7))
+            
+            response = Response({
+                'message': 'User created successfully',
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'role': user.role
+                }
+            }, status=status.HTTP_201_CREATED)
             
             # Set HttpOnly cookies
             response.set_cookie(
                 key='access_token',
                 value=str(refresh.access_token),
                 httponly=True,
-                secure=False,  # Set to True in production with HTTPS
+                secure=secure_cookie,
                 samesite='Lax',
-                max_age=15 * 60  # 15 minutes
+                max_age=access_lifetime * 60
             )
             response.set_cookie(
                 key='refresh_token',
                 value=str(refresh),
                 httponly=True,
-                secure=False,  # Set to True in production with HTTPS
+                secure=secure_cookie,
                 samesite='Lax',
-                max_age=7 * 24 * 60 * 60  # 7 days
+                max_age=refresh_lifetime * 24 * 60 * 60
             )
             
             return response
@@ -59,6 +76,7 @@ class SignUpView(generics.CreateAPIView):
 
 class LoginView(APIView):
     permission_classes = (AllowAny,)
+    authentication_classes = ()
 
     @swagger_auto_schema(
         tags=['Auth'],
@@ -88,24 +106,38 @@ class LoginView(APIView):
         if user:
             refresh = RefreshToken.for_user(user)
             
-            response = Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+            # Get cookie settings from environment
+            secure_cookie = os.environ.get('DEBUG', 'True') != 'True'
+            access_lifetime = int(os.environ.get('JWT_ACCESS_TOKEN_LIFETIME_MINUTES', 15))
+            refresh_lifetime = int(os.environ.get('JWT_REFRESH_TOKEN_LIFETIME_DAYS', 7))
+            
+            response = Response({
+                'message': 'Login successful',
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'role': user.role
+                }
+            }, status=status.HTTP_200_OK)
             
             # Set HttpOnly cookies
             response.set_cookie(
                 key='access_token',
                 value=str(refresh.access_token),
                 httponly=True,
-                secure=False,  # Set to True in production with HTTPS
+                secure=secure_cookie,
                 samesite='Lax',
-                max_age=15 * 60  # 15 minutes
+                max_age=access_lifetime * 60
             )
             response.set_cookie(
                 key='refresh_token',
                 value=str(refresh),
                 httponly=True,
-                secure=False,  # Set to True in production with HTTPS
+                secure=secure_cookie,
                 samesite='Lax',
-                max_age=7 * 24 * 60 * 60  # 7 days
+                max_age=refresh_lifetime * 24 * 60 * 60
             )
             
             return response
@@ -117,9 +149,28 @@ class LoginView(APIView):
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @swagger_auto_schema(tags=['Auth'])
+    @swagger_auto_schema(
+        tags=['Auth'],
+        responses={
+            200: 'Logged out successfully',
+            400: 'Invalid token',
+            500: 'Internal server error'
+        }
+    )
     def post(self, request):
         try:
+            # Get refresh token from cookie to blacklist it
+            refresh_token = request.COOKIES.get('refresh_token')
+            
+            if refresh_token:
+                try:
+                    # Blacklist the refresh token
+                    token = RefreshToken(refresh_token)
+                    token.blacklist()
+                except TokenError:
+                    # Token already blacklisted or invalid, continue anyway
+                    pass
+            
             response = Response({'message': 'Logged out successfully'}, status=status.HTTP_200_OK)
             
             # Clear cookies
@@ -134,8 +185,16 @@ class LogoutView(APIView):
 
 class RefreshView(APIView):
     permission_classes = (AllowAny,)
+    authentication_classes = ()
 
-    @swagger_auto_schema(tags=['Auth'])
+    @swagger_auto_schema(
+        tags=['Auth'],
+        responses={
+            200: 'Token refreshed successfully',
+            401: 'Refresh token not found',
+            403: 'Invalid or expired refresh token'
+        }
+    )
     def post(self, request, *args, **kwargs):
         refresh_token = request.COOKIES.get('refresh_token')
         
@@ -143,24 +202,60 @@ class RefreshView(APIView):
             return Response({'message': 'Refresh token not found'}, status=status.HTTP_401_UNAUTHORIZED)
         
         try:
+            # Get cookie settings from environment
+            secure_cookie = os.environ.get('DEBUG', 'True') != 'True'
+            access_lifetime = int(os.environ.get('JWT_ACCESS_TOKEN_LIFETIME_MINUTES', 15))
+            refresh_lifetime = int(os.environ.get('JWT_REFRESH_TOKEN_LIFETIME_DAYS', 7))
+            
+            # Create refresh token object (this will validate it)
             refresh = RefreshToken(refresh_token)
             
             response = Response({'message': 'Token refreshed'}, status=status.HTTP_200_OK)
             
-            # Set new access token
+            # Set new access token (refresh.access_token generates a new one)
             response.set_cookie(
                 key='access_token',
                 value=str(refresh.access_token),
                 httponly=True,
-                secure=False,  # Set to True in production with HTTPS
+                secure=secure_cookie,
                 samesite='Lax',
-                max_age=15 * 60  # 15 minutes
+                max_age=access_lifetime * 60
+            )
+            
+            # With ROTATE_REFRESH_TOKENS and BLACKLIST_AFTER_ROTATION enabled,
+            # the old token is automatically blacklisted and a new one is issued
+            # Update the refresh token cookie with the rotated token
+            response.set_cookie(
+                key='refresh_token',
+                value=str(refresh),
+                httponly=True,
+                secure=secure_cookie,
+                samesite='Lax',
+                max_age=refresh_lifetime * 24 * 60 * 60
             )
             
             return response
-        except Exception as e:
+        except TokenError as e:
             return Response({'message': 'Invalid or expired refresh token'}, status=status.HTTP_403_FORBIDDEN)
+        except Exception as e:
+            return Response({'message': 'Token refresh failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+
+class MeView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(
+        tags=['Auth'],
+        responses={
+            200: openapi.Response('Current user information', UserSerializer),
+            401: 'Not authenticated'
+        }
+    )
+    def get(self, request):
+        """Get current authenticated user information"""
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CreateAdminView(APIView):
