@@ -1,5 +1,35 @@
 .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     width: 260px;
     height: 100dvh;
+    padding: 16px;
     background-color: var(--dark-background-color);
+}
+
+.sidebar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sidebar__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history__item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background-color 0.3s;
+}
+
+.history__item:hover {
+    background-color: var(--conversation-item-background-color);
 }

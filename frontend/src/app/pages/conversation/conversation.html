@@ -1,5 +1,5 @@
 <div class="conversation">
-    <div class="conversation__message-wrapper">
+    <div class="conversation__message-wrapper" #scrollContainer>
         @for (message of messages(); track message.id) {
             @if (message.is_user) {
                 <div class="message-wrapper__message" [class.message-user]="message.is_user">
@@ -21,7 +21,5 @@
         }
     </div>
 
-    <div class="conversation__input-wrapper">
-        <conversation-chat-input></conversation-chat-input>
-    </div>
+    <conversation-chat-input class="conversation__input-wrapper" (onSend)="getResponse($event)"></conversation-chat-input>
 </div>

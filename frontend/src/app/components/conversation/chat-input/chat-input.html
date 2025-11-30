@@ -1,8 +1,14 @@
 <div class="chat-input">
-    <div class="chat-input__input">
-        <span>plus</span>
-        <ui-textarea></ui-textarea>
-        <span>send</span>
+    <div class="chat-input__input-wrapper">
+        <ui-textarea
+            [isFullWidth]="true"
+            [(value)]="inputText"
+            (keydown.enter)="send(); $event.preventDefault()"
+        ></ui-textarea>
+        <div class="input-wrapper__buttons">
+            <span class="buttons__plus-button">plus</span>
+            <span class="buttons__send-button" (click)="send()">send</span>
+        </div>
     </div>
 
     <span class="chat-input__alert">ШІ-консультант може помилятися. Перевіряйте важливу інформацію.</span>

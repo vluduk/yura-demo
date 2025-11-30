@@ -1,14 +1,50 @@
 <div class="conversation-type">
-    <ui-title [title]="'Оберіть тип чату'"></ui-title>
+    <ui-title class="title" [title]="'Оберіть тип чату'"></ui-title>
+
     <div class="conversation-type__options">
         <div class="options__row">
-            <ui-button [label]="'Власний бізнес'"></ui-button>
-            <ui-button [label]="'Самозайнятість'"></ui-button>
-            <ui-button [label]="'Наймана праця'"></ui-button>
+            <ui-button
+                class="row__button"
+                [label]="'Власний бізнес'"
+                [icon]="'fa-solid fa-wallet'"
+                [size]="'medium'"
+                [type]="'primary'"
+                (click)="createConversation(conversationTypes.Bussiness)"
+            ></ui-button>
+            <ui-button
+                class="row__button"
+                [label]="'Самозайнятість'"
+                [icon]="'fa-solid fa-briefcase'"
+                [size]="'medium'"
+                [type]="'primary'"
+                (click)="createConversation(conversationTypes.SelfEmployment)"
+            ></ui-button>
+            <ui-button
+                class="row__button"
+                [label]="'Наймана праця'"
+                [icon]="'fa-solid fa-handshake'"
+                [size]="'medium'"
+                [type]="'primary'"
+                (click)="createConversation(conversationTypes.Hiring)"
+            ></ui-button>
         </div>
         <div class="options__row">
-            <ui-button [label]="'Вибір напрямку'"></ui-button>
-            <ui-button [label]="'Навчання'"></ui-button>
+            <ui-button
+                class="row__button"
+                [label]="'Вибір напрямку'"
+                [icon]="'fa-solid fa-signs-post'"
+                [size]="'medium'"
+                [type]="'primary'"
+                (click)="createConversation(conversationTypes.CareerPath)"
+            ></ui-button>
+            <ui-button
+                class="row__button"
+                [label]="'Навчання'"
+                [icon]="'fa-solid fa-graduation-cap'"
+                [size]="'medium'"
+                [type]="'primary'"
+                (click)="createConversation(conversationTypes.Education)"
+            ></ui-button>
         </div>
     </div>
 </div>

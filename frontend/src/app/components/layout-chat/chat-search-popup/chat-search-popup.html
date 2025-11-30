@@ -1,0 +1,30 @@
+<div class="popup" [class]="{ popup_visible: isVisible() }">
+    <div class="popup__content">
+        <div class="popup__header">
+            <span class="header__title">Пошук в чатах</span>
+            <span class="header__close-button" (click)="hidePopup()">×</span>
+        </div>
+        <div class="popup__body">
+            <ui-input
+                class="body__search-input"
+                [placeholder]="'Введіть текст для пошуку...'"
+                [(value)]="searchField"
+                (valueChange)="getSearchResults()"
+            ></ui-input>
+            <div class="body__results">
+                @if (results().length === 0) {
+                    <span class="results__no-results">Немає результатів</span>
+                } @else {
+                    @for (result of results(); track result.id) {
+                        <div class="results__item">
+                            <span class="item__chat-title">{{ result.id }}</span>
+                            <span class="item__message-snippet">{{ result.title }}</span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="popup-background"></div>

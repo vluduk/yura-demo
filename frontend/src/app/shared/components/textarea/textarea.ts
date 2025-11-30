@@ -13,7 +13,7 @@ export class Textarea {
     public readonly resize: InputSignal<"none" | "horizontal" | "vertical" | "both"> = input<
         "none" | "horizontal" | "vertical" | "both"
     >("none");
-    public readonly theme: InputSignal<"default" | "primary"> = input<"default" | "primary">("primary");
+    public readonly theme: InputSignal<"default" | "primary"> = input<"default" | "primary">("default");
     public readonly isFullWidth: InputSignal<boolean> = input<boolean>(false);
     public isDisabled: InputSignal<boolean> = input<boolean>(false);
 

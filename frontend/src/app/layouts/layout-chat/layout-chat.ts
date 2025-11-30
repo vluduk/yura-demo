@@ -2,10 +2,11 @@ import { Component } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
 import { ChatSidebar } from "@components/layout-chat/chat-sidebar/chat-sidebar";
 import { ChatHeader } from "@components/layout-chat/chat-header/chat-header";
+import { ChatSearchPopup } from "@components/layout-chat/chat-search-popup/chat-search-popup";
 
 @Component({
     selector: "app-layout-chat",
-    imports: [RouterOutlet, ChatSidebar, ChatHeader],
+    imports: [RouterOutlet, ChatSidebar, ChatHeader, ChatSearchPopup],
     templateUrl: "./layout-chat.html",
     styleUrl: "./layout-chat.css",
 })

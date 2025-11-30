@@ -3,14 +3,17 @@
     [ngClass]="{
         'button_with_label': label(),
         'button_with_icon': icon(),
-        'button_disabled': isDisabled() || isLoading(),
         'button_size_small': size() === 'small',
+        'button_size_medium': size() === 'medium',
         'button_size_large': size() === 'large',
-        'button_width_full': isFullWidth(),
-        'button_type_primary-clear': type() === 'primary-clear',
         'button_type_primary': type() === 'primary',
         'button_type_primary-line': type() === 'primary-line',
-        'button_type_white-icon': type() === 'white-icon',
+        'button_type_secondary': type() === 'secondary',
+        'button_type_icon': type() === 'icon',
+        'button_align_left': align() === 'left',
+        'button_align_center': align() === 'center',
+        'button_width_full': isFullWidth(),
+        'button_disabled': isDisabled() || isLoading(),
     }"
     [disabled]="isDisabled() || isLoading()"
     (click)="handleClick($event)"

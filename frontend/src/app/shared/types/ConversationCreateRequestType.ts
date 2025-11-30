@@ -1,7 +1,7 @@
 import { ConversationTypeEnum } from "./ConversationTypeEnum";
 
-export type ConversationType = {
+export type ConversationCreateRequestType = {
     id: string;
-    title: string;
     type: ConversationTypeEnum;
+    created_at: Date;
 };

@@ -5,9 +5,30 @@
     </div>
 
     <div class="sidebar__nav">
-        <ui-button [label]="'Новий чат'"></ui-button>
-        <ui-button [label]="'Пошук в чатах'"></ui-button>
-        <ui-button [label]="'Бібліотека'"></ui-button>
+        <ui-button
+            [label]="'Новий чат'"
+            [icon]="'fa-solid fa-pen'"
+            [type]="'primary'"
+            [align]="'left'"
+            [isFullWidth]="true"
+            [routerLink]="'/conversation'"
+        ></ui-button>
+        <ui-button
+            [label]="'Пошук в чатах'"
+            [icon]="'fa-solid fa-magnifying-glass'"
+            [type]="'primary'"
+            [align]="'left'"
+            [isFullWidth]="true"
+            (click)="showSearchPopup()"
+        ></ui-button>
+        <ui-button
+            [label]="'Бібліотека'"
+            [icon]="'fa-solid fa-book'"
+            [type]="'primary'"
+            [align]="'left'"
+            [isFullWidth]="true"
+            [routerLink]="'/conversation/library'"
+        ></ui-button>
     </div>
 
     <div class="sidebar__history">
@@ -16,9 +37,21 @@
             <span class="title__icon">ar</span>
         </div>
         <div class="history__list">
-            @for(item of conversations(); track item.id) {
-                <div class="history__item">
-                    <span class="item__icon">ic</span>
+            @for (item of conversations(); track item.id) {
+                <div class="history__item" (click)="openConversation(item.id, item.type)">
+                    <span class="item__icon">
+                        @if (item.type === conversationTypes.Bussiness) {
+                            <i class="fa-solid fa-wallet"></i>
+                        } @else if (item.type === conversationTypes.SelfEmployment) {
+                            <i class="fa-solid fa-briefcase"></i>
+                        } @else if (item.type === conversationTypes.Hiring) {
+                            <i class="fa-solid fa-handshake"></i>
+                        } @else if (item.type === conversationTypes.CareerPath) {
+                            <i class="fa-solid fa-signs-post"></i>
+                        } @else if (item.type === conversationTypes.Education) {
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        }
+                    </span>
                     <span class="item__text">{{ item.title }}</span>
                 </div>
             }
