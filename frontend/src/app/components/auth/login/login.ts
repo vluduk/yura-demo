@@ -4,7 +4,6 @@ import { Input } from "@shared/components/input/input";
 import { Button } from "@shared/components/button/button";
 import { Link } from "@shared/components/link/link";
 import { Router } from "@angular/router";
-import { AuthService } from "@core/services/auth.service";
 
 @Component({
     selector: "auth-login",
@@ -17,15 +16,13 @@ export class Login {
     protected readonly password: WritableSignal<string> = signal<string>("");
 
     protected readonly isLoading: WritableSignal<boolean> = signal<boolean>(false);
-    protected readonly errorMessage: WritableSignal<string> = signal<string>("");
 
     private readonly hasSubmitted: WritableSignal<boolean> = signal<boolean>(false);
 
     private router: Router = inject(Router);
-    private authService: AuthService = inject(AuthService);
 
     protected isFieldValid(field: string): boolean {
-        if (!this.hasSubmitted()) {
+        if (!this.hasSubmitted) {
             return true;
         }
 
@@ -43,7 +40,6 @@ export class Login {
 
     protected async onSubmit(): Promise<void> {
         this.hasSubmitted.set(true);
-        this.errorMessage.set("");
 
         if (!this.email() || !this.password()) {
             return;
@@ -51,20 +47,9 @@ export class Login {
 
         this.isLoading.set(true);
 
-        this.authService.login({
+        console.log("Submitting login form with:", {
             email: this.email(),
-            password: this.password()
-        }).subscribe({
-            next: () => {
-                this.router.navigate(['/']);
-            },
-            error: (error) => {
-                this.errorMessage.set(error.error?.message || 'Login failed');
-                this.isLoading.set(false);
-            },
-            complete: () => {
-                this.isLoading.set(false);
-            }
+            password: this.password(),
         });
     }
 }

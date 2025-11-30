@@ -14,13 +14,9 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project into image
 COPY . .
-
-# Ensure entrypoint is executable inside the image (entrypoint will be mounted to /app)
-RUN if [ -f /app/entrypoint.sh ]; then chmod +x /app/entrypoint.sh; fi
 
 # Add /app/apps to PYTHONPATH if needed, but we set it in settings.py
 # However, running from /app means manage.py is at /app/manage.py
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8080"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -15,11 +15,13 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
         extra_fields.setdefault('role', 'ADMIN')
-        
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
@@ -27,33 +29,36 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
-        ('USER', 'User'),
+        ('WHOLESALE', 'Wholesale'),
+        ('SERVICE_STATION', 'Service Station'),
+        ('RETAIL', 'Retail'),
         ('ADMIN', 'Admin'),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, unique=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    phone = models.CharField(max_length=20, blank=True, null=True)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='USER')
+    name = models.CharField(max_length=100)  # first_name
+    surname = models.CharField(max_length=100) # last_name
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='RETAIL')
     avatar_url = models.CharField(max_length=500, blank=True, null=True)
     career_selected = models.BooleanField(default=False)
     
     is_active = models.BooleanField(default=True)
-    # Canonical admin/staff flag used by the application
     is_staff = models.BooleanField(default=False)
-    created_at = models.DateTimeField(default=timezone.now)
-    last_login = models.DateTimeField(null=True, blank=True)
+    date_joined = models.DateTimeField(default=timezone.now)
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ['name', 'surname']
 
     def __str__(self):
         return self.email
 
-    class Meta:
-        db_table = 'users'
- 
+    @property
+    def first_name(self):
+        return self.name
+    
+    @property
+    def last_name(self):
+        return self.surname

@@ -3,29 +3,17 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
-from django.contrib.auth import authenticate, get_user_model
-from api.serializers.auth import UserRegistrationSerializer, UserLoginSerializer, UserSerializer
+from django.contrib.auth import authenticate
+from src.serializers.auth import UserRegistrationSerializer, UserLoginSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
-User = get_user_model()
-
+from datetime import timedelta
 
 class SignUpView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = UserRegistrationSerializer
 
-    @swagger_auto_schema(
-        tags=['Auth'],
-        responses={
-            201: openapi.Response('User created successfully', openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={'message': openapi.Schema(type=openapi.TYPE_STRING)}
-            )),
-            400: 'Bad request - user already exists',
-            422: 'Validation failed'
-        }
-    )
+    @swagger_auto_schema(tags=['Auth'])
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -55,8 +43,6 @@ class SignUpView(generics.CreateAPIView):
             return response
         return Response({'message': serializer.errors}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-
-
 class LoginView(APIView):
     permission_classes = (AllowAny,)
 
@@ -66,15 +52,10 @@ class LoginView(APIView):
             type=openapi.TYPE_OBJECT,
             required=['email', 'password'],
             properties={
-                'email': openapi.Schema(type=openapi.TYPE_STRING, format='email'),
-                'password': openapi.Schema(type=openapi.TYPE_STRING, format='password'),
+                'email': openapi.Schema(type=openapi.TYPE_STRING),
+                'password': openapi.Schema(type=openapi.TYPE_STRING),
             },
-        ),
-        responses={
-            200: 'Login successful',
-            401: 'Invalid credentials',
-            422: 'Validation errors'
-        }
+        )
     )
     def post(self, request, *args, **kwargs):
         email = request.data.get('email')
@@ -112,8 +93,6 @@ class LoginView(APIView):
         
         return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -129,8 +108,6 @@ class LogoutView(APIView):
             return response
         except Exception as e:
             return Response({'message': 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
 
 class RefreshView(APIView):
     permission_classes = (AllowAny,)
@@ -161,21 +138,13 @@ class RefreshView(APIView):
         except Exception as e:
             return Response({'message': 'Invalid or expired refresh token'}, status=status.HTTP_403_FORBIDDEN)
 
-
-
 class CreateAdminView(APIView):
-    permission_classes = (AllowAny,)  # Should be restricted in production
+    permission_classes = (AllowAny,) # Should probably be restricted or removed in prod
 
     @swagger_auto_schema(tags=['Auth', 'Admin'])
     def post(self, request):
         from django.contrib.auth import get_user_model
         User = get_user_model()
-        if not User.objects.filter(email='admin@yura.com').exists():
-            User.objects.create_superuser(
-                email='admin@yura.com',
-                password='admin123',
-                first_name='Admin',
-                last_name='User'
-            )
-            return Response({'message': 'Admin account created successfully'}, status=status.HTTP_201_CREATED)
-        return Response({'message': 'Admin account already exists'}, status=status.HTTP_200_OK)
+        if not User.objects.filter(email='admin@example.com').exists():
+            User.objects.create_superuser('admin@example.com', 'admin123', name='Admin', surname='User')
+        return Response({'message': 'Admin account created successfully'}, status=status.HTTP_201_CREATED)

@@ -1,49 +1,44 @@
-version: "3.7"
+version: '3.8'
 
 services:
   db:
     image: pgvector/pgvector:pg16
-    container_name: yura-db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=${DATABASE_NAME:-yura_db}
-      - POSTGRES_USER=${DATABASE_USER:-yura_user}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-yura_password}
+      - POSTGRES_DB=yura_db
+      - POSTGRES_USER=yura_user
+      - POSTGRES_PASSWORD=yura_password
     ports:
       - "5433:5432"
 
   backend:
     build: ./backend
-    image: yura-backend-dev:latest
-    container_name: yura-backend-dev
-    # entrypoint path matches the mount `./backend/src:/app` so entrypoint is at /app/entrypoint.sh
-    entrypoint: ["bash", "/app/entrypoint.sh"]
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./backend/src:/app
+      - ./backend:/app
     ports:
-      - "8080:8080"
-    env_file:
-      - ./dev.env
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=dev_secret_key
+      - POSTGRES_DB=yura_db
+      - POSTGRES_USER=yura_user
+      - POSTGRES_PASSWORD=yura_password
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
     depends_on:
       - db
 
   frontend:
     build: ./frontend
-    image: yura-frontend-dev:latest
-    container_name: yura-frontend-dev
+    ports:
+      - "4200:4200"
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    ports:
-      - "4200:4200"
     environment:
       - CHOKIDAR_USEPOLLING=true
 
 volumes:
   postgres_data:
-
-networks:
-  default:
-    driver: bridge
- 

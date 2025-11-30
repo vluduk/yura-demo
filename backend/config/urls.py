@@ -16,7 +16,13 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/auth/', include('api.urls.auth')),
-    path('health/', include('api.urls.health')),
+    path('api/v1/auth/', include('src.urls.auth')),
+    # path('api/v1/users/', include('users.urls_users')), # Splitting for clarity if needed, or keep in one
+    # path('api/v1/ideas/', include('ideas.urls')),
+    # path('api/v1/articles/', include('content.urls')),
+    # path('api/v1/conversations/', include('conversations.urls')),
+    # path('api/v1/resumes/', include('resumes.urls')),
+    
+    # Swagger
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

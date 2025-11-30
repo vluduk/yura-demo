@@ -6,35 +6,24 @@ from rest_framework import status
 
 User = get_user_model()
 
-
 class UserModelTest(TestCase):
     def test_create_user(self):
-        user = User.objects.create_user(
-            email='test@example.com',
-            password='password123',
-            first_name='Test',
-            last_name='User'
-        )
+        user = User.objects.create_user(email='test@example.com', password='password123', name='Test', surname='User')
         self.assertEqual(user.email, 'test@example.com')
         self.assertTrue(user.check_password('password123'))
+        self.assertFalse(user.is_staff)
         self.assertFalse(user.is_superuser)
-        self.assertEqual(user.role, 'USER')
 
     def test_create_superuser(self):
-        admin = User.objects.create_superuser(
-            email='admin@example.com',
-            password='admin123',
-            first_name='Admin',
-            last_name='User'
-        )
+        admin = User.objects.create_superuser(email='admin@example.com', password='admin123', name='Admin', surname='Test')
         self.assertEqual(admin.email, 'admin@example.com')
+        self.assertTrue(admin.is_staff)
         self.assertTrue(admin.is_superuser)
         self.assertEqual(admin.role, 'ADMIN')
 
     def test_create_user_without_email(self):
         with self.assertRaises(ValueError):
             User.objects.create_user(email=None, password='password123')
-
 
 class AuthAPITest(TestCase):
     def setUp(self):
@@ -43,9 +32,9 @@ class AuthAPITest(TestCase):
         self.login_url = reverse('login')
         self.user_data = {
             'email': 'test@example.com',
-            'first_name': 'John',
-            'last_name': 'Doe',
-            'phone': '0991234567',
+            'name': 'John',
+            'surname': 'Doe',
+            'role': 'RETAIL',
             'password': 'HardPassword123'
         }
 
