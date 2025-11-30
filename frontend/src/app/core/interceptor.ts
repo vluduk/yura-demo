@@ -1,5 +1,6 @@
 import { HttpErrorResponse, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from "@angular/common/http";
 import { inject } from "@angular/core";
+import { Router } from "@angular/router";
 import { environment } from "@shared/environments/environment";
 import { AuthService } from "@shared/services/auth.service";
 import { throwError } from "rxjs/internal/observable/throwError";
@@ -21,6 +22,7 @@ function getCsrfToken(): string | null {
 
 export const Interceptor: HttpInterceptorFn = (request: HttpRequest<any>, next: HttpHandlerFn) => {
     const authService: AuthService = inject(AuthService);
+    const router: Router = inject(Router);
 
     let newRequest: HttpRequest<any> = request;
 
@@ -48,8 +50,13 @@ export const Interceptor: HttpInterceptorFn = (request: HttpRequest<any>, next: 
                         return next(newRequest);
                     }),
                     catchError((refreshError) => {
-                        // Refresh failed, clear user state
+                        // Refresh failed, clear user state and redirect to login
                         authService.user.set(null);
+                        try {
+                            router.navigate(["/auth/login"]);
+                        } catch (e) {
+                            // ignore navigation errors
+                        }
                         return throwError(() => refreshError);
                     }),
                 );

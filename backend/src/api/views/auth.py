@@ -1,4 +1,6 @@
 from rest_framework import status, generics
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+from api.throttling import LoginRateThrottle, SignupRateThrottle, RefreshRateThrottle, CreateAdminRateThrottle
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -18,6 +20,7 @@ User = get_user_model()
 class SignUpView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
     authentication_classes = ()
+    throttle_classes = (SignupRateThrottle, AnonRateThrottle)
     serializer_class = UserRegistrationSerializer
 
     @swagger_auto_schema(
@@ -79,6 +82,7 @@ class SignUpView(generics.CreateAPIView):
 class LoginView(APIView):
     permission_classes = (AllowAny,)
     authentication_classes = ()
+    throttle_classes = (LoginRateThrottle, AnonRateThrottle)
 
     @swagger_auto_schema(
         tags=['Auth'],
@@ -188,6 +192,7 @@ class LogoutView(APIView):
 class RefreshView(APIView):
     permission_classes = (AllowAny,)
     authentication_classes = ()
+    throttle_classes = (RefreshRateThrottle,)
 
     @swagger_auto_schema(
         tags=['Auth'],
@@ -201,7 +206,10 @@ class RefreshView(APIView):
         refresh_token = request.COOKIES.get('refresh_token')
         
         if not refresh_token:
-            return Response({'message': 'Refresh token not found'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response({
+                'message': 'Refresh token not found',
+                'code': 'refresh_token_missing'
+            }, status=status.HTTP_401_UNAUTHORIZED)
         
         try:
             # Get cookie settings from environment
@@ -238,7 +246,10 @@ class RefreshView(APIView):
             
             return response
         except TokenError as e:
-            return Response({'message': 'Invalid or expired refresh token'}, status=status.HTTP_403_FORBIDDEN)
+            return Response({
+                'message': 'Invalid or expired refresh token',
+                'code': 'refresh_token_invalid'
+            }, status=status.HTTP_403_FORBIDDEN)
         except Exception as e:
             return Response({'message': 'Token refresh failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -262,6 +273,7 @@ class MeView(APIView):
 
 class CreateAdminView(APIView):
     permission_classes = (AllowAny,)  # Should be restricted in production
+    throttle_classes = (CreateAdminRateThrottle, AnonRateThrottle)
 
     @swagger_auto_schema(tags=['Auth', 'Admin'])
     def post(self, request):
