@@ -7,10 +7,14 @@ import { Observable } from "rxjs";
 export const AuthGuard: CanActivateFn = (route, state) => {
     const authService = inject(AuthService);
     const router = inject(Router);
+    // Allow anonymous access to the site root
+    if (state?.url === '/' || state?.url === '') {
+        return true;
+    }
 
     // Wait for AuthService initialization before checking user state
     return authService.initialized$.pipe(
-        filter(initialized => initialized), // Only proceed when initialized is true
+        filter((initialized): initialized is true => initialized === true), // Only proceed when initialized is true
         take(1),
         map(() => {
             if (authService.user()) {

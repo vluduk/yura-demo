@@ -23,6 +23,8 @@ interface AuthResponse {
 })
 export class AuthService {
     public readonly user: WritableSignal<UserType | null> = signal<UserType | null>(null);
+    // True while the app is fetching initial auth state (called by APP_INITIALIZER)
+    public initializing: boolean = true;
     private readonly _initialized = new BehaviorSubject<boolean>(false);
     public readonly initialized$ = this._initialized.asObservable();
 
@@ -96,16 +98,22 @@ export class AuthService {
     }
 
     public async init(): Promise<void> {
-        // Ensure CSRF cookie is present for subsequent state-changing requests
-        await firstValueFrom(this.httpClient.get<{ message: string }>(environment.serverURL + "/auth/csrf")).catch(() => {
-            // ignore errors - fallback to attempting to get authorized user
-        });
+        this.initializing = true;
+        try {
+            // Ensure CSRF cookie is present for subsequent state-changing requests
+            await firstValueFrom(
+                this.httpClient.get<{ message: string }>(environment.serverURL + "/auth/csrf"),
+            ).catch(() => {
+                // ignore errors - fallback to attempting to get authorized user
+            });
 
-        await this.getAuthorizedUser().catch(() => {
-            this.user.set(null);
-        });
-
-        // Mark initialization complete so guards can proceed
-        this._initialized.next(true);
+            await this.getAuthorizedUser().catch(() => {
+                this.user.set(null);
+            });
+        } finally {
+            // Mark initialization complete so guards can proceed
+            this.initializing = false;
+            this._initialized.next(true);
+        }
     }
 }

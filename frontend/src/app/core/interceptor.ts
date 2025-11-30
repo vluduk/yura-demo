@@ -24,6 +24,13 @@ export const Interceptor: HttpInterceptorFn = (request: HttpRequest<any>, next: 
     const authService: AuthService = inject(AuthService);
     const router: Router = inject(Router);
 
+    // Log outgoing request
+    try {
+        console.debug('[HTTP] -->', request.method, request.url);
+    } catch (e) {
+        // ignore logging errors
+    }
+
     let newRequest: HttpRequest<any> = request;
 
     // Only modify requests to our API
@@ -44,6 +51,26 @@ export const Interceptor: HttpInterceptorFn = (request: HttpRequest<any>, next: 
         catchError((error: HttpErrorResponse) => {
             // Handle 401 Unauthorized - try to refresh the token
             if (error.status === 401) {
+                // If the app is still initializing (APP_INITIALIZER), do not attempt
+                // a refresh or redirect — let the initializer handle auth state.
+                if ((authService as any).initializing) {
+                    console.debug('[HTTP] 401 during app init, skipping refresh/redirect for', request.url);
+                    return throwError(() => error);
+                }
+                // If the failed request was the refresh call itself, do not attempt
+                // to refresh again to avoid an infinite loop. Clear user and
+                // redirect to login immediately.
+                if (request.url.endsWith('/auth/refresh')) {
+                    authService.user.set(null);
+                    try {
+                        router.navigate(["/auth/login"]);
+                    } catch (e) {
+                        // ignore navigation errors
+                    }
+                    return throwError(() => error);
+                }
+
+                // Otherwise attempt to refresh the token once, then retry original
                 return authService.refreshToken().pipe(
                     switchMap(() => {
                         // Retry the original request with the new token
