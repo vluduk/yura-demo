@@ -168,7 +168,7 @@ def read_secret(name: str, file_path: str | None = None) -> str | None:
 # an env var from your CI/CD secrets.
 GOOGLE_API_KEY = read_secret('GOOGLE_API_KEY', file_path=os.environ.get('GOOGLE_API_KEY_FILE', '/run/secrets/google_api_key'))
 # default model name; can be overridden in env
-GOOGLE_LLM_MODEL = os.environ.get('GOOGLE_LLM_MODEL', 'chat-bison-001')
+GOOGLE_LLM_MODEL = os.environ.get('GOOGLE_LLM_MODEL', 'gemini-1.5-flash')
 # optional system prompt to include at the start of conversations
 GOOGLE_LLM_SYSTEM_PROMPT = os.environ.get('GOOGLE_LLM_SYSTEM_PROMPT', '')
 

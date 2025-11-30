@@ -5,6 +5,7 @@ from rest_framework import generics
 from django.utils import timezone
 from django.conf import settings
 import os
+import google.generativeai as genai
 
 from api.models.conversation import Conversation
 from api.models.message import Message
@@ -65,36 +66,29 @@ class ConversationChatView(APIView):
             # No LLM key configured: return a fallback response (echo) and a warning
             ai_text = f"(LLM not configured) Echo: {content[:1000]}"
         else:
-            # Try to call Google's Generative API. This code expects `google.generativeai` to be installed.
+            # Try to call Google's Generative API (Gemini).
             try:
-                import google.generativeai as genai
 
                 genai.configure(api_key=api_key)
-                # Use chat-bison or model configured in settings
-                model = getattr(settings, 'GOOGLE_LLM_MODEL', 'chat-bison-001')
-
-                # Build messages: you can extend with system prompt from settings
+                model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'gemini-pro')
+                
+                # Handle system prompt
                 system_prompt = getattr(settings, 'GOOGLE_LLM_SYSTEM_PROMPT', None)
-                messages = []
+                
+                # Prepend system prompt to content
+                full_prompt = content
                 if system_prompt:
-                    messages.append({'role': 'system', 'content': system_prompt})
-                messages.append({'role': 'user', 'content': content})
+                    full_prompt = f"{system_prompt}\n\n{content}"
 
-                resp = genai.chat.create(model=model, messages=messages)
-
-                # Extract text in common response shapes
-                ai_text = None
-                # genai response may have .candidates, .last, or .output
-                if hasattr(resp, 'candidates') and resp.candidates:
-                    ai_text = resp.candidates[0].content
-                elif hasattr(resp, 'last') and resp.last:
-                    ai_text = resp.last
-                elif hasattr(resp, 'output') and resp.output:
-                    # output may be list of dicts
-                    first = resp.output[0]
-                    ai_text = getattr(first, 'content', None) or first.get('content') if isinstance(first, dict) else str(first)
+                model = genai.GenerativeModel(model_name)
+                response = model.generate_content(full_prompt)
+                
+                # Check if we got a valid response
+                if response.parts:
+                    ai_text = response.text
                 else:
-                    ai_text = str(resp)
+                    ai_text = "(No response - likely blocked by safety filters)"
+
             except Exception as e:
                 ai_text = f"(LLM error) {str(e)}"
 
