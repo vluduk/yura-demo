@@ -9,6 +9,8 @@ from api.serializers.auth import UserRegistrationSerializer, UserLoginSerializer
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 import os
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 User = get_user_model()
 
@@ -274,3 +276,18 @@ class CreateAdminView(APIView):
             )
             return Response({'message': 'Admin account created successfully'}, status=status.HTTP_201_CREATED)
         return Response({'message': 'Admin account already exists'}, status=status.HTTP_200_OK)
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class CsrfView(APIView):
+    """Simple endpoint to ensure `csrftoken` cookie is set for SPA clients.
+
+    Call this with GET from the frontend during app initialization so the
+    browser receives the `csrftoken` cookie that Angular will read and send
+    on subsequent state-changing requests.
+    """
+    permission_classes = (AllowAny,)
+
+    @swagger_auto_schema(tags=['Auth'], responses={200: 'CSRF cookie set'})
+    def get(self, request, *args, **kwargs):
+        return Response({'message': 'CSRF cookie set'}, status=status.HTTP_200_OK)

@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable, signal, WritableSignal } from "@angular/core";
 import { environment } from "@shared/environments/environment";
 import { UserType } from "@shared/types/UserType";
-import { firstValueFrom, Observable } from "rxjs";
+import { firstValueFrom, Observable, BehaviorSubject } from "rxjs";
 import { UserService } from "./user.service";
 import { UserSignUpRequestType } from "@shared/types/UserSignUpRequestType";
 import { UserLoginRequestType } from "@shared/types/UserLoginRequestType";
@@ -23,6 +23,8 @@ interface AuthResponse {
 })
 export class AuthService {
     public readonly user: WritableSignal<UserType | null> = signal<UserType | null>(null);
+    private readonly _initialized = new BehaviorSubject<boolean>(false);
+    public readonly initialized$ = this._initialized.asObservable();
 
     private readonly httpClient: HttpClient = inject(HttpClient);
     private readonly userService: UserService = inject(UserService);
@@ -94,8 +96,16 @@ export class AuthService {
     }
 
     public async init(): Promise<void> {
+        // Ensure CSRF cookie is present for subsequent state-changing requests
+        await firstValueFrom(this.httpClient.get<{ message: string }>(environment.serverURL + "/auth/csrf")).catch(() => {
+            // ignore errors - fallback to attempting to get authorized user
+        });
+
         await this.getAuthorizedUser().catch(() => {
             this.user.set(null);
         });
+
+        // Mark initialization complete so guards can proceed
+        this._initialized.next(true);
     }
 }
