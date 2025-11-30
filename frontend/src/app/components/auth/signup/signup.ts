@@ -1,4 +1,5 @@
 import { Component, inject, model, ModelSignal, signal, WritableSignal } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { AuthService } from "@shared/services/auth.service";
 import { Router } from "@angular/router";
 import { Button } from "@shared/components/button/button";
@@ -8,7 +9,7 @@ import { Logo } from "@shared/components/logo/logo";
 
 @Component({
     selector: "auth-signup",
-    imports: [Logo, Input, Button, Link],
+    imports: [CommonModule, Logo, Input, Button, Link],
     templateUrl: "./signup.html",
     styleUrls: ["./signup.css"],
 })

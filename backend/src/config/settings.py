@@ -138,18 +138,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    # Throttling is applied per-view via custom throttle classes (see api.throttling)
-    # Default throttle rates are configured here and referenced by scope name.
-    'DEFAULT_THROTTLE_RATES': {
-        # Login attempts: protect against brute force
-        'login': os.environ.get('THROTTLE_LOGIN', '10/minute'),
-        # Signup attempts: more restrictive to avoid mass account creation
-        'signup': os.environ.get('THROTTLE_SIGNUP', '5/hour'),
-        # Token refreshes
-        'refresh': os.environ.get('THROTTLE_REFRESH', '60/hour'),
-        # Admin creation helper (should be rarely used)
-        'create_admin': os.environ.get('THROTTLE_CREATE_ADMIN', '1/hour'),
-    },
 }
 
 SIMPLE_JWT = {
