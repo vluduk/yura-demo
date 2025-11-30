@@ -1,3 +1,4 @@
 export const environment = {
-    serverURL: "http://localhost:3000",
+    // Development frontend should talk to Django dev server + API prefix
+    serverURL: "http://localhost:8080/api/v1",
 };

@@ -12,12 +12,12 @@ export class UserService {
     private httpClient: HttpClient = inject(HttpClient);
 
     public async getPersonalData(): Promise<UserType> {
-        return await firstValueFrom<UserType>(this.httpClient.get<UserType>(environment.serverURL + "/users/me"));
+        return await firstValueFrom<UserType>(this.httpClient.get<UserType>(environment.serverURL + "/auth/me"));
     }
 
     public async updatePersonalData(
-        name?: string,
-        surname?: string,
+        first_name?: string,
+        last_name?: string,
         email?: string,
         phone?: string,
         avatar_url?: string,
@@ -25,11 +25,11 @@ export class UserService {
     ): Promise<null> {
         const body: Partial<UserType> = {};
 
-        if (!name) {
-            body.name = name;
+        if (!first_name) {
+            body.first_name = first_name;
         }
-        if (!surname) {
-            body.surname = surname;
+        if (!last_name) {
+            body.last_name = last_name;
         }
         if (!email) {
             body.email = email;
@@ -44,10 +44,10 @@ export class UserService {
             body.career_selected = career_selected;
         }
 
-        return await firstValueFrom<null>(this.httpClient.patch<null>(environment.serverURL + "/users/me", body));
+        return await firstValueFrom<null>(this.httpClient.patch<null>(environment.serverURL + "/auth/me", body));
     }
 
     public async deleteUser(): Promise<null> {
-        return await firstValueFrom<null>(this.httpClient.delete<null>(environment.serverURL + "/users/me"));
+        return await firstValueFrom<null>(this.httpClient.delete<null>(environment.serverURL + "/auth/me"));
     }
 }

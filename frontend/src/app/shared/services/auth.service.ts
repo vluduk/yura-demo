@@ -7,6 +7,17 @@ import { UserService } from "./user.service";
 import { UserSignUpRequestType } from "@shared/types/UserSignUpRequestType";
 import { UserLoginRequestType } from "@shared/types/UserLoginRequestType";
 
+interface AuthResponse {
+    message: string;
+    user?: {
+        id: string;
+        email: string;
+        first_name: string;
+        last_name: string;
+        role: string;
+    };
+}
+
 @Injectable({
     providedIn: "root",
 })
@@ -16,23 +27,48 @@ export class AuthService {
     private readonly httpClient: HttpClient = inject(HttpClient);
     private readonly userService: UserService = inject(UserService);
 
-    public async signUp(signUpData: UserSignUpRequestType): Promise<{ message: string }> {
-        return await firstValueFrom<{ message: string }>(
-            this.httpClient.post<{ message: string }>(environment.serverURL + "/auth/sign-up", signUpData),
-        ).then((response: { message: string }) => {
-            this.getAuthorizedUser();
+    /**
+     * Get CSRF token from cookies
+     */
+    public getCsrfToken(): string | null {
+        const name = "csrftoken";
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            return parts.pop()?.split(";").shift() || null;
+        }
+        return null;
+    }
 
-            return response;
+    public async signUp(signUpData: UserSignUpRequestType): Promise<{ message: string }> {
+        return await firstValueFrom<AuthResponse>(
+            this.httpClient.post<AuthResponse>(environment.serverURL + "/auth/sign-up", signUpData),
+        ).then((response: AuthResponse) => {
+            // If user data is returned, update the user signal
+            if (response.user) {
+                this.user.set(response.user as unknown as UserType);
+            } else {
+                // Otherwise fetch the full user profile
+                this.getAuthorizedUser();
+            }
+
+            return { message: response.message };
         });
     }
 
     public async login(credentials: UserLoginRequestType): Promise<{ message: string }> {
-        return await firstValueFrom<{ message: string }>(
-            this.httpClient.post<{ message: string }>(environment.serverURL + "/auth/login", credentials),
-        ).then((response: { message: string }) => {
-            this.getAuthorizedUser();
+        return await firstValueFrom<AuthResponse>(
+            this.httpClient.post<AuthResponse>(environment.serverURL + "/auth/login", credentials),
+        ).then((response: AuthResponse) => {
+            // If user data is returned, update the user signal
+            if (response.user) {
+                this.user.set(response.user as unknown as UserType);
+            } else {
+                // Otherwise fetch the full user profile
+                this.getAuthorizedUser();
+            }
 
-            return response;
+            return { message: response.message };
         });
     }
 

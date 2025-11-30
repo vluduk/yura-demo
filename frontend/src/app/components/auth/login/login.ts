@@ -1,4 +1,5 @@
 import { Component, inject, signal, WritableSignal } from "@angular/core";
+import { AuthService } from "@shared/services/auth.service";
 import { Logo } from "@shared/components/logo/logo";
 import { Input } from "@shared/components/input/input";
 import { Button } from "@shared/components/button/button";
@@ -38,18 +39,28 @@ export class Login {
         }
     }
 
+    private authService = inject(AuthService);
+
     protected async onSubmit(): Promise<void> {
         this.hasSubmitted.set(true);
 
-        if (!this.email() || !this.password()) {
+        if (!this.isFieldValid("email") || !this.isFieldValid("password")) {
             return;
         }
 
         this.isLoading.set(true);
 
-        console.log("Submitting login form with:", {
-            email: this.email(),
-            password: this.password(),
-        });
+        try {
+            await this.authService.login({
+                email: this.email(),
+                password: this.password(),
+            });
+            await this.router.navigate(["/conversation"]);
+        } catch (error) {
+            console.error("Login failed", error);
+            // TODO: Show error message to user
+        } finally {
+            this.isLoading.set(false);
+        }
     }
 }

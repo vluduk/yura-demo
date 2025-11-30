@@ -1,4 +1,5 @@
 import { Component, inject, signal, WritableSignal } from "@angular/core";
+import { AuthService } from "@shared/services/auth.service";
 import { Router } from "@angular/router";
 import { Button } from "@shared/components/button/button";
 import { Input } from "@shared/components/input/input";
@@ -47,27 +48,37 @@ export class Signup {
         }
     }
 
+    private authService = inject(AuthService);
+
     protected async onSubmit(): Promise<void> {
         this.hasSubmitted = true;
 
         if (
-            !this.email() ||
-            !this.name() ||
-            !this.surname() ||
-            !this.password() ||
-            !this.confirmPassword() ||
-            this.password() !== this.confirmPassword()
+            !this.isFieldValid("email") ||
+            !this.isFieldValid("name") ||
+            !this.isFieldValid("surname") ||
+            !this.isFieldValid("password") ||
+            !this.isFieldValid("confirmPassword")
         ) {
             return;
         }
 
         this.isLoading.set(true);
 
-        console.log("Submitting signup form with:", {
-            name: this.name(),
-            surname: this.surname(),
-            email: this.email(),
-            password: this.password(),
-        });
+        try {
+            await this.authService.signUp({
+                email: this.email(),
+                first_name: this.name(),
+                last_name: this.surname(),
+                password: this.password(),
+                phone: "1234567890", // TODO: Add phone field to signup form
+            });
+            await this.router.navigate(["/conversation"]);
+        } catch (error) {
+            console.error("Signup failed", error);
+            // TODO: Show error message to user
+        } finally {
+            this.isLoading.set(false);
+        }
     }
 }

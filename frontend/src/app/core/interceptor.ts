@@ -6,27 +6,56 @@ import { throwError } from "rxjs/internal/observable/throwError";
 import { catchError } from "rxjs/internal/operators/catchError";
 import { switchMap } from "rxjs/internal/operators/switchMap";
 
+/**
+ * Get CSRF token from cookies
+ */
+function getCsrfToken(): string | null {
+    const name = "csrftoken";
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+        return parts.pop()?.split(";").shift() || null;
+    }
+    return null;
+}
+
 export const Interceptor: HttpInterceptorFn = (request: HttpRequest<any>, next: HttpHandlerFn) => {
     const authService: AuthService = inject(AuthService);
 
     let newRequest: HttpRequest<any> = request;
 
+    // Only modify requests to our API
     if (request.url.startsWith(environment.serverURL)) {
+        // Always include credentials for cookie-based auth
         newRequest = request.clone({ withCredentials: true });
+
+        // Add CSRF token for state-changing methods
+        const csrfToken = getCsrfToken();
+        if (csrfToken && ["POST", "PUT", "PATCH", "DELETE"].includes(request.method)) {
+            newRequest = newRequest.clone({
+                headers: newRequest.headers.set("X-CSRFToken", csrfToken),
+            });
+        }
     }
 
     return next(newRequest).pipe(
         catchError((error: HttpErrorResponse) => {
-            if (error.status == 401) {
+            // Handle 401 Unauthorized - try to refresh the token
+            if (error.status === 401) {
                 return authService.refreshToken().pipe(
-                    switchMap(() => next(newRequest)),
+                    switchMap(() => {
+                        // Retry the original request with the new token
+                        return next(newRequest);
+                    }),
                     catchError((refreshError) => {
+                        // Refresh failed, clear user state
                         authService.user.set(null);
                         return throwError(() => refreshError);
                     }),
                 );
             }
 
+            // For other errors, just pass them through
             return throwError(() => error);
         }),
     );
