@@ -140,6 +140,38 @@ REST_FRAMEWORK = {
     ),
 }
 
+
+# Helper to read secrets from a file (Docker/K8s secrets) or environment variables.
+def read_secret(name: str, file_path: str | None = None) -> str | None:
+    """Return secret value from a file first (if present), otherwise from environment.
+
+    - `file_path` is an explicit path to a file containing the secret (e.g. `/run/secrets/google_api_key`).
+    - If `file_path` is None, the function will check for an env var named `<name>_FILE` and
+      use its value as a file path if present.
+    - Falls back to `os.environ.get(name)`.
+    """
+    # try explicit file_path
+    try:
+        path = file_path or os.environ.get(f"{name}_FILE")
+        if path:
+            with open(path, "r") as f:
+                return f.read().strip()
+    except Exception:
+        # ignore file read errors and fallback to env var
+        pass
+    return os.environ.get(name)
+
+
+# Google LLM / Generative AI settings
+# The view will look for `GOOGLE_API_KEY` via settings or env var. Prefer mounting this
+# secret as a Docker/Swarm/Kubernetes secret at `/run/secrets/google_api_key` or setting
+# an env var from your CI/CD secrets.
+GOOGLE_API_KEY = read_secret('GOOGLE_API_KEY', file_path=os.environ.get('GOOGLE_API_KEY_FILE', '/run/secrets/google_api_key'))
+# default model name; can be overridden in env
+GOOGLE_LLM_MODEL = os.environ.get('GOOGLE_LLM_MODEL', 'chat-bison-001')
+# optional system prompt to include at the start of conversations
+GOOGLE_LLM_SYSTEM_PROMPT = os.environ.get('GOOGLE_LLM_SYSTEM_PROMPT', '')
+
 SIMPLE_JWT = {
     # Token Lifetimes
     'ACCESS_TOKEN_LIFETIME': timedelta(
