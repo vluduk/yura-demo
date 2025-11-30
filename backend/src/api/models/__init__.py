@@ -1,6 +1,7 @@
 from .user import User
 from .article import Article, ArticleCategory
-from .conversation import Conversation, Message
+from .conversation import Conversation
+from .message import Message
 from .resume import (
 	CVTemplate,
 	Resume,

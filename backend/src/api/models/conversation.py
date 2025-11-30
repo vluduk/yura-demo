@@ -16,18 +16,3 @@ class Conversation(models.Model):
 
     def __str__(self):
         return self.title or str(self.id)
-
-
-class Message(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
-    content = models.TextField()
-    context_used = models.JSONField(default=dict, blank=True)
-    is_user = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'messages'
-
-    def __str__(self):
-        return f"Message {self.id} in {self.conversation_id}"
