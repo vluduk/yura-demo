@@ -1,4 +1,6 @@
-import { Component, inject, signal, WritableSignal } from "@angular/core";
+import { Component, inject, model, ModelSignal, signal, WritableSignal } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { AuthService } from "@shared/services/auth.service";
 import { Router } from "@angular/router";
 import { Button } from "@shared/components/button/button";
 import { Input } from "@shared/components/input/input";
@@ -7,25 +9,26 @@ import { Logo } from "@shared/components/logo/logo";
 
 @Component({
     selector: "auth-signup",
-    imports: [Logo, Input, Button, Link],
+    imports: [CommonModule, Logo, Input, Button, Link],
     templateUrl: "./signup.html",
-    styleUrl: "./signup.css",
+    styleUrls: ["./signup.css"],
 })
 export class Signup {
-    protected name: WritableSignal<string> = signal<string>("");
-    protected surname: WritableSignal<string> = signal<string>("");
-    protected email: WritableSignal<string> = signal<string>("");
-    protected password: WritableSignal<string> = signal<string>("");
-    protected confirmPassword: WritableSignal<string> = signal<string>("");
+    protected name: ModelSignal<string> = model<string>("");
+    protected surname: ModelSignal<string> = model<string>("");
+    protected email: ModelSignal<string> = model<string>("");
+    protected password: ModelSignal<string> = model<string>("");
+    protected confirmPassword: ModelSignal<string> = model<string>("");
 
     protected isLoading: WritableSignal<boolean> = signal<boolean>(false);
+    protected errorMessage: WritableSignal<string | null> = signal<string | null>(null);
 
-    private hasSubmitted: boolean = false;
+    protected hasSubmitted: WritableSignal<boolean> = signal<boolean>(false);
 
     private router: Router = inject(Router);
 
     protected isFieldValid(field: string): boolean {
-        if (!this.hasSubmitted) {
+        if (!this.hasSubmitted()) {
             return true;
         }
 
@@ -47,27 +50,43 @@ export class Signup {
         }
     }
 
+    private authService = inject(AuthService);
+
     protected async onSubmit(): Promise<void> {
-        this.hasSubmitted = true;
+        console.log('Signup onSubmit called', {
+            name: this.name(),
+            surname: this.surname(),
+            email: this.email(),
+        });
+        this.hasSubmitted.set(true);
 
         if (
-            !this.email() ||
-            !this.name() ||
-            !this.surname() ||
-            !this.password() ||
-            !this.confirmPassword() ||
-            this.password() !== this.confirmPassword()
+            !this.isFieldValid("email") ||
+            !this.isFieldValid("name") ||
+            !this.isFieldValid("surname") ||
+            !this.isFieldValid("password") ||
+            !this.isFieldValid("confirmPassword")
         ) {
             return;
         }
 
         this.isLoading.set(true);
 
-        console.log("Submitting signup form with:", {
-            name: this.name(),
-            surname: this.surname(),
-            email: this.email(),
-            password: this.password(),
-        });
+        try {
+            await this.authService.signUp({
+                email: this.email(),
+                first_name: this.name(),
+                last_name: this.surname(),
+                password: this.password(),
+                phone: "1234567890", // TODO: Add phone field to signup form
+            });
+            await this.router.navigate(["/conversation"]);
+        } catch (error) {
+            console.error("Signup failed", error);
+            const msg = (error as any)?.error?.message || (error as any)?.message || 'Signup failed';
+            this.errorMessage.set(String(msg));
+        } finally {
+            this.isLoading.set(false);
+        }
     }
 }

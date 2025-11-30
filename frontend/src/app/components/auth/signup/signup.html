@@ -12,10 +12,12 @@
             <ui-input [(value)]="confirmPassword" [label]="'Повторіть пароль'" [type]="'password'"></ui-input>
         </div>
 
-        <ui-button [label]="'Увійти'" [isLoading]="isLoading()" (click)="onSubmit()"></ui-button>
+        <ui-button [label]="'Зареєструватися'" [isLoading]="isLoading()" (click)="onSubmit()"></ui-button>
+
+        <div *ngIf="errorMessage()" class="signup__error">{{ errorMessage() }}</div>
 
         <span class="signup__option-text">
-            Не маєш облікового запису?
+            Вже маєш обліковий запис?
             <ui-link [label]="'Увійти'" [type]="'primary-line'" [routerLink]="'/auth/login'"></ui-link>
         </span>
     </div>
