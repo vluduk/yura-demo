@@ -64,9 +64,14 @@ do
   WAITED=$((WAITED+1))
 done
 
-echo "Apply database migrations"
-python manage.py makemigrations || true
-python manage.py migrate --noinput
+# Only run migrations if NOT explicitly skipped
+if [ "${SKIP_MIGRATIONS:-0}" != "1" ]; then
+  echo "Apply database migrations"
+  python manage.py makemigrations || true
+  python manage.py migrate --noinput
+else
+  echo "Skipping database migrations (SKIP_MIGRATIONS=1)"
+fi
 
 echo "Create superuser if not exists"
 # Use ADMIN_FIRST_NAME / ADMIN_LAST_NAME if provided when creating the superuser.
