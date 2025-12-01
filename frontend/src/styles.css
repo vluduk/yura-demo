@@ -32,8 +32,8 @@
     --contrast-color: #d2a679;
     --contrast-hover-color: #9e7d5b;
 
-    --shadow-color-1: rgb(0, 0, 0, 0.8);
-    --shadow-color-2: rgb(0, 0, 0, 0.5);
+    --shadow-color-1: rgb(0, 0, 0, 0.5);
+    --shadow-color-2: rgb(0, 0, 0, 0.2);
 }
 
 * {

@@ -14,6 +14,7 @@ export class Button {
     public readonly type: InputSignal<"primary" | "primary-line" | "secondary" | "icon"> = input<
         "primary" | "primary-line" | "secondary" | "icon"
     >("primary");
+    public readonly theme: InputSignal<"light" | "dark"> = input<"light" | "dark">("light");
     public readonly align: InputSignal<"left" | "center"> = input<"left" | "center">("center");
     public readonly isDisabled: InputSignal<boolean> = input<boolean>(false);
     public readonly isFullWidth: InputSignal<boolean> = input<boolean>(false);

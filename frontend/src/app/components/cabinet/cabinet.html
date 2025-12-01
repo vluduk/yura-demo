@@ -1,1 +1,31 @@
-<p>cabinet works!</p>
+<div class="cabinet" [class]="{ cabinet_visible: isVisible() }">
+    <div class="cabinet__menu">
+        @for (tab of tabs(); track tab.id) {
+            <div
+                class="menu__item"
+                [class]="{ item_active: activeTab()?.id === tab.id }"
+                (click)="setActiveTab(tab)"
+            >
+                {{ tab.label }}
+            </div>
+        }
+    </div>
+
+    <div class="cabinet__content">
+        <div class="content__header">
+            <ui-title [title]="activeTab()?.label ?? ''" [size]="'medium'"></ui-title>
+            <span class="header__close-button" (click)="hideCabinet()">×</span>
+        </div>
+
+        <div class="content__main">
+            @if (activeTab()?.id === "account") {
+                <cabinet-account></cabinet-account>
+            }
+            @else if (activeTab()?.id === "settings") {
+                <cabinet-settings></cabinet-settings>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="cabinet-background" (click)="hideCabinet()"></div>

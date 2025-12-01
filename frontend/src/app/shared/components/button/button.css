@@ -125,6 +125,22 @@
     background-color: transparent;
 }
 
+.button_theme_light {
+    color: var(--primary-text-color);
+}
+
+.button_theme_light.button_type_icon:hover {
+    filter: brightness(0.8);
+}
+
+.button_theme_dark {
+    color: var(--secondary-text-color);
+}
+
+.button_theme_dark.button_type_icon:hover {
+    filter: brightness(4);
+}
+
 .button_align_left {
     justify-content: flex-start;
 }
