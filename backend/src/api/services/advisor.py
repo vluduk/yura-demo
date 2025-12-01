@@ -1,6 +1,7 @@
 import json
 import re
 import os
+import logging
 import google.generativeai as genai
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
@@ -163,6 +164,8 @@ class AdvisorService:
             return final_text
 
         except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.exception('Error in AdvisorService.get_ai_response')
             err_text = str(e)
             return f"(Помилка LLM) {err_text}"
 
@@ -393,8 +396,9 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
                 return f"{system_prompt}\n{context_injection}\n{history_text}\nПовідомлення користувача: {user_content}"
 
         except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.exception('Validation error in _build_business_prompt')
             # Fallback if LangChain fails or imports fail
-            print(f"Validation error: {e}")
             pass
         
         # Standard business validation prompt (fallback)
@@ -483,7 +487,9 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
             else:
                 # No results from vector search, try keyword
                 relevant_docs = AdvisorService._search_knowledge_base(user_content)
-        except Exception:
+        except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.exception('Vector RAG initialization/search failed; falling back to keyword search')
             # Vector RAG not available, use keyword search
             relevant_docs = AdvisorService._search_knowledge_base(user_content)
         
@@ -615,7 +621,9 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
                     })
             
             return results
-        except Exception:
+        except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.exception('Error searching knowledge base')
             return []
 
     @staticmethod
@@ -643,7 +651,9 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
             # Remove the JSON block from the response shown to the user
             clean_text = raw_text.replace(json_match.group(0), '').strip()
             return clean_text
-        except Exception:
+        except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.exception('Failed to parse JSON updates from LLM response')
             # If parsing fails, just return the raw text
             return raw_text
 
@@ -691,6 +701,8 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
 
             return response.text
         except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.exception('Error generating initial message from LLM; returning fallback greeting')
             return "Вітаю! Я ваш кар'єрний радник. Радий(а), що ви тут. Чим можу допомогти?"
 
     @staticmethod
@@ -757,5 +769,5 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
                 conversation.save(update_fields=['title'])
                 
         except Exception as e:
-            # Silent fail - don't disrupt the conversation
-            pass
+            logger = logging.getLogger(__name__)
+            logger.exception('Error generating conversation title')
