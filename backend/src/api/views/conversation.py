@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from rest_framework import generics
 from django.utils import timezone
 from django.conf import settings
+from django.http import StreamingHttpResponse
 import os
-import google.generativeai as genai
+import json
 
 from api.models.conversation import Conversation
 from api.models.message import Message
@@ -23,6 +24,23 @@ class ConversationListCreateView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.IsAuthenticated()]
+    
+    def perform_create(self, serializer):
+        # Ensure the conversation is owned by the requesting user
+        conv = serializer.save(user=self.request.user)
+
+        # If the new conversation has no messages, ask the LLM to generate an initial assistant message
+        try:
+            from api.services.advisor import AdvisorService
+
+            # Generate a starter assistant message
+            initial_text = AdvisorService.generate_initial_message(self.request.user, conv)
+            if initial_text:
+                from api.models.message import Message
+                Message.objects.create(conversation=conv, content=initial_text, is_user=False)
+        except Exception:
+            # Do not block creation on LLM failures; conversation exists regardless
+            pass
 
 
 class ConversationDetailView(generics.RetrieveAPIView):
@@ -36,7 +54,12 @@ class ConversationDetailView(generics.RetrieveAPIView):
 class ConversationChatView(APIView):
     """Accepts a user message, stores it, calls Google LLM (if configured), stores the AI reply, and returns it.
 
-    Request JSON: { "conversation_id": <uuid, optional>, "content": "user message", "title": "optional title for new conv" }
+    Request JSON: { 
+        "conversation_id": <uuid, optional>, 
+        "content": "user message", 
+        "title": "optional title for new conv",
+        "conv_type": "optional conversation type"
+    }
     """
     permission_classes = [permissions.IsAuthenticated]
 
@@ -53,51 +76,44 @@ class ConversationChatView(APIView):
             except Conversation.DoesNotExist:
                 return Response({'detail': 'conversation not found'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            conv = Conversation.objects.create(user=user, title=request.data.get('title', ''))
+            # Create new conversation with optional title and conv_type
+            conv = Conversation.objects.create(
+                user=user, 
+                title=request.data.get('title', ''),
+                conv_type=request.data.get('conv_type', '')
+            )
 
         # Save user message
         user_msg = Message.objects.create(conversation=conv, content=content, is_user=True)
 
         # Prepare LLM call
-        api_key = getattr(settings, 'GOOGLE_API_KEY', None) or os.environ.get('GOOGLE_API_KEY')
-        ai_text = None
+        from api.services.advisor import AdvisorService
+        ai_text = AdvisorService.get_ai_response(user, conv, content)
 
-        if not api_key:
-            # No LLM key configured: return a fallback response (echo) and a warning
-            ai_text = f"(LLM not configured) Echo: {content[:1000]}"
-        else:
-            # Try to call Google's Generative API (Gemini).
-            try:
-
-                genai.configure(api_key=api_key)
-                model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'gemini-pro')
-                
-                # Handle system prompt
-                system_prompt = getattr(settings, 'GOOGLE_LLM_SYSTEM_PROMPT', None)
-                
-                # Prepend system prompt to content
-                full_prompt = content
-                if system_prompt:
-                    full_prompt = f"{system_prompt}\n\n{content}"
-
-                model = genai.GenerativeModel(model_name)
-                response = model.generate_content(full_prompt)
-                
-                # Check if we got a valid response
-                if response.parts:
-                    ai_text = response.text
-                else:
-                    ai_text = "(No response - likely blocked by safety filters)"
-
-            except Exception as e:
-                ai_text = f"(LLM error) {str(e)}"
-
-        # Save AI message
+        # Save AI message (full text)
         ai_msg = Message.objects.create(conversation=conv, content=ai_text, is_user=False)
 
         # Update conversation last active
         conv.last_active_at = timezone.now()
         conv.save(update_fields=('last_active_at',))
+
+        # If client requested streaming (SSE), stream character-by-character
+        stream = request.GET.get('stream') or request.data.get('stream')
+        if stream in (True, '1', 'true', 'True', 'yes'):
+            # Generator that yields SSE events for each character
+            def event_stream(text: str):
+                try:
+                    for ch in text:
+                        # JSON-encode the chunk to be safe
+                        payload = json.dumps({"chunk": ch})
+                        yield f"data: {payload}\n\n"
+                    # signal completion
+                    yield "event: done\n"
+                    yield "data: {}\n\n"
+                except GeneratorExit:
+                    return
+
+            return StreamingHttpResponse(event_stream(ai_text), content_type='text/event-stream')
 
         serializer = MessageSerializer(ai_msg)
         return Response(serializer.data, status=status.HTTP_201_CREATED)

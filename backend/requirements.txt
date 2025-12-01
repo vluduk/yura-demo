@@ -7,3 +7,6 @@ drf-yasg>=1.21
 Pillow>=10.0
 requests>=2.31
 google-generativeai>=0.3.0
+
+# Language model tooling
+langchain

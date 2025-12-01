@@ -132,7 +132,7 @@ AUTH_USER_MODEL = 'api.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'api.authentication.CookieJWTAuthentication',  # Custom cookie-based JWT auth
+        'api.utils.authentication.CookieJWTAuthentication',  # Custom cookie-based JWT auth
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # Fallback to header-based
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -168,9 +168,16 @@ def read_secret(name: str, file_path: str | None = None) -> str | None:
 # an env var from your CI/CD secrets.
 GOOGLE_API_KEY = read_secret('GOOGLE_API_KEY', file_path=os.environ.get('GOOGLE_API_KEY_FILE', '/run/secrets/google_api_key'))
 # default model name; can be overridden in env
-GOOGLE_LLM_MODEL = os.environ.get('GOOGLE_LLM_MODEL', 'gemini-1.5-flash')
+# Default model name. The runtime may expose full resource names like
+# 'models/gemini-2.5-flash' depending on the Google Generative API version.
+# Prefer setting `GOOGLE_LLM_MODEL` in your environment to a supported model
+# from the API's ListModels output. A good default for modern runtimes is:
+GOOGLE_LLM_MODEL = os.environ.get('GOOGLE_LLM_MODEL', 'models/gemini-2.5-flash')
 # optional system prompt to include at the start of conversations
-GOOGLE_LLM_SYSTEM_PROMPT = os.environ.get('GOOGLE_LLM_SYSTEM_PROMPT', '')
+GOOGLE_LLM_SYSTEM_PROMPT = os.environ.get(
+    'GOOGLE_LLM_SYSTEM_PROMPT',
+    'Ви — корисний, ввічливий та уважний кар\'єрний радник для українських ветеранів. Відповідайте українською мовою, стисло та по суті. Якщо потрібно, ставте уточнюючі запитання, щоб краще зрозуміти користувача.'
+)
 
 SIMPLE_JWT = {
     # Token Lifetimes

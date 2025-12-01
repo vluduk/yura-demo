@@ -36,176 +36,110 @@ export class ConversationService {
         search?: string,
         type?: ConversationTypeEnum,
     ): Promise<ConversationType[]> {
-        const body: ConversationGetRequestType = {
-            page,
-            limit,
-        };
-
-        if (search) {
-            body.search = search;
-        }
-        if (type) {
-            body.type = type;
-        }
-
-        const res = [
-            { id: "1", title: "Conversation 1", type: ConversationTypeEnum.Bussiness },
-            { id: "2", title: "Conversation 2", type: ConversationTypeEnum.Hiring },
-            { id: "3", title: "Conversation 3", type: ConversationTypeEnum.SelfEmployment },
-        ];
-
-        return res;
-
-        // return await firstValueFrom<ConversationType[]>(
-        //     this.httpClient.get<ConversationType[]>(environment.serverURL + "/conversations/me", {
-        //         params: body,
-        //     }),
-        // );
+        // Get conversations from backend
+        return await firstValueFrom<ConversationType[]>(
+            this.httpClient.get<ConversationType[]>(environment.serverURL + "/conversations", {
+                params: { page: page.toString(), limit: limit.toString() },
+            }),
+        );
     }
 
-    public async createConversation(id: string, type: ConversationTypeEnum): Promise<ConversationType> {
-        const mockTitles: Record<ConversationTypeEnum, string> = {
-            [ConversationTypeEnum.Bussiness]: "Нова бізнес-бесіда",
-            [ConversationTypeEnum.Hiring]: "Нова бесіда про найм",
-            [ConversationTypeEnum.SelfEmployment]: "Нова бесіда про самозайнятість",
-            [ConversationTypeEnum.Education]: "Нова бесіда про освіту",
-            [ConversationTypeEnum.CareerPath]: "Нова бесіда про кар'єру",
+    public async createConversation(title?: string, convType?: ConversationTypeEnum): Promise<ConversationType> {
+        const body: any = {
+            title: title || "",
         };
 
-        const mockConversation: ConversationType = {
-            id,
-            title: mockTitles[type] || "Нова бесіда",
-            type,
-        };
+        if (convType) {
+            // Map frontend enum values to backend ConversationType choices
+            const convTypeMap: Record<ConversationTypeEnum, string> = {
+                [ConversationTypeEnum.Bussiness]: "Business",
+                [ConversationTypeEnum.SelfEmployment]: "SelfEmployment",
+                [ConversationTypeEnum.Hiring]: "Hiring",
+                [ConversationTypeEnum.CareerPath]: "CareerPath",
+                [ConversationTypeEnum.Education]: "Education",
+            };
 
-        await new Promise((resolve) => setTimeout(resolve, 300));
+            body.conv_type = convTypeMap[convType] || convType;
+        }
 
-        return mockConversation;
-
-        // Original code (uncomment when backend is ready):
-        // const body: ConversationCreateRequestType = {
-        //     id,
-        //     type,
-        //     created_at: new Date(),
-        // };
-        //
-        // return await firstValueFrom<ConversationType>(
-        //     this.httpClient.post<ConversationType>(environment.serverURL + "/conversations/me", body),
-        // );
+        return await firstValueFrom<ConversationType>(
+            this.httpClient.post<ConversationType>(environment.serverURL + "/conversations", body),
+        );
     }
 
-    public async getMessagesByConversationId(
-        conversationId: string,
-        page: number = 1,
-        limit: number = 4,
-    ): Promise<MessageType[]> {
-        // MOCK: return empty array for new conversations, or mock messages for existing ones
-        const mockMessages: Record<string, MessageType[]> = {
-            "1": [
-                { id: "msg-1", content: "Привіт! Як розпочати бізнес?", created_at: new Date(), is_user: true },
-                {
-                    id: "msg-2",
-                    content: "Вітаю! Для початку бізнесу вам потрібно визначити нішу та скласти бізнес-план.",
-                    created_at: new Date(),
-                    is_user: false,
-                },
-            ],
-            "2": [
-                { id: "msg-3", content: "Як найняти розробника?", created_at: new Date(), is_user: true },
-                {
-                    id: "msg-4",
-                    content: "Рекомендую почати з опису вакансії та визначення необхідних навичок.",
-                    created_at: new Date(),
-                    is_user: false,
-                },
-            ],
-            "3": [
-                { id: "msg-5", content: "Як стати самозайнятим?", created_at: new Date(), is_user: true },
-                {
-                    id: "msg-6",
-                    content: "Для самозайнятості потрібно зареєструватися як ФОП та обрати групу оподаткування.",
-                    created_at: new Date(),
-                    is_user: false,
-                },
-            ],
-        };
+    public async getMessagesByConversationId(conversationId: string): Promise<MessageType[]> {
+        try {
+            // Get conversation to fetch its messages
+            const conversation = await firstValueFrom<any>(
+                this.httpClient.get<any>(environment.serverURL + `/conversations/${conversationId}`),
+            );
 
-        await new Promise((resolve) => setTimeout(resolve, 200));
-
-        return mockMessages[conversationId] || [];
-
-        // Original code (uncomment when backend is ready):
-        // const body: MessageConversationRequestType = {
-        //     conversation_id: conversationId,
-        //     page,
-        //     limit,
-        // };
-        //
-        // return await firstValueFrom<MessageType[]>(
-        //     this.httpClient.get<MessageType[]>(environment.serverURL + `/conversations/${conversationId}`, {
-        //         params: body,
-        //     }),
-        // );
+            // Return messages from conversation (they're included in the conversation object)
+            return conversation.messages || [];
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+            return [];
+        }
     }
 
     public getMessageResponse(
         conversationId: string,
         messageId: string,
         requestText: string,
+        convType?: ConversationTypeEnum,
         file?: File,
     ): Observable<string> {
-        // MOCK: simulate streaming AI response only
+        // Call backend chat endpoint and consume SSE for character-by-character streaming
         return new Observable<string>((observer) => {
-            const mockResponses: string[] = [
-                "Дякую за ваше запитання! ",
-                "Ось що я можу вам порадити. ",
-                "По-перше, важливо розуміти контекст вашої ситуації. ",
-                "По-друге, рекомендую звернути увагу на наступні аспекти. ",
-                "Якщо у вас є додаткові питання, ",
-                "я завжди готовий допомогти!",
-            ];
+            const body: any = {
+                content: requestText,
+            };
 
-            let index = 0;
+            // Add conversation_id if it exists (not a new conversation)
+            if (conversationId) {
+                body.conversation_id = conversationId;
+            }
 
-            const interval = setInterval(() => {
-                if (index < mockResponses.length) {
-                    observer.next(mockResponses[index]);
-                    index++;
-                } else {
-                    clearInterval(interval);
-                    observer.complete();
-                }
-            }, 300);
+            // Add conv_type for new conversations
+            if (convType && !conversationId) {
+                body.conv_type = convType;
+            }
 
-            return () => clearInterval(interval);
+            // Use fetchEventSource to attach to an SSE stream. Backend supports `?stream=1`.
+            const url = environment.serverURL + "/conversations/chat?stream=1";
+
+            try {
+                fetchEventSource(url, {
+                    method: "POST",
+                    body: JSON.stringify(body),
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    onmessage(event) {
+                        try {
+                            // Expecting JSON payload like {"chunk": "c"}
+                            const data = JSON.parse(event.data || "{}");
+                            if (data.chunk) {
+                                observer.next(data.chunk);
+                            } else {
+                                // If message doesn't have chunk, send raw data
+                                observer.next(event.data);
+                            }
+                        } catch (e) {
+                            // fallback: forward raw event data
+                            observer.next(event.data);
+                        }
+                    },
+                    onclose() {
+                        observer.complete();
+                    },
+                    onerror(err) {
+                        observer.error(err);
+                    },
+                });
+            } catch (err) {
+                observer.error(err as any);
+            }
         });
-
-        // Original code (uncomment when backend is ready):
-        // return new Observable<string>((observer: Subscriber<string>) => {
-        //     const formData = new FormData();
-        //
-        //     formData.append("messageId", messageId);
-        //     formData.append("requestText", requestText);
-        //     if (file) {
-        //         formData.append("file", file);
-        //     }
-        //
-        //     fetchEventSource(environment.serverURL + `/conversations/${conversationId}/messages`, {
-        //         method: "POST",
-        //         body: formData,
-        //         headers: {},
-        //         credentials: "include",
-        //         onmessage(event) {
-        //             observer.next(event.data);
-        //         },
-        //         onclose() {
-        //             observer.complete();
-        //         },
-        //         onerror(err) {
-        //             observer.error(err);
-        //         },
-        //     });
-        // });
     }
 
     public regenerateMessageResponse(conversationId: string, messageId: string): Observable<string> {

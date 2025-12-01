@@ -1,8 +1,9 @@
-import { Component, inject, signal, WritableSignal } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { Title } from "@shared/components/title/title";
 import { Button } from "@shared/components/button/button";
 import { ConversationTypeEnum } from "@shared/types/ConversationTypeEnum";
 import { Router } from "@angular/router";
+import { ConversationService } from "@shared/services/conversation.service";
 
 @Component({
     selector: "app-conversation-type",
@@ -14,12 +15,17 @@ export class ConversationType {
     protected readonly conversationTypes = ConversationTypeEnum;
 
     private readonly router: Router = inject(Router);
+    private readonly conversationService: ConversationService = inject(ConversationService);
 
-    protected createConversation(type: ConversationTypeEnum): void {
-        const newId = crypto.randomUUID();
-
-        this.router.navigate(["/conversation", newId], {
-            queryParams: { type: type },
-        });
+    protected async createConversation(type: ConversationTypeEnum): Promise<void> {
+        try {
+            const conv = await this.conversationService.createConversation('', type);
+            this.conversationService.addToSidebar(conv);
+            this.router.navigate(["/conversation", conv.id], {
+                queryParams: { type: type },
+            });
+        } catch (err) {
+            console.error('Failed to create conversation', err);
+        }
     }
 }

@@ -15,3 +15,8 @@ try:
 except Exception:
 	# If it's not registered or unregister fails, ignore silently.
 	pass
+
+# Customize admin site
+_admin.site.site_header = "Yura Administration"
+_admin.site.site_title = "Yura Admin Portal"
+_admin.site.index_title = "Welcome to Yura Administration"

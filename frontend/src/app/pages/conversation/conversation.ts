@@ -137,19 +137,16 @@ export class Conversation implements OnInit {
         this.printingMessage.set("");
         this.isLoading.set(true);
 
-        if (this.messages().length === 1) {
-            await this.conversationService
-                .createConversation(
-                    this.currentConversationId(),
-                    this.currentConversationType() as ConversationTypeEnum,
-                )
-                .then((conversation) => {
-                    console.log("Conversation created:", conversation);
-                    this.conversationService.addToSidebar(conversation);
-                });
-        }
+        // For new conversations (no conversationId), the backend will create it
+        // For existing conversations, pass the conversationId
+        const isNewConversation = !this.currentConversationId() || this.messages().length === 1;
 
-        this.conversationService.getMessageResponse(this.currentConversationId(), messageId, requestText).subscribe({
+        this.conversationService.getMessageResponse(
+            this.currentConversationId(),
+            messageId,
+            requestText,
+            this.currentConversationType() || undefined
+        ).subscribe({
             next: (chunk) => {
                 this.printingMessage.update((value: string) => value + chunk);
             },

@@ -44,15 +44,15 @@
                     (click)="openConversation(item.id, item.type)"
                 >
                     <span class="item__icon">
-                        @if (item.type === conversationTypes.Bussiness) {
+                        @if (item.conv_type === conversationTypes.Bussiness) {
                             <i class="fa-solid fa-wallet"></i>
-                        } @else if (item.type === conversationTypes.SelfEmployment) {
+                        } @else if (item.conv_type === conversationTypes.SelfEmployment) {
                             <i class="fa-solid fa-briefcase"></i>
-                        } @else if (item.type === conversationTypes.Hiring) {
+                        } @else if (item.conv_type === conversationTypes.Hiring) {
                             <i class="fa-solid fa-handshake"></i>
-                        } @else if (item.type === conversationTypes.CareerPath) {
+                        } @else if (item.conv_type === conversationTypes.CareerPath) {
                             <i class="fa-solid fa-signs-post"></i>
-                        } @else if (item.type === conversationTypes.Education) {
+                        } @else if (item.conv_type === conversationTypes.Education) {
                             <i class="fa-solid fa-graduation-cap"></i>
                         }
                     </span>

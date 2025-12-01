@@ -78,9 +78,10 @@ export class ChatSidebar implements OnInit {
         this.activeConversationId.set(resolved);
     }
 
-    protected openConversation(conversationId: string, type: ConversationTypeEnum): void {
+    protected openConversation(conversationId: string, type: ConversationTypeEnum | undefined): void {
+        const queryParams = type ? { type } : {};
         this.router.navigate(["/conversation", conversationId], {
-            queryParams: { type: type },
+            queryParams,
         });
     }
 }
