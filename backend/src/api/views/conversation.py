@@ -1,10 +1,12 @@
 from rest_framework import permissions, status
+from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from django.utils import timezone
 from django.conf import settings
 from django.http import StreamingHttpResponse
+from api.renderers.event_stream import EventStreamRenderer
 import os
 import json
 import logging
@@ -64,6 +66,8 @@ class ConversationChatView(APIView):
     }
     """
     permission_classes = [permissions.IsAuthenticated]
+    # Allow DRF to negotiate text/event-stream for streaming clients
+    renderer_classes = (EventStreamRenderer, JSONRenderer)
 
     def post(self, request, *args, **kwargs):
         user = request.user

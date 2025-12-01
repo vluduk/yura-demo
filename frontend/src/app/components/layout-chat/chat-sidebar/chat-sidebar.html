@@ -41,7 +41,7 @@
                 <div 
                     class="history__item" 
                     [class]="{ item_active: item.id === activeConversationId() }"
-                    (click)="openConversation(item.id, item.type)"
+                    (click)="openConversation(item.id, item.conv_type)"
                 >
                     <span class="item__icon">
                         @if (item.conv_type === conversationTypes.Bussiness) {
