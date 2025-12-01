@@ -89,9 +89,12 @@ class ConversationChatView(APIView):
                 return Response({'detail': 'conversation not found'}, status=status.HTTP_404_NOT_FOUND)
         else:
             # Create new conversation with optional title and conv_type
+            # Use provided title or a sensible default for new conversations
+            provided_title = request.data.get('title')
+            default_title = 'Нова розмова'
             conv = Conversation.objects.create(
-                user=user, 
-                title=request.data.get('title', ''),
+                user=user,
+                title=provided_title or default_title,
                 conv_type=request.data.get('conv_type', '')
             )
 
@@ -114,6 +117,31 @@ class ConversationChatView(APIView):
         # Update conversation last active
         conv.last_active_at = timezone.now()
         conv.save(update_fields=('last_active_at',))
+
+        # Try to generate a better conversation title after exchanges.
+        # Use LLM-based title generation if available; otherwise fall back to a short snippet
+        # of the user's message when the title is still the default.
+        try:
+            from api.services.advisor import AdvisorService
+
+            # Ask AdvisorService to create/update a title (no blocking on failure)
+            try:
+                AdvisorService.generate_conversation_title(conv)
+            except Exception:
+                logger = logging.getLogger(__name__)
+                logger.exception('generate_conversation_title failed')
+
+            # If title still equals the default, set a short user-content fallback title
+            if conv.title in (None, '', default_title):
+                fallback = (content or '').strip()
+                if fallback:
+                    short = (fallback[:60] + '...') if len(fallback) > 60 else fallback
+                    conv.title = short
+                    conv.save(update_fields=('title',))
+        except Exception:
+            # Don't let title generation errors break the response flow
+            logger = logging.getLogger(__name__)
+            logger.exception('Unexpected error while attempting to set conversation title')
 
         # If client requested streaming (SSE), stream character-by-character
         stream = request.GET.get('stream') or request.data.get('stream')
