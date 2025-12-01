@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
+# Ensure Python outputs are unbuffered so logs appear in container stdout/stderr immediately
+export PYTHONUNBUFFERED=1
+# Allow overriding log level via env
+export LOG_LEVEL=${LOG_LEVEL:-INFO}
 # Entrypoint: robust startup for the Django app inside the container.
 # Assumes project is mounted at /app or /app/src. Ensures we cd to the
 # directory that contains `manage.py` and waits for the database before

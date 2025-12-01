@@ -1,12 +1,15 @@
 from rest_framework import permissions, status
+from rest_framework.renderers import JSONRenderer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from django.utils import timezone
 from django.conf import settings
 from django.http import StreamingHttpResponse
+from api.renderers.event_stream import EventStreamRenderer
 import os
 import json
+import logging
 
 from api.models.conversation import Conversation
 from api.models.message import Message
@@ -40,7 +43,8 @@ class ConversationListCreateView(generics.ListCreateAPIView):
                 Message.objects.create(conversation=conv, content=initial_text, is_user=False)
         except Exception:
             # Do not block creation on LLM failures; conversation exists regardless
-            pass
+            logger = logging.getLogger(__name__)
+            logger.exception('Failed to generate initial assistant message during conversation creation')
 
 
 class ConversationDetailView(generics.RetrieveAPIView):
@@ -62,18 +66,26 @@ class ConversationChatView(APIView):
     }
     """
     permission_classes = [permissions.IsAuthenticated]
+    # Allow DRF to negotiate text/event-stream for streaming clients
+    renderer_classes = (EventStreamRenderer, JSONRenderer)
 
     def post(self, request, *args, **kwargs):
         user = request.user
+        logger = logging.getLogger(__name__)
+        logger.debug('ConversationChatView POST called', extra={'user': getattr(user, 'email', None), 'path': request.path})
         conversation_id = request.data.get('conversation_id')
         content = request.data.get('content')
         if not content:
+            logger.warning('Chat request missing content', extra={'user': getattr(user, 'email', None), 'data': request.data})
+            logger.debug('Request headers: %s', dict(request.headers))
             return Response({'detail': 'content is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         if conversation_id:
             try:
                 conv = Conversation.objects.get(id=conversation_id, user=user)
             except Conversation.DoesNotExist:
+                logger.warning('Conversation not found for user', extra={'user': getattr(user, 'email', None), 'conversation_id': conversation_id})
+                logger.debug('Request headers: %s', dict(request.headers))
                 return Response({'detail': 'conversation not found'}, status=status.HTTP_404_NOT_FOUND)
         else:
             # Create new conversation with optional title and conv_type
@@ -88,7 +100,13 @@ class ConversationChatView(APIView):
 
         # Prepare LLM call
         from api.services.advisor import AdvisorService
-        ai_text = AdvisorService.get_ai_response(user, conv, content)
+        try:
+            ai_text = AdvisorService.get_ai_response(user, conv, content)
+        except Exception as e:
+            logger.exception('AdvisorService.get_ai_response raised an exception')
+            ai_text = f"(Помилка LLM) {str(e)}"
+
+        logger.debug('AI response generated', extra={'ai_length': len(ai_text) if ai_text else 0})
 
         # Save AI message (full text)
         ai_msg = Message.objects.create(conversation=conv, content=ai_text, is_user=False)
@@ -99,7 +117,9 @@ class ConversationChatView(APIView):
 
         # If client requested streaming (SSE), stream character-by-character
         stream = request.GET.get('stream') or request.data.get('stream')
+        logger.debug('Stream param value', extra={'stream': stream})
         if stream in (True, '1', 'true', 'True', 'yes'):
+            logger.info('Client requested streaming response', extra={'user': getattr(user, 'email', None), 'conversation_id': str(conv.id)})
             # Generator that yields SSE events for each character
             def event_stream(text: str):
                 try:

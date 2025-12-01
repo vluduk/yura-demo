@@ -7,6 +7,8 @@ import json
 from typing import List, Dict, Any, Optional
 from django.conf import settings
 
+import logging
+logger = logging.getLogger(__name__)
 try:
     from langchain.chains import LLMChain, SequentialChain
     from langchain.prompts import PromptTemplate
@@ -17,17 +19,17 @@ try:
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
-
-
 class BusinessValidationChain:
     """Multi-step business idea validation using LangChain."""
     
     def __init__(self):
         if not LANGCHAIN_AVAILABLE:
+            logger.error('LangChain not available: BusinessValidationChain cannot be constructed')
             raise ImportError("LangChain is not installed. Run: pip install langchain langchain-google-genai")
         
         api_key = getattr(settings, 'GOOGLE_API_KEY', None) or os.environ.get('GOOGLE_API_KEY')
         if not api_key:
+            logger.error('GOOGLE_API_KEY not configured for BusinessValidationChain')
             raise ValueError("GOOGLE_API_KEY not configured")
         
         model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'gemini-2.0-flash-exp')
