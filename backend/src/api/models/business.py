@@ -10,6 +10,14 @@ class BusinessIdea(models.Model):
     status = models.CharField(max_length=50, default='BRAINSTORM')
     validation_score = models.IntegerField(default=0)
     business_canvas = models.JSONField(default=dict, blank=True)
+    
+    # Step-by-step validation fields
+    market_analysis = models.TextField(blank=True, default='')
+    financial_analysis = models.TextField(blank=True, default='')
+    skills_match = models.TextField(blank=True, default='')
+    risk_assessment = models.TextField(blank=True, default='')
+    final_verdict = models.TextField(blank=True, default='')
+    
     market_research = models.JSONField(default=dict, blank=True)
     summary_card_data = models.JSONField(default=dict, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
