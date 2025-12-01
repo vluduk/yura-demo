@@ -1,4 +1,4 @@
-import { Component, computed, inject, Signal, signal, WritableSignal } from "@angular/core";
+import { Component, computed, inject, OnInit, Signal, signal, WritableSignal } from "@angular/core";
 import { ChatSearchPopupService } from "@shared/services/chatSearchPopup.service";
 import { ConversationType } from "@shared/types/ConversationType";
 import { ConversationTypeEnum } from "@shared/types/ConversationTypeEnum";
@@ -10,7 +10,7 @@ import { Input } from "../../../shared/components/input/input";
     templateUrl: "./chat-search-popup.html",
     styleUrl: "./chat-search-popup.css",
 })
-export class ChatSearchPopup {
+export class ChatSearchPopup implements OnInit {
     private readonly popupService: ChatSearchPopupService = inject(ChatSearchPopupService);
 
     protected readonly searchField: WritableSignal<string> = signal<string>("");
@@ -18,10 +18,13 @@ export class ChatSearchPopup {
 
     private debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
-    protected readonly results: Signal<ConversationType[]> = computed<ConversationType[]>(() =>
-        this.popupService.results(),
-    );
-    protected readonly isVisible: Signal<boolean> = computed<boolean>(() => this.popupService.isVisible());
+    protected results: Signal<ConversationType[]> = signal<ConversationType[]>([]);
+    protected isVisible: Signal<boolean> = signal<boolean>(false);
+
+    ngOnInit(): void {
+        this.results = this.popupService.results;
+        this.isVisible = this.popupService.isVisible;
+    }
 
     protected hidePopup(): void {
         this.popupService.hideChatSearchPopup();

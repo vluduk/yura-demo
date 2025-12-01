@@ -38,7 +38,11 @@
         </div>
         <div class="history__list">
             @for (item of conversations(); track item.id) {
-                <div class="history__item" (click)="openConversation(item.id, item.type)">
+                <div 
+                    class="history__item" 
+                    [class]="{ item_active: item.id === activeConversationId() }"
+                    (click)="openConversation(item.id, item.type)"
+                >
                     <span class="item__icon">
                         @if (item.type === conversationTypes.Bussiness) {
                             <i class="fa-solid fa-wallet"></i>

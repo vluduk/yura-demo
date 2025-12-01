@@ -1,9 +1,10 @@
 import { Component, output, OutputEmitterRef, signal, WritableSignal } from "@angular/core";
 import { Textarea } from "@shared/components/textarea/textarea";
+import { Button } from "@shared/components/button/button";
 
 @Component({
     selector: "conversation-chat-input",
-    imports: [Textarea],
+    imports: [Textarea, Button],
     templateUrl: "./chat-input.html",
     styleUrl: "./chat-input.css",
 })

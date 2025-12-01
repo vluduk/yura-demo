@@ -27,9 +27,13 @@
     padding: 10px;
     cursor: pointer;
     border-radius: 12px;
-    transition: background-color 0.3s;
+    transition: background-color 0.2s;
+}
+
+.item_active {
+    background-color: var(--conversation-item-background-color);
 }
 
 .history__item:hover {
-    background-color: var(--conversation-item-background-color);
+    background-color: var(--button-hover-color);
 }

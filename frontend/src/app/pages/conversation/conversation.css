@@ -1,16 +1,47 @@
 .conversation {
     position: relative;
-    height: 100dvh;
+    height: 100%;
+    padding-top: 20px;
 }
 
 .conversation__message-wrapper {
-    height: calc(100vh - 220px);
-    padding: 20px 0;
+    height: calc(100vh - 200px);
     overflow: auto;
+}
+
+.conversation__message-wrapper::-webkit-scrollbar {
+    display: none;
 }
 
 .conversation__input-wrapper {
     position: absolute;
     bottom: 0;
     width: 100%;
+}
+
+.message-ai,
+.message-user {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message-user {
+    align-items: flex-end;
+    max-width: 640px;
+    margin-left: auto;
+}
+
+.message-user .message__content {
+    display: block;
+    padding: 16px 24px;
+    color: var(--secondary-text-color);
+    background-color: var(--card-background-color);
+    border-radius: 16px;
+}
+
+.control-button,
+:host ::ng-deep .message__control .button {
+    height: 20px !important;
+    font-size: 14px !important;
 }

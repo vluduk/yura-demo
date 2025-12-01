@@ -15,10 +15,11 @@ import { MessageType } from "@shared/types/MessageType";
 import { ChatInput } from "@components/conversation/chat-input/chat-input";
 import { ConversationService } from "@shared/services/conversation.service";
 import { ConversationTypeEnum } from "@shared/types/ConversationTypeEnum";
+import { Button } from "@shared/components/button/button";
 
 @Component({
     selector: "chat-conversation",
-    imports: [ChatInput],
+    imports: [ChatInput, Button],
     templateUrl: "./conversation.html",
     styleUrl: "./conversation.css",
 })
@@ -59,14 +60,24 @@ export class Conversation implements OnInit {
     constructor() {
         effect(() => {
             if (this.messages().length > 0) {
-                setTimeout(() => {
-                    const element: HTMLElement = this.messagesContainer()?.nativeElement;
-                    if (element) {
-                        element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
-                    }
-                }, 50);
+                this.scrollToBottom();
             }
         });
+
+        effect(() => {
+            if (this.printingMessage().length > 0) {
+                this.scrollToBottom();
+            }
+        });
+    }
+
+    private scrollToBottom(): void {
+        setTimeout(() => {
+            const element: HTMLElement = this.messagesContainer()?.nativeElement;
+            if (element) {
+                element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
+            }
+        }, 50);
     }
 
     ngOnInit(): void {

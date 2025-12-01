@@ -16,8 +16,19 @@
     border-radius: 24px;
 }
 
+:host ::ng-deep .chat-input__input-wrapper .textarea {
+    height: 100px !important;
+    min-height: auto !important;
+    padding: 16px 20px !important;
+}
+
 .input-wrapper__buttons {
     display: flex;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 16px 16px;
+}
+
+.chat-input__alert {
+    font-size: 12px;
+    font-weight: 200;
 }

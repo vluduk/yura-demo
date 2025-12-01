@@ -5,21 +5,47 @@
                 <div class="message-wrapper__message" [class.message-user]="message.is_user">
                     <span class="message__content">{{ message.content }}</span>
                     <div class="message__control">
-                        <span class="control__edit">edit</span>
-                        <span class="control__copy">copy</span>
+                        <ui-button
+                            class="control__copy control-button"
+                            [icon]="'fa-solid fa-copy'"
+                            [type]="'icon'"
+                        ></ui-button>
+                        <ui-button
+                            class="control__edit control-button"
+                            [icon]="'fa-solid fa-pencil'"
+                            [type]="'icon'"
+                        ></ui-button>
                     </div>
                 </div>
             } @else {
                 <div class="message-wrapper__message" [class.message-ai]="!message.is_user">
                     <span class="message__content">{{ message.content }}</span>
                     <div class="message__control">
-                        <span class="control__edit">refresh</span>
-                        <span class="control__copy">copy</span>
+                        <ui-button
+                            class="control__copy control-button"
+                            [icon]="'fa-solid fa-copy'"
+                            [type]="'icon'"
+                        ></ui-button>
+                        <ui-button
+                            class="control__refresh control-button"
+                            [icon]="'fa-solid fa-arrows-rotate'"
+                            [type]="'icon'"
+                        ></ui-button>
                     </div>
                 </div>
             }
         }
+
+        <!-- Streaming AI message -->
+        @if (printingMessage().length > 0) {
+            <div class="message-wrapper__message message-ai message-printing">
+                <span class="message__content">{{ printingMessage() }}</span>
+            </div>
+        }
     </div>
 
-    <conversation-chat-input class="conversation__input-wrapper" (onSend)="getResponse($event)"></conversation-chat-input>
+    <conversation-chat-input
+        class="conversation__input-wrapper"
+        (onSend)="getResponse($event)"
+    ></conversation-chat-input>
 </div>

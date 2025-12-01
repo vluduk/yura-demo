@@ -6,8 +6,8 @@
             (keydown.enter)="send(); $event.preventDefault()"
         ></ui-textarea>
         <div class="input-wrapper__buttons">
-            <span class="buttons__plus-button">plus</span>
-            <span class="buttons__send-button" (click)="send()">send</span>
+            <ui-button [icon]="'fa-solid fa-plus'" [type]="'icon'" [theme]="'dark'"></ui-button>
+            <ui-button [icon]="'fa-solid fa-arrow-up'" [type]="'icon'" [theme]="'dark'" (click)="send()"></ui-button>
         </div>
     </div>
 
