@@ -13,12 +13,10 @@ export const routes: Routes = [
             {
                 path: "articles",
                 loadComponent: () => import("@pages/article-list/article-list").then((m) => m.ArticleList),
-                canActivate: [AuthGuard],
             },
             {
                 path: "article/:id",
                 loadComponent: () => import("@pages/article/article").then((m) => m.Article),
-                canActivate: [AuthGuard],
             },
             {
                 path: "resume-builder/:resumeId",

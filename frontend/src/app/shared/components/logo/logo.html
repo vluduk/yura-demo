@@ -1,1 +1,7 @@
-<p>logo works!</p>
+<a [routerLink]="['/']">
+    @if (size() === "small") {
+        <img class="logo logo_small" src="assets/logo_small.png" alt="Logo" />
+    } @else {
+        <img class="logo logo_large" src="assets/logo_full.png" alt="Logo" />
+    }
+</a>

@@ -1,7 +1,7 @@
 <div class="sidebar">
     <div class="sidebar__header">
-        <span class="sidebar__collapse-button">coll</span>
-        <ui-logo></ui-logo>
+        <i class="fa-solid fa-bars"></i>
+        <ui-logo [size]="'small'"></ui-logo>
     </div>
 
     <div class="sidebar__nav">
@@ -34,7 +34,7 @@
     <div class="sidebar__history">
         <div class="history__title">
             <span class="title__text">Минулі чати</span>
-            <span class="title__icon">ar</span>
+            <i class="fa-solid fa-arrow-down"></i>
         </div>
         <div class="history__list">
             @for (item of conversations(); track item.id) {
