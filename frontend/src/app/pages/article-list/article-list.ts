@@ -4,10 +4,11 @@ import { Button } from "@shared/components/button/button";
 import { ArticleService } from "@shared/services/article.service";
 import { ArticleType } from "@shared/types/ArticleType";
 import { ArticleCard } from "@components/article/article-card/article-card";
+import { Input } from "@shared/components/input/input";
 
 @Component({
     selector: "app-article-list",
-    imports: [Title, Button, ArticleCard],
+    imports: [Title, Button, ArticleCard, Input],
     templateUrl: "./article-list.html",
     styleUrl: "./article-list.css",
 })

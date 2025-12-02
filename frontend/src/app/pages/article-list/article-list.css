@@ -1,4 +1,9 @@
 .article-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    width: 100%;
     padding: 24px;
 }
 
@@ -13,45 +18,42 @@
 .search-wrapper__search {
     position: relative;
     display: flex;
-    align-items: center;
     gap: 8px;
+    align-items: center;
 }
 
 .search__input {
     flex: 1;
-    padding: 12px 16px;
-    border: 1px solid var(--color-border, #e0e0e0);
-    border-radius: 8px;
-    font-size: 14px;
-    background-color: var(--card-background-color);
-    color: var(--color-text-primary, #1a1a1a);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
     min-width: 300px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--primary-text-color);
+    background-color: var(--card-background-color);
+    border-radius: 8px;
+    transition: all 0.2s;
 }
 
 .search__input:focus {
     outline: none;
-    border-color: var(--color-primary, #3b82f6);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .search__input::placeholder {
-    color: var(--color-text-tertiary, #999);
+    font-weight: 100;
 }
 
 .search__button {
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
     width: 44px;
     height: 44px;
-    border: none;
-    border-radius: 8px;
-    background-color: var(--color-primary, #3b82f6);
     color: white;
     cursor: pointer;
+    background-color: var(--color-primary, #3b82f6);
+    border: none;
+    border-radius: 8px;
     transition: background-color 0.2s ease;
-    flex-shrink: 0;
 }
 
 .search__button:hover {
@@ -63,50 +65,55 @@
 }
 
 .search-wrapper__filters {
-    margin-top: 16px;
     display: flex;
-    align-items: center;
     gap: 12px;
+    align-items: center;
+    margin-top: 16px;
 }
 
 .filters__title {
     font-weight: 500;
-    color: var(--color-text-secondary, #666);
+    color: var(--primary-text-color);
 }
 
 .filter-list {
     display: flex;
-    gap: 8px;
     flex-wrap: wrap;
+    gap: 8px;
 }
 
 .filter-list__item {
     padding: 6px 12px;
     font-size: 14px;
     cursor: pointer;
-    background-color: var(--card-background-color);
     border-radius: 16px;
-    transition: all 0.2s ease;
-}
-
-.filter-list__item:hover {
-    background-color: var(--color-primary-light, rgba(59, 130, 246, 0.15));
+    transition: all 0.2s;
 }
 
 .filter-list__item.active {
-    background-color: var(--color-primary, #3b82f6);
-    color: white;
+    background-color: var(--button-background-color);
+}
+
+.filter-list__item:hover {
+    background-color: var(--button-hover-color);
 }
 
 .article-list__content {
     margin-top: 16px;
 }
 
+.article-list__recommended-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
 .content__loading,
 .content__empty {
-    text-align: center;
     padding: 48px;
-    color: var(--color-text-secondary, #666);
+    text-align: center;
 }
 
 .content__list {
@@ -115,118 +122,61 @@
     gap: 16px;
 }
 
-/* Keep grid for default variant if needed */
-.content__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-}
-
 .article-card {
     padding: 16px;
-    border-radius: 12px;
-    background-color: var(--color-bg-card, #fff);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: var(--card-background-color);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--shadow-color-2);
+    transition: all 0.2s;
 }
 
 .article-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .article-card__title {
-    margin: 0 0 8px 0;
     font-size: 18px;
     font-weight: 600;
 }
 
-.article-card__summary {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    color: var(--color-text-secondary, #666);
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.article-card__category {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    background-color: var(--color-primary-light, rgba(59, 130, 246, 0.15));
-    color: var(--color-primary, #3b82f6);
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.article-card__tags {
-    margin-top: 12px;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-.tags__item {
-    padding: 2px 8px;
-    border-radius: 12px;
-    background-color: var(--color-bg-secondary, #f0f0f0);
-    font-size: 12px;
-    color: var(--color-text-secondary, #666);
-}
-
-/* Recommended articles section */
-.article-list__recommended-wrapper {
-    margin: 32px 0;
-}
-
 .recommended-wrapper__list-wrapper {
     display: flex;
-    align-items: stretch;
     gap: 12px;
-    margin-top: 16px;
+    align-items: center;
+    width: 100%;
 }
 
-.list-wrapper__list.recommended-list {
+.list-wrapper__list {
     display: flex;
+    flex: 1;
     gap: 16px;
+    padding: 8px 4px 16px;
     overflow-x: auto;
     scroll-behavior: smooth;
-    padding: 8px 4px 16px 4px;
-    flex: 1;
+    scrollbar-color: var(--button-background-color) transparent;
     scrollbar-width: thin;
-    scrollbar-color: var(--color-primary, #3b82f6) transparent;
 }
 
-.list-wrapper__list.recommended-list::-webkit-scrollbar {
+.list-wrapper__list::-webkit-scrollbar {
     height: 6px;
 }
 
-.list-wrapper__list.recommended-list::-webkit-scrollbar-track {
+.list-wrapper__list::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.list-wrapper__list.recommended-list::-webkit-scrollbar-thumb {
-    background-color: var(--color-primary-light, rgba(59, 130, 246, 0.3));
-    border-radius: 3px;
+.list-wrapper__list::-webkit-scrollbar-thumb:hover {
+    background-color: var(--button-hover-color);
 }
 
-.list-wrapper__list.recommended-list::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-primary, #3b82f6);
-}
-
-/* Recommended article card fixed width */
-.recommended-list app-article-card {
+.list-wrapper__list app-article-card {
     flex: 0 0 260px;
     min-width: 260px;
     max-width: 260px;
     height: 280px;
 }
 
-/* All articles section */
 .article-list__all-wrapper {
     margin-top: 32px;
 }

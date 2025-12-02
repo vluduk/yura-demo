@@ -1,16 +1,14 @@
-<div class="article-list">
+<div class="article-list container">
     <div class="article-list__header">
         <ui-title [title]="'Що ви хочете опанувати сьогодні?'" [size]="'large'"></ui-title>
         <div class="header__search-wrapper">
             <div class="search-wrapper__search">
-                <input 
-                    type="text"
-                    class="search__input"
-                    placeholder="Назва статті"
-                    [value]="searchQuery()"
-                    (input)="onSearchInput($any($event.target).value)"
+                <ui-input
+                    [(value)]="searchQuery"
+                    [placeholder]="'Назва статті'"
+                    (onChange)="onSearchInput($any($event.target).value)"
                     (keydown.enter)="onSearch()"
-                />
+                ></ui-input>
                 <button class="search__button" (click)="onSearch()">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
@@ -44,18 +42,18 @@
             <ui-title [title]="'Рекомендовані статті'" [size]="'medium'"></ui-title>
 
             <div class="recommended-wrapper__list-wrapper">
-                <ui-button 
-                    [icon]="'fa-solid fa-chevron-left'" 
+                <ui-button
+                    [icon]="'fa-solid fa-chevron-left'"
                     [type]="'icon'"
                     (click)="scrollRecommended('left')"
                 ></ui-button>
-                <div class="list-wrapper__list recommended-list" #recommendedList>
+                <div class="list-wrapper__list" #recommendedList>
                     @for (article of recommendedArticles(); track article.id) {
                         <app-article-card [article]="article" [variant]="'small'"></app-article-card>
                     }
                 </div>
-                <ui-button 
-                    [icon]="'fa-solid fa-chevron-right'" 
+                <ui-button
+                    [icon]="'fa-solid fa-chevron-right'"
                     [type]="'icon'"
                     (click)="scrollRecommended('right')"
                 ></ui-button>
