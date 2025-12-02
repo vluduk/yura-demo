@@ -15,9 +15,16 @@ export class ArticleCard {
     >("default");
 
     public readonly onClick: OutputEmitterRef<ArticleType> = output<ArticleType>();
+    public readonly onTagClick: OutputEmitterRef<string> = output<string>();
 
     protected handleClick(): void {
         this.onClick.emit(this.article());
+    }
+
+    protected handleTagClick(event: Event, tag: string): void {
+        event.stopPropagation();
+        event.preventDefault();
+        this.onTagClick.emit(tag);
     }
 
     protected formatDate(date: Date): string {

@@ -180,3 +180,42 @@
 .article-list__all-wrapper {
     margin-top: 32px;
 }
+
+.filters__selected-tag {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 12px;
+    margin-left: 16px;
+    background-color: var(--card-background-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 16px;
+}
+
+.selected-tag__label {
+    font-size: 14px;
+    color: var(--primary-color);
+}
+
+.selected-tag__clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    color: var(--primary-text-color);
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.selected-tag__clear:hover {
+    background-color: var(--button-hover-color);
+}
+
+.selected-tag__clear i {
+    font-size: 12px;
+}

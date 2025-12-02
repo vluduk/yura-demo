@@ -132,6 +132,25 @@
     transform: translateX(3px);
 }
 
+.article-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-right: 8px;
+}
+
+.article-card__tag {
+    font-size: 10px;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.article-card__tag:hover {
+    color: var(--primary-color-dark);
+    text-decoration: underline;
+}
+
 .article-card--small {
     height: 280px;
     min-height: 280px;

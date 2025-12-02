@@ -1,0 +1,40 @@
+<div class="article-page">
+    <div class="article-header">
+        <ui-button [type]="'secondary'" [routerLink]="['/articles']">
+            <i class="fa-solid fa-arrow-left"></i> Назад до статей
+        </ui-button>
+    </div>
+
+    @if (isLoading()) {
+        <div class="loading">Завантаження...</div>
+    } @else if (article(); as article) {
+        <article class="article-content">
+            <div class="article-meta">
+                <span class="category">{{ article.category }}</span>
+                @if (article.tags && article.tags.length > 0) {
+                    <div class="tags">
+                        @for (tag of article.tags; track tag) {
+                            <span class="tag">#{{ tag }}</span>
+                        }
+                    </div>
+                }
+                <span class="date">{{ article.created_at | date:'dd.MM.yyyy' }}</span>
+                <span class="views"><i class="fa-solid fa-eye"></i> {{ article.views }}</span>
+            </div>
+
+            <ui-title [title]="article.title" [size]="'large'"></ui-title>
+
+            @if (article.image) {
+                <div class="article-image">
+                    <img [src]="article.image" [alt]="article.title">
+                </div>
+            }
+
+            <div class="article-body">
+                <markdown [data]="article.content"></markdown>
+            </div>
+        </article>
+    } @else {
+        <div class="not-found">Статтю не знайдено</div>
+    }
+</div>
