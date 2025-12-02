@@ -57,6 +57,16 @@
                         }
                     </span>
                     <span class="item__text">{{ item.title }}</span>
+
+                    <div class="item__menu" (click)="$event.stopPropagation()">
+                        <button class="menu__toggle" (click)="showMenu(item.id)">⋯</button>
+                        @if (openMenuId() === item.id) {
+                            <div class="menu__dropdown">
+                                <button class="menu__action" (click)="renameConversation(item.id)">Rename</button>
+                                <button class="menu__action menu__danger" (click)="deleteConversation(item.id)">Delete</button>
+                            </div>
+                        }
+                    </div>
                 </div>
             }
         </div>

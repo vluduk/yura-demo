@@ -48,7 +48,7 @@ class ConversationListCreateView(generics.ListCreateAPIView):
             logger.exception('Failed to generate initial assistant message during conversation creation')
 
 
-class ConversationDetailView(generics.RetrieveDestroyAPIView):
+class ConversationDetailView(generics.RetrieveUpdateDestroyAPIView):
     """Retrieve or delete a conversation belonging to the authenticated user.
 
     DELETE /api/conversations/<uuid:pk> will remove the conversation and cascade-delete related messages

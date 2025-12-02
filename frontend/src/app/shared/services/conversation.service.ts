@@ -315,4 +315,35 @@ export class ConversationService {
             });
         });
     }
+
+    public async deleteConversation(conversationId: string): Promise<void> {
+        try {
+            await firstValueFrom(this.httpClient.delete(`${environment.serverURL}/conversations/${conversationId}`, { withCredentials: true }));
+
+            // Remove from sidebar cache if present
+            const kept = this.sidebarConversations().filter((c) => c && c.id !== conversationId);
+            this.sidebarConversations.set(kept as any);
+        } catch (e) {
+            console.error('Failed to delete conversation', e);
+            throw e;
+        }
+    }
+
+    public async renameConversation(conversationId: string, newTitle: string): Promise<any> {
+        try {
+            const payload = { title: newTitle };
+            const updated = await firstValueFrom(
+                this.httpClient.patch<any>(`${environment.serverURL}/conversations/${conversationId}`, payload, { withCredentials: true }),
+            );
+
+            // Update sidebar cache if present
+            const updatedList = this.sidebarConversations().map((c) => (c && c.id === conversationId ? { ...c, title: updated.title } : c));
+            this.sidebarConversations.set(updatedList as any);
+
+            return updated;
+        } catch (e) {
+            console.error('Failed to rename conversation', e);
+            throw e;
+        }
+    }
 }

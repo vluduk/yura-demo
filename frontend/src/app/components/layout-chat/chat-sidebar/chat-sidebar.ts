@@ -25,6 +25,7 @@ export class ChatSidebar implements OnInit {
     protected readonly isSearchVisible: WritableSignal<boolean> = signal<boolean>(false);
 
     protected readonly conversationTypes = ConversationTypeEnum;
+    protected readonly openMenuId: WritableSignal<string | null> = signal<string | null>(null);
 
     private readonly router: Router = inject(Router);
     private readonly conversationService: ConversationService = inject(ConversationService);
@@ -83,5 +84,41 @@ export class ChatSidebar implements OnInit {
         this.router.navigate(["/conversation", conversationId], {
             queryParams,
         });
+    }
+
+    protected showMenu(conversationId: string): void {
+        this.openMenuId.set(conversationId);
+    }
+
+    protected hideMenu(): void {
+        this.openMenuId.set(null);
+    }
+
+    protected async renameConversation(conversationId: string): Promise<void> {
+        const current = this.conversationService.sidebarConversations().find((c) => c && c.id === conversationId);
+        const currentTitle = current?.title || "";
+        const newTitle = prompt("Enter new conversation title:", currentTitle);
+        if (!newTitle || newTitle.trim() === "") return;
+
+        try {
+            await this.conversationService.renameConversation(conversationId, newTitle.trim());
+            this.hideMenu();
+        } catch (e) {
+            console.error('Rename failed', e);
+            alert('Failed to rename conversation');
+        }
+    }
+
+    protected async deleteConversation(conversationId: string): Promise<void> {
+        const ok = confirm('Are you sure you want to delete this conversation? This action cannot be undone.');
+        if (!ok) return;
+
+        try {
+            await this.conversationService.deleteConversation(conversationId);
+            this.hideMenu();
+        } catch (e) {
+            console.error('Delete failed', e);
+            alert('Failed to delete conversation');
+        }
     }
 }
