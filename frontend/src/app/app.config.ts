@@ -10,6 +10,7 @@ import { routes } from "./app.routes";
 import { provideHttpClient, withInterceptors } from "@angular/common/http";
 import { Interceptor } from "@core/interceptor";
 import { AuthService } from "@shared/services/auth.service";
+import { provideMarkdown } from "ngx-markdown";
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -17,6 +18,7 @@ export const appConfig: ApplicationConfig = {
         provideZonelessChangeDetection(),
         provideRouter(routes, withComponentInputBinding()),
         provideHttpClient(withInterceptors([Interceptor])),
+        provideMarkdown(),
         {
             provide: APP_INITIALIZER,
             useFactory: (authService: AuthService) => () => authService.init(),

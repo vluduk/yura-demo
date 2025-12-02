@@ -19,6 +19,9 @@ export class ConversationType {
 
     protected async createConversation(type: ConversationTypeEnum): Promise<void> {
         try {
+            // Remove any ephemeral/unsent conversations first (e.g. previously created "new chat" placeholders)
+            this.conversationService.cleanupUnsavedConversations();
+
             const conv = await this.conversationService.createConversation('', type);
             this.conversationService.addToSidebar(conv);
             this.router.navigate(["/conversation", conv.id], {
