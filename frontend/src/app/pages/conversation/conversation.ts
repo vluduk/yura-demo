@@ -16,10 +16,11 @@ import { ChatInput } from "@components/conversation/chat-input/chat-input";
 import { ConversationService } from "@shared/services/conversation.service";
 import { ConversationTypeEnum } from "@shared/types/ConversationTypeEnum";
 import { Button } from "@shared/components/button/button";
+import { MarkdownModule } from "ngx-markdown";
 
 @Component({
     selector: "chat-conversation",
-    imports: [ChatInput, Button],
+    imports: [ChatInput, Button, MarkdownModule],
     templateUrl: "./conversation.html",
     styleUrl: "./conversation.css",
 })

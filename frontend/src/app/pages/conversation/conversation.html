@@ -3,7 +3,7 @@
         @for (message of messages(); track message.id) {
             @if (message.is_user) {
                 <div class="message-wrapper__message" [class.message-user]="message.is_user">
-                    <span class="message__content">{{ message.content }}</span>
+                    <markdown class="message__content" [data]="message.content"></markdown>
                     <div class="message__control">
                         <ui-button
                             class="control__copy control-button"
@@ -19,7 +19,7 @@
                 </div>
             } @else {
                 <div class="message-wrapper__message" [class.message-ai]="!message.is_user">
-                    <span class="message__content">{{ message.content }}</span>
+                    <markdown class="message__content" [data]="message.content"></markdown>
                     <div class="message__control">
                         <ui-button
                             class="control__copy control-button"
@@ -39,7 +39,7 @@
         <!-- Streaming AI message -->
         @if (printingMessage().length > 0) {
             <div class="message-wrapper__message message-ai message-printing">
-                <span class="message__content">{{ printingMessage() }}</span>
+                <markdown class="message__content" [data]="printingMessage()"></markdown>
             </div>
         }
     </div>

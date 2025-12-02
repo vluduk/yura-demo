@@ -82,7 +82,17 @@
     </div>
 
     <div class="form__field">
-        <label class="field__label">Про себе</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <label class="field__label" style="margin-bottom: 0;">Про себе</label>
+            <ui-button 
+                type="secondary" 
+                size="small" 
+                (click)="generateSummary()"
+                icon="fa-solid fa-wand-magic-sparkles"
+            >
+                Автозаповнення AI
+            </ui-button>
+        </div>
         <textarea 
             class="field__textarea"
             [value]="personalInfo()?.summary || ''"

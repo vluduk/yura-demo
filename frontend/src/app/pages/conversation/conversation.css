@@ -46,3 +46,28 @@
     height: 20px !important;
     font-size: 14px !important;
 }
+
+:host ::ng-deep .message__content p {
+    margin-bottom: 0.5rem;
+}
+
+:host ::ng-deep .message__content ul,
+:host ::ng-deep .message__content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+:host ::ng-deep .message__content pre {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 0.5rem;
+}
+
+:host ::ng-deep .message__content code {
+    font-family: monospace;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+}

@@ -99,15 +99,14 @@ class AdvisorService:
     }
 
     @staticmethod
-    def get_ai_response(user, conversation, user_content):
+    def get_ai_response(user, conversation, user_content, file_content=None):
         """
-        Generates a response from the AI advisor based on the user's state and message.
-        Handles assessment updates if applicable.
+        Generates a response from the AI advisor.
+        Returns the text response.
         """
         api_key = getattr(settings, 'GOOGLE_API_KEY', None) or os.environ.get('GOOGLE_API_KEY')
         if not api_key:
-            sample = user_content[:1000]
-            return f"(LLM не налаштовано) Ехо: {sample}"
+            return f"(LLM не налаштовано) Ехо: {user_content}"
 
         try:
             genai.configure(api_key=api_key)
@@ -130,21 +129,20 @@ class AdvisorService:
                 role = "Користувач" if msg.is_user else "Радник"
                 history_text += f"{role}: {msg.content}\n"
 
-            # Build the prompt based on conversation type
-            # Some builders (like business validation) may return a direct response
+            # Build the prompt
             build_result = AdvisorService._build_prompt(
                 user, 
                 assessment, 
                 conversation, 
                 history_text, 
-                user_content
+                user_content,
+                file_content
             )
             
             # Handle different return types
             if isinstance(build_result, tuple):
                 full_prompt, direct_response = build_result
                 if direct_response:
-                    # Multi-step chain provided direct response (e.g., business validation)
                     return direct_response
             else:
                 full_prompt = build_result
@@ -170,7 +168,72 @@ class AdvisorService:
             return f"(Помилка LLM) {err_text}"
 
     @staticmethod
-    def _build_prompt(user, assessment, conversation, history_text, user_content):
+    def get_ai_response_stream(user, conversation, user_content, file_content=None):
+        """
+        Generates a streaming response from the AI advisor.
+        Yields chunks of text.
+        """
+        api_key = getattr(settings, 'GOOGLE_API_KEY', None) or os.environ.get('GOOGLE_API_KEY')
+        if not api_key:
+            sample = user_content[:1000]
+            yield f"(LLM не налаштовано) Ехо: {sample}"
+            return
+
+        try:
+            genai.configure(api_key=api_key)
+            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemini-2.0-flash-exp')
+            
+            # Get or create assessment for the user
+            try:
+                assessment, _ = UserAssessment.objects.get_or_create(user=user)
+            except MultipleObjectsReturned:
+                assessments = UserAssessment.objects.filter(user=user).order_by('-updated_at')
+                assessment = assessments.first()
+            
+            # Fetch conversation history
+            from api.models.message import Message
+            recent_messages = conversation.messages.order_by('-created_at')[:10]
+            recent_messages = reversed(recent_messages)
+            
+            history_text = ""
+            for msg in recent_messages:
+                role = "Користувач" if msg.is_user else "Радник"
+                history_text += f"{role}: {msg.content}\n"
+
+            # Build the prompt
+            build_result = AdvisorService._build_prompt(
+                user, 
+                assessment, 
+                conversation, 
+                history_text, 
+                user_content,
+                file_content
+            )
+            
+            # Handle different return types
+            if isinstance(build_result, tuple):
+                full_prompt, direct_response = build_result
+                if direct_response:
+                    yield direct_response
+                    return
+            else:
+                full_prompt = build_result
+            
+            # Call LLM with streaming
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(full_prompt, stream=True)
+
+            for chunk in response:
+                if chunk.text:
+                    yield chunk.text
+
+        except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.exception('Error in AdvisorService.get_ai_response_stream')
+            yield f"(Помилка LLM) {str(e)}"
+
+    @staticmethod
+    def _build_prompt(user, assessment, conversation, history_text, user_content, file_content=None):
         """Build prompt based on conversation type or assessment state."""
         
         # If user hasn't selected career and conversation has no type, use assessment mode
@@ -183,6 +246,10 @@ class AdvisorService:
             conv_type, 
             AdvisorService.SYSTEM_PROMPTS[ConversationType.CAREER_PATH]
         )
+
+        # Append file content if present
+        if file_content:
+            user_content = f"{user_content}\n\n[ВКЛАДЕНИЙ ФАЙЛ]:\n{file_content}\n[КІНЕЦЬ ФАЙЛУ]"
         
         # For EDUCATION type, use RAG
         if conv_type == ConversationType.EDUCATION:
@@ -216,33 +283,49 @@ class AdvisorService:
     def _build_assessment_prompt(assessment, history_text, user_content):
         """Build prompt for initial assessment phase."""
         system_prompt = AdvisorService.SYSTEM_PROMPTS['assessment']
-        current_answers_json = json.dumps(assessment.answers, indent=2, ensure_ascii=False)
-        questions_json = json.dumps(ASSESSMENT_QUESTIONS, indent=2, ensure_ascii=False)
-        
+        # Determine next unanswered question (in order)
+        answers = assessment.answers or {}
+        next_q = None
+        for q in ASSESSMENT_QUESTIONS:
+            qid = q.get('id')
+            if qid not in answers or answers.get(qid) in (None, '', []):
+                next_q = q
+                break
+
+        # If all questions answered, return a prompt that acknowledges completion
+        if not next_q:
+            prompt = f"{system_prompt}\nВиглядає так, що профіль оцінювання вже заповнений. Підтвердіть, якщо потрібно оновити дані або продовжити розмову. Повідомлення користувача: {user_content}"
+            return prompt
+
+        # Build a focused prompt that asks ONLY the next question and instructs the LLM
+        current_answers_json = json.dumps(answers, indent=2, ensure_ascii=False)
+        question_text = next_q.get('question')
+        question_id = next_q.get('id')
+
         prompt = f"""{system_prompt}
 
 ПОТОЧНИЙ СТАН ОЦІНЮВАННЯ (JSON):
 {current_answers_json}
 
-УСІ ПИТАННЯ ОЦІНЮВАННЯ:
-{questions_json}
+НАСТУПНЕ ПИТАННЯ (тільки ОДНЕ):
+ID: {question_id}
+Питання: {question_text}
 
-ІСТОРІЯ РОЗМОВИ:
-{history_text}
-
-ІНСТРУКЦІЇ:
-1. Проаналізуйте останнє повідомлення користувача ("{user_content}"). Чи воно містить відповідь на одне з питань?
-2. Якщо виявлено нову релевантну інформацію, ВИ МАЄТЕ ВИДАТИ JSON-блок НА ПОЧАТКУ ВАШОЇ ВІДПОВІДІ у форматі:
+ІНСТРУКЦІЇ ДЛЯ МОДЕЛІ:
+1) Проаналізуйте останнє повідомлення користувача ("{user_content}"). Якщо воно містить відповідь на вищезгадане питання — ВИПИШІТЬ ЛИШЕ JSON-блок на початку відповіді у форматі:
 ```json
 {{
     "updates": {{
-        "question_id": "extracted answer value"
+        "{question_id}": "extracted answer value"
     }}
 }}
 ```
-3. Після JSON-блоку (якщо він є) — підтвердіть отримані дані та задайте НАСТУПНЕ найрелевантніше невідповідане питання.
-4. Не задавайте все одразу; тримайте розмову короткою та діалоговою.
-5. Якщо потрібні роз'яснення — надайте їх.
+2) Якщо користувач не дав відповіді на це питання, НЕ надавайте жодних інших питань і дайте лише коротку підказку (1-2 речення), щоб уточнити.
+3) НЕ ЗАДАВАЙТЕ декілька питань одночасно. Задавайте ТІЛЬКИ вказане питання або просіть уточнення.
+4) Після JSON-блоку (якщо він є) — підтвердіть отримані дані коротко і не додавайте інші питання.
+
+ІСТОРІЯ РОЗМОВИ:
+{history_text}
 
 Повідомлення користувача: {user_content}
 """
@@ -639,6 +722,9 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
         if not json_match:
             return raw_text
 
+        # Always try to strip the JSON block first so the user doesn't see it
+        clean_text = raw_text.replace(json_match.group(0), '').strip()
+
         try:
             data = json.loads(json_match.group(1))
             updates = data.get('updates', {})
@@ -648,14 +734,12 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
                 assessment.answers.update(updates)
                 assessment.save()
 
-            # Remove the JSON block from the response shown to the user
-            clean_text = raw_text.replace(json_match.group(0), '').strip()
             return clean_text
         except Exception as e:
             logger = logging.getLogger(__name__)
-            logger.exception('Failed to parse JSON updates from LLM response')
-            # If parsing fails, just return the raw text
-            return raw_text
+            logger.exception('Failed to parse or save JSON updates from LLM response')
+            # Even if saving fails, return the clean text without the JSON block
+            return clean_text
 
     @staticmethod
     def generate_initial_message(user, conversation):
@@ -771,3 +855,60 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
         except Exception as e:
             logger = logging.getLogger(__name__)
             logger.exception('Error generating conversation title')
+
+    @staticmethod
+    def generate_resume_content(user, resume, field, context=None):
+        """
+        Generates content for a specific resume field using AI.
+        """
+        api_key = getattr(settings, 'GOOGLE_API_KEY', None) or os.environ.get('GOOGLE_API_KEY')
+        if not api_key:
+            return "AI configuration missing."
+
+        try:
+            genai.configure(api_key=api_key)
+            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemini-2.0-flash-exp')
+            
+            # Get user assessment
+            try:
+                assessment = UserAssessment.objects.get(user=user)
+                assessment_text = f"""
+                Skills: {assessment.primary_skills}
+                Experience: {assessment.experience_years} years
+                Preferences: {assessment.work_preferences}
+                """
+            except UserAssessment.DoesNotExist:
+                assessment_text = "No assessment data available."
+
+            # Build prompt based on field
+            prompt = f"""
+            You are an expert resume writer helping a Ukrainian veteran transition to a civilian career.
+            
+            User Profile:
+            {assessment_text}
+            
+            Current Resume Title: {resume.title}
+            
+            Task: Write a professional and compelling content for the resume field: "{field}".
+            """
+            
+            if context:
+                prompt += f"\nContext/Details provided by user: {context}"
+                
+            if field == 'summary':
+                prompt += "\nWrite a professional summary (3-5 sentences) highlighting the user's strengths and career goals."
+            elif field == 'experience_description':
+                prompt += "\nWrite a detailed description of the work experience, focusing on achievements and responsibilities. Use bullet points."
+            elif field == 'skills':
+                prompt += "\nList relevant technical and soft skills based on the profile."
+            
+            prompt += "\nReturn ONLY the content for the field, no explanations or markdown formatting unless requested."
+
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(prompt)
+            
+            return response.text.strip()
+
+        except Exception as e:
+            logging.getLogger(__name__).error(f"Error generating resume content: {e}")
+            return "Failed to generate content."

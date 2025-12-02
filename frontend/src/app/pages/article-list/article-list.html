@@ -33,6 +33,14 @@
                         </span>
                     }
                 </div>
+                @if (selectedTag()) {
+                    <div class="filters__selected-tag">
+                        <span class="selected-tag__label">Тег: #{{ selectedTag() }}</span>
+                        <button class="selected-tag__clear" (click)="onTagSelect(null)">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -49,7 +57,11 @@
                 ></ui-button>
                 <div class="list-wrapper__list" #recommendedList>
                     @for (article of recommendedArticles(); track article.id) {
-                        <app-article-card [article]="article" [variant]="'small'"></app-article-card>
+                        <app-article-card 
+                            [article]="article" 
+                            [variant]="'small'"
+                            (onTagClick)="onTagSelect($event)"
+                        ></app-article-card>
                     }
                 </div>
                 <ui-button
@@ -76,7 +88,11 @@
             } @else {
                 <div class="content__list">
                     @for (article of articles(); track article.id) {
-                        <app-article-card [article]="article" [variant]="'horizontal'"></app-article-card>
+                        <app-article-card 
+                            [article]="article" 
+                            [variant]="'horizontal'"
+                            (onTagClick)="onTagSelect($event)"
+                        ></app-article-card>
                     }
                 </div>
             }

@@ -33,13 +33,21 @@
     </div>
 
     <div class="article-card__footer">
+        @if (article().tags && article().tags!.length > 0) {
+            <div class="article-card__tags">
+                @for (tag of article().tags; track tag) {
+                    <span class="article-card__tag" (click)="handleTagClick($event, tag)">#{{ tag }}</span>
+                }
+            </div>
+        }
+
         @if (article().category) {
             <span class="article-card__category">{{ article().category }}</span>
         }
 
         <button 
             class="article-card__button"
-            [routerLink]="['/conversation/library', article().id]"
+            [routerLink]="['/article', article().id]"
             (click)="handleClick(); $event.stopPropagation()"
         >
             Читати

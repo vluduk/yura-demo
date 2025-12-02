@@ -24,6 +24,7 @@ import {
 } from "@shared/types/ResumeDataType";
 import { ResumeTemplateType } from "@shared/types/ResumeTemplateType";
 import { ResumeTemplateService } from "@shared/services/resumeTemplate.service";
+import { ResumeService } from "@shared/services/resume.service";
 import { Button } from "@shared/components/button/button";
 import { ResumeFormPersonal } from "@components/resume/resume-form-personal/resume-form-personal";
 import { ResumeFormExperience } from "@components/resume/resume-form-experience/resume-form-experience";
@@ -100,6 +101,7 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
 
     private readonly httpClient: HttpClient = inject(HttpClient);
     private readonly templateService: ResumeTemplateService = inject(ResumeTemplateService);
+    private readonly resumeService: ResumeService = inject(ResumeService);
 
     @Input()
     set resumeId(id: string) {
@@ -118,10 +120,8 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        if (!this.currentResumeId()) {
-            this.createEmptyResume();
-        }
-
+        // If we have a resumeId, loadResume is called by the setter.
+        // If not, we might need to create one or wait.
         if (!this.currentTemplateId()) {
             this.loadTemplate("1");
         }
@@ -166,177 +166,106 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
-    private createEmptyResume(): void {
-        this.resume.set({
-            id: crypto.randomUUID(),
-            template_id: this.currentTemplateId() || "1",
-            title: "Нове резюме",
-            is_primary: false,
-            personal_info: {
-                first_name: "",
-                last_name: "",
-                email: "",
-                phone: "",
-            },
-            experience: [],
-            education: [],
-            skills: [],
-            languages: [],
-        });
-    }
-
     private async loadResume(id: string): Promise<void> {
         this.isLoading.set(true);
-        // MOCK: simulate loading
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        this.createEmptyResume();
-        this.isLoading.set(false);
+        try {
+            const resume = await this.resumeService.getResumeById(id);
+            this.resume.set(resume);
+        } catch (e) {
+            console.error("Failed to load resume", e);
+        } finally {
+            this.isLoading.set(false);
+        }
     }
 
     // Personal info
     public updatePersonalInfo(field: keyof PersonalInfoType, value: string): void {
-        const current = this.resume();
-        if (current) {
-            this.resume.set({
-                ...current,
-                personal_info: {
-                    ...current.personal_info!,
-                    [field]: value,
-                },
-            });
-        }
+        this.resumeService.updatePersonalInfo({ [field]: value });
+        this.resume.set(this.resumeService.currentResume());
     }
 
     // Experience
     public addExperience(): void {
-        const current = this.resume();
-        if (current) {
-            const newExp: ExperienceType = {
-                id: crypto.randomUUID(),
-                job_title: "",
-                employer: "",
-            };
-            this.resume.set({
-                ...current,
-                experience: [...(current.experience ?? []), newExp],
-            });
-        }
+        const newExp: ExperienceType = {
+            id: crypto.randomUUID(),
+            job_title: "",
+            employer: "",
+        };
+        this.resumeService.addExperience(newExp);
+        this.resume.set(this.resumeService.currentResume());
     }
 
     public updateExperience(id: string, field: keyof ExperienceType, value: any): void {
-        const current = this.resume();
-        if (current) {
-            this.resume.set({
-                ...current,
-                experience: (current.experience ?? []).map((exp) => (exp.id === id ? { ...exp, [field]: value } : exp)),
-            });
-        }
+        this.resumeService.updateExperience(id, { [field]: value });
+        this.resume.set(this.resumeService.currentResume());
     }
 
     public removeExperience(id: string): void {
-        const current = this.resume();
-        if (current) {
-            this.resume.set({
-                ...current,
-                experience: (current.experience ?? []).filter((exp) => exp.id !== id),
-            });
-        }
+        this.resumeService.removeExperience(id);
+        this.resume.set(this.resumeService.currentResume());
     }
 
     // Education
     public addEducation(): void {
-        const current = this.resume();
-        if (current) {
-            const newEdu: EducationType = {
-                id: crypto.randomUUID(),
-                institution: "",
-                degree: "",
-            };
-            this.resume.set({
-                ...current,
-                education: [...(current.education ?? []), newEdu],
-            });
-        }
+        const newEdu: EducationType = {
+            id: crypto.randomUUID(),
+            institution: "",
+            degree: "",
+        };
+        this.resumeService.addEducation(newEdu);
+        this.resume.set(this.resumeService.currentResume());
     }
 
     public updateEducation(id: string, field: keyof EducationType, value: any): void {
-        const current = this.resume();
-        if (current) {
-            this.resume.set({
-                ...current,
-                education: (current.education ?? []).map((edu) => (edu.id === id ? { ...edu, [field]: value } : edu)),
-            });
-        }
+        this.resumeService.updateEducation(id, { [field]: value });
+        this.resume.set(this.resumeService.currentResume());
     }
 
     public removeEducation(id: string): void {
-        const current = this.resume();
-        if (current) {
-            this.resume.set({
-                ...current,
-                education: (current.education ?? []).filter((edu) => edu.id !== id),
-            });
-        }
+        this.resumeService.removeEducation(id);
+        this.resume.set(this.resumeService.currentResume());
     }
 
     // Skills
     public addSkill(name: string, level: SkillType["level"]): void {
-        const current = this.resume();
-        if (current && name.trim()) {
+        if (name.trim()) {
             const newSkill: SkillType = {
                 id: crypto.randomUUID(),
                 name: name.trim(),
                 level,
             };
-            this.resume.set({
-                ...current,
-                skills: [...(current.skills ?? []), newSkill],
-            });
+            this.resumeService.addSkill(newSkill);
+            this.resume.set(this.resumeService.currentResume());
         }
     }
 
     public removeSkill(id: string): void {
-        const current = this.resume();
-        if (current) {
-            this.resume.set({
-                ...current,
-                skills: (current.skills ?? []).filter((skill) => skill.id !== id),
-            });
-        }
+        this.resumeService.removeSkill(id);
+        this.resume.set(this.resumeService.currentResume());
     }
 
     // Languages
     public addLanguage(language: string, proficiency: LanguageType["proficiency"]): void {
-        const current = this.resume();
-        if (current && language.trim()) {
+        if (language.trim()) {
             const newLang: LanguageType = {
                 id: crypto.randomUUID(),
                 language: language.trim(),
                 proficiency: proficiency,
             };
-            this.resume.set({
-                ...current,
-                languages: [...(current.languages ?? []), newLang],
-            });
+            this.resumeService.addLanguage(newLang);
+            this.resume.set(this.resumeService.currentResume());
         }
     }
 
     public removeLanguage(id: string): void {
-        const current = this.resume();
-        if (current) {
-            this.resume.set({
-                ...current,
-                languages: (current.languages ?? []).filter((lang) => lang.id !== id),
-            });
-        }
+        this.resumeService.removeLanguage(id);
+        this.resume.set(this.resumeService.currentResume());
     }
 
     protected async saveResume(): Promise<void> {
         this.isLoading.set(true);
-
+        await this.resumeService.saveResume();
         await this.downloadPdf();
-
-        console.log("Resume saved:", this.resume());
         this.isLoading.set(false);
     }
 

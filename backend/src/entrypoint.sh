@@ -93,6 +93,20 @@ else:
   print('Superuser exists')
 PY
 
+# # Run all backend tests before starting the server
+# if [ "${SKIP_TESTS:-0}" != "1" ]; then
+#   echo "Running backend tests..."
+#   python manage.py test api.tests --verbosity=2 --noinput
+#   TEST_EXIT_CODE=$?
+#   if [ ${TEST_EXIT_CODE} -ne 0 ]; then
+#     echo "Tests failed with exit code ${TEST_EXIT_CODE}. Aborting startup." >&2
+#     exit ${TEST_EXIT_CODE}
+#   fi
+#   echo "All tests passed successfully!"
+# else
+#   echo "Skipping tests (SKIP_TESTS=1)"
+# fi
+
 echo "Starting server"
 if [ "${ENV_NAME:-dev}" = "dev" ]; then
   echo "Running development server"

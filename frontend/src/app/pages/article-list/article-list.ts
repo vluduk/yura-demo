@@ -18,6 +18,7 @@ export class ArticleList implements OnInit {
     protected readonly isLoading: WritableSignal<boolean> = signal<boolean>(false);
     protected readonly searchQuery: WritableSignal<string> = signal<string>("");
     protected readonly selectedCategory: WritableSignal<string | null> = signal<string | null>(null);
+    protected readonly selectedTag: WritableSignal<string | null> = signal<string | null>(null);
 
     protected readonly categories: string[] = ["Бізнес", "Найм", "Самозайнятість", "Освіта", "Кар'єра"];
 
@@ -39,6 +40,7 @@ export class ArticleList implements OnInit {
                 20,
                 this.searchQuery() || undefined,
                 this.selectedCategory() || undefined,
+                this.selectedTag() ? [this.selectedTag()!] : undefined,
             );
             this.articles.set(articles);
         } finally {
@@ -78,6 +80,11 @@ export class ArticleList implements OnInit {
 
     protected onCategorySelect(category: string | null): void {
         this.selectedCategory.set(category);
+        this.loadArticles();
+    }
+
+    protected onTagSelect(tag: string | null): void {
+        this.selectedTag.set(tag);
         this.loadArticles();
     }
 
