@@ -4,11 +4,11 @@ import uuid
 
 
 class ConversationType(models.TextChoices):
-    BUSINESS = 'Business', 'Власний бізнес'
-    SELF_EMPLOYMENT = 'SelfEmployment', 'Самозайнятість'
-    HIRING = 'Hiring', 'Наймана праця'
-    CAREER_PATH = 'CareerPath', 'Вибір напрямку'
-    EDUCATION = 'Education', 'Навчання'
+    BUSINESS = 'BUSINESS', 'Власний бізнес'
+    SELF_EMPLOYMENT = 'SELF_EMPLOYMENT', 'Самозайнятість'
+    HIRING = 'HIRING', 'Наймана праця'
+    CAREER_PATH = 'CAREER_PATH', 'Вибір напрямку'
+    EDUCATION = 'EDUCATION', 'Навчання'
 
 
 class Conversation(models.Model):

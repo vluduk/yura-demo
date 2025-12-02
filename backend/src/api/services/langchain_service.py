@@ -2,6 +2,7 @@
 LangChain-based services for advanced AI features.
 Includes multi-step business validation and vector RAG.
 """
+from __future__ import annotations
 import os
 import json
 from typing import List, Dict, Any, Optional
@@ -23,42 +24,59 @@ class BusinessValidationChain:
     """Multi-step business idea validation using LangChain."""
     
     def __init__(self):
+        # If LangChain isn't available, provide a safe non-raising fallback
         if not LANGCHAIN_AVAILABLE:
-            logger.error('LangChain not available: BusinessValidationChain cannot be constructed')
-            raise ImportError("LangChain is not installed. Run: pip install langchain langchain-google-genai")
-        
+            logger.warning('LangChain not available: BusinessValidationChain will operate in fallback mode')
+            self.available = False
+            return
+
         api_key = getattr(settings, 'GOOGLE_API_KEY', None) or os.environ.get('GOOGLE_API_KEY')
         if not api_key:
             logger.error('GOOGLE_API_KEY not configured for BusinessValidationChain')
-            raise ValueError("GOOGLE_API_KEY not configured")
-        
+            # Keep object usable but mark unavailable so callers can decide
+            self.available = False
+            return
+
         model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'gemini-2.0-flash-exp')
         self.llm = ChatGoogleGenerativeAI(
             model=model_name,
             google_api_key=api_key,
             temperature=0.3  # Lower temperature for more consistent analysis
         )
+        self.available = True
     
     def validate_market(self, business_idea: str) -> str:
         """Step 1: Market Analysis"""
+        if not getattr(self, 'available', False):
+            return "(LangChain not available — market analysis skipped)"
+
         chain = self._create_market_analysis_chain()
         result = chain.run(business_idea=business_idea)
         return result
 
     def validate_financials(self, business_idea: str, market_analysis: str) -> str:
         """Step 2: Financial Analysis"""
+        if not getattr(self, 'available', False):
+            return "(LangChain not available — financial analysis skipped)"
+
         chain = self._create_financial_analysis_chain()
         result = chain.run(business_idea=business_idea, market_analysis=market_analysis)
         return result
 
     def validate_skills(self, business_idea: str, user_context: str) -> str:
         """Step 3: Skills Match"""
+        if not getattr(self, 'available', False):
+            return "(LangChain not available — skills match skipped)"
+
         chain = self._create_skills_match_chain()
         result = chain.run(business_idea=business_idea, user_context=user_context)
         return result
 
     def validate_risks(self, business_idea: str, market_analysis: str, financial_analysis: str, skills_match: str) -> str:
         """Step 4: Risk Assessment"""
+        if not getattr(self, 'available', False):
+            return "(LangChain not available — risk assessment skipped)"
+
         chain = self._create_risk_assessment_chain()
         result = chain.run(
             business_idea=business_idea,
@@ -70,6 +88,9 @@ class BusinessValidationChain:
 
     def validate_verdict(self, business_idea: str, market_analysis: str, financial_analysis: str, skills_match: str, risk_assessment: str) -> str:
         """Step 5: Final Verdict"""
+        if not getattr(self, 'available', False):
+            return "(LangChain not available — final verdict skipped)"
+
         chain = self._create_final_verdict_chain()
         result = chain.run(
             business_idea=business_idea,
@@ -86,6 +107,16 @@ class BusinessValidationChain:
         DEPRECATED: Use individual step methods for interactive validation.
         """
         
+        # If LangChain is unavailable, return a safe placeholder result
+        if not getattr(self, 'available', False):
+            return {
+                'market_analysis': '(LangChain not available — market analysis skipped)',
+                'financial_analysis': '(LangChain not available — financial analysis skipped)',
+                'skills_match': '(LangChain not available — skills match skipped)',
+                'risk_assessment': '(LangChain not available — risk assessment skipped)',
+                'final_verdict': '(LangChain not available — final verdict skipped)'
+            }
+
         # Step 1: Market Analysis
         market_chain = self._create_market_analysis_chain()
         
@@ -304,13 +335,24 @@ class VectorRAG:
     """Vector-based Retrieval Augmented Generation for learning mode."""
     
     def __init__(self, persist_directory: str = "/tmp/chroma_db"):
+        # If LangChain isn't available, operate in a safe fallback mode
         if not LANGCHAIN_AVAILABLE:
-            raise ImportError("LangChain is not installed")
-        
+            logger.warning('LangChain not available: VectorRAG will operate in fallback mode')
+            self.available = False
+            self.persist_directory = persist_directory
+            self.vectorstore = None
+            self.embeddings = None
+            return
+
         api_key = getattr(settings, 'GOOGLE_API_KEY', None) or os.environ.get('GOOGLE_API_KEY')
         if not api_key:
-            raise ValueError("GOOGLE_API_KEY not configured")
-        
+            logger.error('GOOGLE_API_KEY not configured for VectorRAG')
+            self.available = False
+            self.persist_directory = persist_directory
+            self.vectorstore = None
+            self.embeddings = None
+            return
+
         self.embeddings = GoogleGenerativeAIEmbeddings(
             model="models/embedding-001",
             google_api_key=api_key
@@ -320,6 +362,10 @@ class VectorRAG:
     
     def initialize_vectorstore(self, force_refresh: bool = False):
         """Initialize or load existing vector store."""
+        if not getattr(self, 'available', True):
+            # Nothing to do in fallback mode
+            return
+
         try:
             if not force_refresh:
                 # Try to load existing vectorstore
@@ -386,6 +432,9 @@ class VectorRAG:
         - type: 'knowledge_document' or 'article'
         - relevance_score: Similarity score
         """
+        if not getattr(self, 'available', True):
+            return []
+
         if not self.vectorstore:
             self.initialize_vectorstore()
         
