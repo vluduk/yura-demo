@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, Signal, signal, WritableSignal } from "@angular/core";
+import { Component, computed, inject, OnDestroy, OnInit, Signal, signal, WritableSignal } from "@angular/core";
 import { Logo } from "@shared/components/logo/logo";
 import { Button } from "@shared/components/button/button";
 import { RouterLink, Router, NavigationEnd } from "@angular/router";
@@ -42,7 +42,39 @@ export class ChatSidebar implements OnInit {
 
         // Load conversations only once on init
         this.loadInitialConversations();
+        // Close open menus when clicking outside or pressing Escape
+        document.addEventListener('click', this._onDocumentClick);
+        document.addEventListener('keydown', this._onDocumentKeydown);
     }
+
+    ngOnDestroy(): void {
+        document.removeEventListener('click', this._onDocumentClick);
+        document.removeEventListener('keydown', this._onDocumentKeydown);
+    }
+
+    private _onDocumentClick = (evt: MouseEvent) => {
+        // If no menu is open, nothing to do
+        if (!this.openMenuId()) return;
+
+        // Inspect event path to ensure clicks inside menu don't close it
+        const path = (evt.composedPath && evt.composedPath()) || ((evt as any).path || []);
+        for (const el of path) {
+            if (!el || !(el as any).classList) continue;
+            const cls = (el as any).classList;
+            if (cls.contains && (cls.contains('menu__dropdown') || cls.contains('menu__toggle') || cls.contains('item__menu'))) {
+                return;
+            }
+        }
+
+        // Click was outside the menu — hide it
+        this.hideMenu();
+    };
+
+    private _onDocumentKeydown = (evt: KeyboardEvent) => {
+        if (evt.key === 'Escape' || evt.key === 'Esc') {
+            this.hideMenu();
+        }
+    };
 
     private loadInitialConversations(): void {
         if (this.conversationService.sidebarConversations().length === 0) {
