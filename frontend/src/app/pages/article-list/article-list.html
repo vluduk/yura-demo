@@ -1,1 +1,87 @@
-<p>article-list works!</p>
+<div class="article-list">
+    <div class="article-list__header">
+        <ui-title [title]="'Що ви хочете опанувати сьогодні?'" [size]="'large'"></ui-title>
+        <div class="header__search-wrapper">
+            <div class="search-wrapper__search">
+                <input 
+                    type="text"
+                    class="search__input"
+                    placeholder="Назва статті"
+                    [value]="searchQuery()"
+                    (input)="onSearchInput($any($event.target).value)"
+                    (keydown.enter)="onSearch()"
+                />
+                <button class="search__button" (click)="onSearch()">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+            <div class="search-wrapper__filters">
+                <span class="filters__title">Фільтри:</span>
+                <div class="filters__list filter-list">
+                    <span
+                        class="filter-list__item"
+                        [class.active]="selectedCategory() === null"
+                        (click)="onCategorySelect(null)"
+                    >
+                        Всі
+                    </span>
+                    @for (category of categories; track category) {
+                        <span
+                            class="filter-list__item"
+                            [class.active]="isCategoryActive(category)"
+                            (click)="onCategorySelect(category)"
+                        >
+                            {{ category }}
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (recommendedArticles().length !== 0) {
+        <div class="article-list__recommended-wrapper">
+            <ui-title [title]="'Рекомендовані статті'" [size]="'medium'"></ui-title>
+
+            <div class="recommended-wrapper__list-wrapper">
+                <ui-button 
+                    [icon]="'fa-solid fa-chevron-left'" 
+                    [type]="'icon'"
+                    (click)="scrollRecommended('left')"
+                ></ui-button>
+                <div class="list-wrapper__list recommended-list" #recommendedList>
+                    @for (article of recommendedArticles(); track article.id) {
+                        <app-article-card [article]="article" [variant]="'small'"></app-article-card>
+                    }
+                </div>
+                <ui-button 
+                    [icon]="'fa-solid fa-chevron-right'" 
+                    [type]="'icon'"
+                    (click)="scrollRecommended('right')"
+                ></ui-button>
+            </div>
+        </div>
+    }
+
+    <div class="article-list__all-wrapper">
+        <ui-title [title]="'Всі статті'" [size]="'medium'"></ui-title>
+
+        <div class="article-list__content">
+            @if (isLoading()) {
+                <div class="content__loading">
+                    <span>Завантаження...</span>
+                </div>
+            } @else if (articles().length === 0) {
+                <div class="content__empty">
+                    <span>Статей не знайдено</span>
+                </div>
+            } @else {
+                <div class="content__list">
+                    @for (article of articles(); track article.id) {
+                        <app-article-card [article]="article" [variant]="'horizontal'"></app-article-card>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
