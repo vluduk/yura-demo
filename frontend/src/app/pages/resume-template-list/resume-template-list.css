@@ -1,0 +1,68 @@
+.resume-template-list {
+    padding: 32px 24px;
+}
+
+.resume-template-list__header {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.header__subtitle {
+    max-width: 500px;
+    margin-top: 12px;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 16px;
+    color: var(--primary-text-color);
+}
+
+.resume-template-list__content {
+    margin-top: 24px;
+}
+
+.content__loading,
+.content__empty {
+    padding: 64px;
+    font-size: 16px;
+    color: var(--primary-text-color);
+    text-align: center;
+}
+
+.content__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.content__grid--disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.content__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-index-1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--secondary-text-color);
+    background-color: var(--shadow-color-2);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .content__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .content__grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}

@@ -1,0 +1,19 @@
+<div class="form-languages">
+    <h3 class="form__title">Мови</h3>
+    <div class="form__add">
+        <input type="text" class="field__input" placeholder="Мова" [value]="newLang()" (input)="newLang.set($any($event.target).value)" (keydown.enter)="addLanguage()" />
+        <select class="field__select" [value]="newProficiency()" (change)="newProficiency.set($any($event.target).value)">
+            @for (level of proficiencies; track level.value) { <option [value]="level.value">{{ level.label }}</option> }
+        </select>
+        <ui-button [icon]="'fa-solid fa-plus'" [type]="'primary'" (click)="addLanguage()"></ui-button>
+    </div>
+    <div class="languages__list">
+        @for (lang of languages(); track lang.id) {
+            <div class="lang-item">
+                <span class="lang__name">{{ lang.language }}</span>
+                <span class="lang__level">{{ lang.proficiency?.toUpperCase() }}</span>
+                <button class="lang__remove" (click)="removeLanguage(lang.id)"><i class="fa-solid fa-times"></i></button>
+            </div>
+        } @empty { <p class="form__empty">Додайте мови</p> }
+    </div>
+</div>

@@ -1,1 +1,87 @@
-<p>resume-builder works!</p>
+<div class="resume-builder container">
+    <div class="resume-builder__content">
+        <div class="content__form">
+            <div class="form__header">
+                <div class="header__tabs" [style.--progress-width]="`${progressWidth()}%`">
+                    @for (tab of tabs; track tab.id) {
+                        <ui-button
+                            class="tabs__item"
+                            [label]="tab.label"
+                            [icon]="tab.icon"
+                            (click)="setActiveTab(tab)"
+                        ></ui-button>
+                    }
+                </div>
+            </div>
+
+            @if (resume()) {
+                @switch (activeTab()) {
+                    @case ("personal") {
+                        <app-resume-form-personal
+                            [personalInfo]="personalInfo()"
+                            (onUpdate)="updatePersonalInfo($event.field, $event.value)"
+                        ></app-resume-form-personal>
+                    }
+                    @case ("experience") {
+                        <app-resume-form-experience
+                            [experiences]="experiences()"
+                            (onAdd)="addExperience()"
+                            (onUpdate)="updateExperience($event.id, $event.field, $event.value)"
+                            (onRemove)="removeExperience($event)"
+                        ></app-resume-form-experience>
+                    }
+                    @case ("education") {
+                        <app-resume-form-education
+                            [educations]="educations()"
+                            (onAdd)="addEducation()"
+                            (onUpdate)="updateEducation($event.id, $event.field, $event.value)"
+                            (onRemove)="removeEducation($event)"
+                        ></app-resume-form-education>
+                    }
+                    @case ("skills") {
+                        <app-resume-form-skills
+                            [skills]="skills()"
+                            (onAdd)="addSkill($event.name, $event.level)"
+                            (onRemove)="removeSkill($event)"
+                        ></app-resume-form-skills>
+                    }
+                    @case ("languages") {
+                        <app-resume-form-languages
+                            [languages]="languages()"
+                            (onAdd)="addLanguage($event.language, $event.proficiency)"
+                            (onRemove)="removeLanguage($event)"
+                        ></app-resume-form-languages>
+                    }
+                }
+            }
+
+            <div class="form__actions">
+                <ui-button
+                    [label]="'Зберегти'"
+                    [icon]="'fa-solid fa-save'"
+                    [type]="'primary'"
+                    [isLoading]="isLoading()"
+                    (click)="saveResume()"
+                ></ui-button>
+            </div>
+        </div>
+
+        <div class="content__preview-wrapper" #resumeContainer>
+            @if (resume() && template()) {
+                <div class="preview-wrapper__resume-preview" #previewWrapper>
+                    @if (templateComponent()) {
+                        <ng-container
+                            *ngComponentOutlet="templateComponent(); inputs: { data: resume(), scale: scaleFactor() }"
+                        ></ng-container>
+                    } @else {
+                        <div class="resume-preview__fallback">
+                            <span>Шаблон не знайдено</span>
+                        </div>
+                    }
+                </div>
+            } @else {
+                <div class="content__preview-loading">Завантаження...</div>
+            }
+        </div>
+    </div>
+</div>

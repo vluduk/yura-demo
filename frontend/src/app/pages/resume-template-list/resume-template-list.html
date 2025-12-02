@@ -1,1 +1,32 @@
-<p>resume-template-list works!</p>
+<div class="resume-template-list container">
+    <div class="resume-template-list__header">
+        <ui-title [title]="'Оберіть шаблон резюме'" [size]="'large'"></ui-title>
+    </div>
+
+    <div class="resume-template-list__content">
+        @if (isLoading()) {
+            <div class="content__loading">
+                <span>Завантаження...</span>
+            </div>
+        } @else if (templates().length === 0) {
+            <div class="content__empty">
+                <span>Шаблони не знайдено</span>
+            </div>
+        } @else {
+            <div class="content__grid" [class.content__grid--disabled]="isCreating()">
+                @for (template of templates(); track template.id) {
+                    <app-resume-template-card 
+                        [template]="template"
+                        (onSelect)="onTemplateSelect($event)"
+                    ></app-resume-template-card>
+                }
+            </div>
+        }
+
+        @if (isCreating()) {
+            <div class="content__overlay">
+                <span>Створення резюме...</span>
+            </div>
+        }
+    </div>
+</div>

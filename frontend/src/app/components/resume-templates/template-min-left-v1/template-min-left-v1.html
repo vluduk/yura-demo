@@ -1,0 +1,123 @@
+<div class="template" [style.transform]="'scale(' + scale() + ')'">
+    <header class="template__header">
+        <h1 class="header__name">{{ data().personal_info?.first_name }} {{ data().personal_info?.last_name }}</h1>
+
+        <div class="header__contacts">
+            @if (data().personal_info?.email) {
+                <span class="contacts__item">
+                    <i class="fa-solid fa-envelope"></i>
+                    {{ data().personal_info?.email }}
+                </span>
+            }
+            @if (data().personal_info?.phone) {
+                <span class="contacts__item">
+                    <i class="fa-solid fa-phone"></i>
+                    {{ data().personal_info?.phone }}
+                </span>
+            }
+            @if (data().personal_info?.city || data().personal_info?.country) {
+                <span class="contacts__item">
+                    <i class="fa-solid fa-location-dot"></i>
+                    {{ data().personal_info?.city }}
+                    @if (data().personal_info?.city && data().personal_info?.country) {
+                        ,
+                    }
+                    {{ data().personal_info?.country }}
+                </span>
+            }
+        </div>
+    </header>
+
+    @if (data().personal_info?.summary) {
+        <section class="template__section section-summary">
+            <h2 class="section__title">Professional Summary</h2>
+            <p class="section-summary__text">{{ data().personal_info?.summary }}</p>
+        </section>
+    }
+
+    @if (data().experience && data().experience!.length > 0) {
+        <section class="template__section section-experience">
+            <h2 class="section__title">Experience</h2>
+
+            @for (job of data().experience; track job.id) {
+                <div class="section-experience__entry experience-entry resume-entry">
+                    <div class="resume-entry__header experience-entry-header">
+                        <div class="experience-entry-header__main experience-entry-main entry-main">
+                            <span class="entry-main__bold">{{ job.job_title }}</span>
+                            <span class="entry-main__separator">, </span>
+                            <span class="entry-main__italic">{{ job.employer }}</span>
+                        </div>
+
+                        <div class="experience-entry-header__meta experience-entry-meta entry-meta">
+                            <span class="entry-meta__date">
+                                {{ job.start_date }}
+                                @if (job.start_date) {
+                                    —
+                                }
+                                {{ job.is_current ? "теперішній час" : job.end_date }}
+                            </span>
+                        </div>
+                    </div>
+
+                    @if (job.city) {
+                        <div class="experience-entry__subtitle entry-subtitle">{{ job.city }}</div>
+                    }
+
+                    @if (job.description) {
+                        <div class="experience-entry__content">{{ job.description }}</div>
+                    }
+                </div>
+            }
+        </section>
+    }
+
+    @if (data().education && data().education!.length > 0) {
+        <section class="template__section section-education">
+            <h2 class="section__title">Education</h2>
+
+            @for (edu of data().education; track edu.id) {
+                <div class="section-education-entry education-entry resume-entry">
+                    <div class="resume-entry__header education-entry-header">
+                        <span class="education-entry-header__main education-entry-main entry-main">
+                            {{ edu.institution }}
+                        </span>
+                        <div class="education-entry-header__meta education-entry-meta entry-meta">
+                            <span class="entry-meta__date">
+                                {{ edu.start_date }}
+                                @if (edu.start_date) {
+                                    —
+                                }
+                                {{ edu.is_current ? "теперішній час" : edu.end_date }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="education-entry__subtitle entry-subtitle">
+                        <span class="education-entry__degree">{{ edu.degree }}</span>
+                        @if (edu.field_of_study) {
+                            <span> in {{ edu.field_of_study }}</span>
+                        }
+                    </div>
+                </div>
+            }
+        </section>
+    }
+
+    @if ((data().skills?.length || 0) > 0) {
+        <section class="template__section section-skills">
+            <h2 class="section__title">Skills</h2>
+
+            <div class="section-skills__content skill-content">
+                <span class="skill-content__label">Technical: </span>
+                <span class="skill-content__list">
+                    @for (skill of data().skills; track skill.id; let last = $last) {
+                        {{ skill.name }}
+                        @if (!last) {
+                            <span>, </span>
+                        }
+                    }
+                </span>
+            </div>
+        </section>
+    }
+</div>

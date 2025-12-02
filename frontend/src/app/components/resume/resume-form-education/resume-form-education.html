@@ -1,0 +1,12 @@
+<div class="form-education">
+    <div class="form__header"><h3 class="form__title">Освіта</h3><ui-button [label]="'Додати'" [icon]="'fa-solid fa-plus'" [type]="'secondary'" (click)="addEducation()"></ui-button></div>
+    @for (edu of educations(); track edu.id) {
+        <div class="education-item">
+            <div class="item__header"><span class="item__number">{{ $index + 1 }}</span><button class="item__remove" (click)="removeEducation(edu.id)"><i class="fa-solid fa-trash"></i></button></div>
+            <div class="form__row"><div class="form__field"><label class="field__label">Заклад</label><input type="text" class="field__input" [value]="edu.institution" (input)="updateEducation(edu.id, 'institution', $event)" /></div><div class="form__field"><label class="field__label">Ступінь</label><input type="text" class="field__input" [value]="edu.degree" (input)="updateEducation(edu.id, 'degree', $event)" /></div></div>
+            <div class="form__field"><label class="field__label">Спеціальність</label><input type="text" class="field__input" [value]="edu.field_of_study || ''" (input)="updateEducation(edu.id, 'field_of_study', $event)" /></div>
+            <div class="form__row"><div class="form__field"><label class="field__label">Початок</label><input type="month" class="field__input" [value]="edu.start_date" (input)="updateEducation(edu.id, 'start_date', $event)" /></div><div class="form__field"><label class="field__label">Кінець</label><input type="month" class="field__input" [value]="edu.end_date" [disabled]="edu.is_current" (input)="updateEducation(edu.id, 'end_date', $event)" /></div></div>
+            <div class="form__field form__field--checkbox"><input type="checkbox" [checked]="edu.is_current" (change)="updateEducation(edu.id, 'is_current', $event)" /><label>Навчаюсь зараз</label></div>
+        </div>
+    } @empty { <p class="form__empty">Додайте свою освіту</p> }
+</div>

@@ -20,6 +20,17 @@ export const routes: Routes = [
                 loadComponent: () => import("@pages/article/article").then((m) => m.Article),
                 canActivate: [AuthGuard],
             },
+            {
+                path: "resume-builder/:resumeId",
+                loadComponent: () => import("@pages/resume-builder/resume-builder").then((m) => m.ResumeBuilder),
+                canActivate: [AuthGuard],
+            },
+            {
+                path: "resume-templates",
+                loadComponent: () =>
+                    import("@pages/resume-template-list/resume-template-list").then((m) => m.ResumeTemplateList),
+                canActivate: [AuthGuard],
+            },
         ],
     },
     {

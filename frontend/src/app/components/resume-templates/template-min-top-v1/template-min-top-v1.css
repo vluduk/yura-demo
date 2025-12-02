@@ -1,0 +1,137 @@
+.template {
+    width: 210mm;
+    height: 297mm;
+    padding: 10mm 15mm;
+    overflow-y: auto;
+    font-family: Georgia, serif;
+    font-size: 10pt;
+    line-height: 1.4;
+    color: #333333;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: #ffffff;
+    transform-origin: top center;
+}
+
+.template__header {
+    padding-bottom: 6mm;
+    margin-bottom: 8mm;
+    text-align: center;
+    border-bottom: 0.5pt solid #dddddd;
+}
+
+.header__name {
+    margin: 0 0 4mm;
+    font-size: 22pt;
+    font-weight: 400;
+    color: #222222;
+    text-transform: uppercase;
+    letter-spacing: 1pt;
+}
+
+.header__contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6mm;
+    justify-content: center;
+    font-size: 9pt;
+    color: #666666;
+}
+
+.contacts__item {
+    display: flex;
+    gap: 1.5mm;
+    align-items: center;
+}
+
+.contacts__item i {
+    font-size: 8pt;
+    color: #888888;
+}
+
+.template__section {
+    margin-bottom: 7mm;
+}
+
+.section__title {
+    padding-bottom: 2mm;
+    margin-bottom: 4mm;
+    font-size: 11pt;
+    font-weight: 400;
+    color: #444444;
+    text-transform: uppercase;
+    letter-spacing: 0.5pt;
+    border-bottom: 0.25pt solid #eeeeee;
+}
+
+.section__text {
+    margin: 0;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #555555;
+    text-align: justify;
+}
+
+.section__list {
+    display: flex;
+    flex-direction: column;
+    gap: 5mm;
+}
+
+.list__item {
+    display: flex;
+    flex-direction: column;
+    gap: 1mm;
+}
+
+.item__header {
+    display: flex;
+    gap: 3mm;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.item__title {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #333333;
+}
+
+.item__date {
+    font-size: 8pt;
+    color: #888888;
+    white-space: nowrap;
+}
+
+.item__subtitle {
+    font-size: 9pt;
+    font-style: italic;
+    color: #666666;
+}
+
+.item__field {
+    font-size: 9pt;
+    color: #777777;
+}
+
+.item__description {
+    margin: 1.5mm 0 0;
+    font-size: 9pt;
+    line-height: 1.4;
+    color: #555555;
+}
+
+.section__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5mm;
+}
+
+.tags__item {
+    padding: 1.5mm 3mm;
+    font-size: 8pt;
+    color: #555555;
+    background: #f5f5f5;
+    border: 0.25pt solid #e0e0e0;
+    border-radius: 1mm;
+}

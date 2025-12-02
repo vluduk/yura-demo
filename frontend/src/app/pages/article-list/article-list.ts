@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, signal, ViewChild, WritableSignal } from "@angular/core";
+import { Component, ElementRef, inject, OnInit, Signal, signal, viewChild, WritableSignal } from "@angular/core";
 import { Title } from "@shared/components/title/title";
 import { Button } from "@shared/components/button/button";
 import { ArticleService } from "@shared/services/article.service";
@@ -21,7 +21,7 @@ export class ArticleList implements OnInit {
 
     protected readonly categories: string[] = ["Бізнес", "Найм", "Самозайнятість", "Освіта", "Кар'єра"];
 
-    @ViewChild("recommendedList") recommendedListRef!: ElementRef;
+    protected readonly recommendedListRef: Signal<ElementRef> = viewChild.required<ElementRef>("recommendedList");
 
     private readonly articleService: ArticleService = inject(ArticleService);
     private searchTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -86,7 +86,7 @@ export class ArticleList implements OnInit {
     }
 
     protected scrollRecommended(direction: "left" | "right"): void {
-        const container = this.recommendedListRef?.nativeElement;
+        const container = this.recommendedListRef()?.nativeElement as HTMLElement;
         if (container) {
             const scrollAmount = 280;
             container.scrollBy({

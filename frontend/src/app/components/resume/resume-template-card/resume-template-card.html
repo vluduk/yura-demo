@@ -1,0 +1,16 @@
+<div class="template-card" (click)="handleSelect()">
+    <div class="template-card__preview">
+        <img [src]="template().preview_image" [alt]="template().name" class="preview__image" />
+        
+        <div class="preview__overlay">
+            <button class="overlay__button">
+                <i class="fa-solid fa-plus"></i>
+                Використати
+            </button>
+        </div>
+    </div>
+
+    <div class="template-card__info">
+        <h3 class="info__name">{{ template().name }}</h3>
+    </div>
+</div>

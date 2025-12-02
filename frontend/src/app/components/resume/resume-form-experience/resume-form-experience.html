@@ -1,0 +1,56 @@
+<div class="form-experience">
+    <div class="form__header">
+        <h3 class="form__title">Досвід роботи</h3>
+        <ui-button 
+            [label]="'Додати'"
+            [icon]="'fa-solid fa-plus'"
+            [type]="'secondary'"
+            (click)="addExperience()"
+        ></ui-button>
+    </div>
+
+    @for (exp of experiences(); track exp.id) {
+        <div class="experience-item">
+            <div class="item__header">
+                <span class="item__number">{{ $index + 1 }}</span>
+                <button class="item__remove" (click)="removeExperience(exp.id)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+
+            <div class="form__row">
+                <div class="form__field">
+                    <label class="field__label">Компанія</label>
+                    <input type="text" class="field__input" [value]="exp.employer" (input)="updateExperience(exp.id, 'employer', $event)" />
+                </div>
+                <div class="form__field">
+                    <label class="field__label">Посада</label>
+                    <input type="text" class="field__input" [value]="exp.job_title" (input)="updateExperience(exp.id, 'job_title', $event)" />
+                </div>
+            </div>
+
+            <div class="form__row">
+                <div class="form__field">
+                    <label class="field__label">Початок</label>
+                    <input type="month" class="field__input" [value]="exp.start_date" (input)="updateExperience(exp.id, 'start_date', $event)" />
+                </div>
+                <div class="form__field">
+                    <label class="field__label">Кінець</label>
+                    <input type="month" class="field__input" [value]="exp.end_date" [disabled]="exp.is_current" (input)="updateExperience(exp.id, 'end_date', $event)" />
+                </div>
+            </div>
+
+            <div class="form__field form__field--checkbox">
+                <input type="checkbox" [checked]="exp.is_current" (change)="updateExperience(exp.id, 'is_current', $event)" />
+                <label>Працюю тут зараз</label>
+            </div>
+
+            <div class="form__field">
+                <label class="field__label">Опис</label>
+                <textarea class="field__textarea" [value]="exp.description || ''" (input)="updateExperience(exp.id, 'description', $event)" rows="3"></textarea>
+            </div>
+        </div>
+    } @empty {
+        <p class="form__empty">Додайте свій досвід роботи</p>
+    }
+</div>

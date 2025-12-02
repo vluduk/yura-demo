@@ -1,0 +1,120 @@
+:host {
+    display: block;
+    --font-family-serif: "Georgia", "Times New Roman", serif;
+    --font-size-base: 10.5pt;
+    --font-size-h1: 22pt;
+    --font-size-h2: 11pt;
+    --line-height-base: 1.4;
+    --spacing-section: 18px;
+    --spacing-item: 12px;
+    --color-text-primary: #222222;
+    --color-text-secondary: #555555;
+    --border-color: #000000;
+}
+
+.template {
+    width: 210mm;
+    height: 297mm;
+    padding: 10mm;
+    overflow-y: auto;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 10pt;
+    line-height: 1.4;
+    color: #333333;
+    background: #ffffff;
+    transform-origin: top center;
+}
+
+
+.template__header {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.header__name {
+    padding: 0;
+    margin-bottom: 8px;
+    font-size: var(--font-size-h1);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.header__contacts {
+    font-size: 10pt;
+}
+
+.header__contact-item {
+    display: inline-block;
+}
+
+.header__contact-item:not(:last-child)::after {
+    margin: 0 6px;
+    color: var(--color-text-secondary);
+    content: "•";
+}
+
+.template__section {
+    margin-bottom: var(--spacing-section);
+}
+
+.section__title {
+    padding-bottom: 3px;
+    margin-bottom: 10px;
+    font-size: var(--font-size-h2);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-summary__text {
+    margin: 0;
+    text-align: justify;
+}
+
+.resume-entry {
+    margin-bottom: var(--spacing-item);
+    break-inside: avoid;
+}
+
+.resume-entry__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.entry-main__bold {
+    font-size: 11pt;
+    font-weight: 700;
+}
+
+.entry-main__italic {
+    font-style: italic;
+}
+
+.entry-meta__date {
+    font-size: 10pt;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.entry-subtitle {
+    margin-bottom: 4px;
+    font-size: 9pt;
+    color: var(--color-text-secondary);
+}
+
+.experience-entry__content {
+    text-align: justify;
+    white-space: pre-wrap;
+}
+
+.skill-content {
+    margin-bottom: 4px;
+}
+
+.skill-content__label {
+    font-weight: 700;
+}
