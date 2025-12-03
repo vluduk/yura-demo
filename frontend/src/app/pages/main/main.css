@@ -25,3 +25,127 @@
     height: 100%;
     object-fit: cover;
 }
+
+.intro-part__title {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 32px 0;
+}
+
+.title__pretitle {
+    font-size: 48px;
+    font-weight: 700;
+}
+
+.pretitle__contrast {
+    color: var(--contrast-color);
+}
+
+.title__subtitle {
+    font-weight: 300;
+}
+
+.intro-part__buttons {
+    display: flex;
+    gap: 32px;
+}
+
+.help__cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-top: 32px;
+}
+
+.help-cards__card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: calc(50% - 20px);
+    min-height: 140px;
+    padding: 18px 24px 24px;
+    color: var(--primary-text-color);
+    text-align: justify;
+    background-color: var(--background-color);
+    border-radius: 20px;
+}
+
+.card__title {
+    font-size: 26px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.how__cards {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 32px;
+}
+
+.how-cards__card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 560px;
+    height: 80px;
+    padding: 0 24px;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--secondary-text-color);
+    text-align: center;
+    background-color: var(--card-background-color);
+    border-radius: 32px;
+}
+
+.card_left {
+    align-self: flex-start;
+}
+
+.card_center {
+    align-self: center;
+}
+
+.card_right {
+    align-self: flex-end;
+}
+
+.articles__card-list {
+    display: flex;
+    gap: 54px;
+    margin-top: 32px;
+}
+
+.articles-card-list__card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    width: calc(33% - 54px);
+    padding: 18px 24px 24px;
+    color: var(--primary-text-color);
+    background-color: var(--background-color);
+    border-radius: 16px;
+}
+
+.article-card__title {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.article-card__summary {
+    text-align: justify;
+}
+
+.article-card__button {
+    margin-top: auto;
+}
+
+.articles__link-button {
+    display: block;
+    margin: 40px auto;
+    text-align: center;
+}
