@@ -289,7 +289,7 @@
 }
 
 .horizontal__content .footer__button:hover {
-    background-color: var(--button-hover-dark);
+    background-color: var(--button-hover-color);
 }
 
 .horizontal__content .footer__button i {

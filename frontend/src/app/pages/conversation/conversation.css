@@ -1,14 +1,14 @@
 .conversation {
     position: relative;
     height: 100%;
-    padding-top: var(--header-height);
+    padding-top: 30px;
 }
 
 .conversation__message-wrapper {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    height: calc(100vh - 274px);
+    height: calc(100vh - 240px);
     padding-top: 20px;
     overflow: auto;
 }
