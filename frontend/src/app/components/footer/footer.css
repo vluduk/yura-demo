@@ -11,6 +11,13 @@
     height: 100%;
 }
 
+.footer__description {
+    display: block;
+    width: 210px;
+    margin-top: 16px;
+    font-size: 12px;
+}
+
 .block__title {
     font-weight: 700;
 }

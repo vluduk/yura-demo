@@ -2,32 +2,32 @@
     <div class="container">
         <div class="footer__block">
             <ui-logo [size]="'large'"></ui-logo>
-            <span>Платформа кар'єрної навігації для українських ветеранів</span>
+            <span class="footer__description">Платформа кар'єрної навігації для українських ветеранів</span>
         </div>
 
         <div class="footer__block">
             <span class="block__title">Освітні напрямки</span>
             <div class="block__links">
-                <ui-link [label]="'Наймана праця'" [routerLink]="'/'"></ui-link>
-                <ui-link [label]="'Самозайнятість'" [routerLink]="'/'"></ui-link>
-                <ui-link [label]="'Власний бізнес'" [routerLink]="'/'"></ui-link>
+                <ui-link [label]="'Наймана праця'" (click)="createConversation(conversationTypes.Hiring)"></ui-link>
+                <ui-link [label]="'Самозайнятість'" (click)="createConversation(conversationTypes.SelfEmployment)"></ui-link>
+                <ui-link [label]="'Власний бізнес'" (click)="createConversation(conversationTypes.Business)"></ui-link>
             </div>
         </div>
 
         <div class="footer__block">
             <span class="block__title">Ресурси</span>
             <div class="block__links">
-                <ui-link [label]="'ШІ-консультант'" [routerLink]="'/'"></ui-link>
-                <ui-link [label]="'Конструктор резюме'" [routerLink]="'/'"></ui-link>
-                <ui-link [label]="'Валідатор бізнес-ідей'" [routerLink]="'/'"></ui-link>
+                <ui-link [label]="'ШІ-консультант'" [routerLink]="'/conversation'"></ui-link>
+                <ui-link [label]="'Конструктор резюме'" [routerLink]="'/resume-templates'"></ui-link>
+                <ui-link [label]="'Валідатор бізнес-ідей'" (click)="createConversation(conversationTypes.Business)"></ui-link>
             </div>
         </div>
 
         <div class="footer__block">
             <span class="block__title">Контакти</span>
             <div class="block__links">
-                <ui-link [label]="'email@gmail.com'" [path]="'/'"></ui-link>
-                <ui-link [label]="'+380 99 999 9999'" [path]="'/'"></ui-link>
+                <ui-link [label]="'email@gmail.com'" [path]="'mailto:email@gmail.com'"></ui-link>
+                <ui-link [label]="'+380 99 999 9999'" [path]="'tel:+380999999999'"></ui-link>
             </div>
         </div>
     </div>
