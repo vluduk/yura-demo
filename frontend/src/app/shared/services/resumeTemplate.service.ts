@@ -19,31 +19,13 @@ export class ResumeTemplateService {
         {
             id: "2",
             name: "Мінімалізм",
-            preview_image: "https://cdn-images.zety.com/pages/minimalist_resume_template_1.jpg",
+            preview_image: "res1.webp",
             component: null as any as Type<IResumeTemplate>,
         },
         {
             id: "3",
             name: "Креативний",
-            preview_image: "https://cdn-images.zety.com/pages/creative_resume_template_2.jpg",
-            component: null as any as Type<IResumeTemplate>,
-        },
-        {
-            id: "4",
-            name: "IT-спеціаліст",
-            preview_image: "https://cdn-images.zety.com/pages/modern_resume_template_3.jpg",
-            component: null as any as Type<IResumeTemplate>,
-        },
-        {
-            id: "5",
-            name: "Бізнес",
-            preview_image: "https://cdn-images.zety.com/pages/professional_resume_template_1.jpg",
-            component: null as any as Type<IResumeTemplate>,
-        },
-        {
-            id: "6",
-            name: "Студентський",
-            preview_image: "https://cdn-images.zety.com/pages/clean_resume_template_2.jpg",
+            preview_image: "res2.png",
             component: null as any as Type<IResumeTemplate>,
         },
     ];
@@ -65,7 +47,11 @@ export class ResumeTemplateService {
         this.isLoading.set(true);
         try {
             const response = await firstValueFrom(
-                this.httpClient.post<any>(`${environment.serverURL}/resumes/`, { template_id: templateId }, { withCredentials: true })
+                this.httpClient.post<any>(
+                    `${environment.serverURL}/resumes/`,
+                    { template_id: templateId },
+                    { withCredentials: true },
+                ),
             );
 
             // Map backend response to frontend ResumeDataType

@@ -14,13 +14,13 @@ export const TEMPLATES: Record<string, ResumeTemplateType> = {
     "min-left-v1": {
         id: "min-left-v1",
         name: "Мінімалістичний (ліва панель)",
-        preview_image: "https://cdn.example.com/templates/min-left-v1/preview.jpg",
+        preview_image: "res1.webp",
         component: TemplateMinLeftV1,
     },
     "min-top-v1": {
         id: "min-top-v1",
         name: "Мінімалістичний (верхня панель)",
-        preview_image: "https://cdn.example.com/templates/min-top-v1/preview.jpg",
+        preview_image: "res2.png",
         component: TemplateMinTopV1,
     },
 };

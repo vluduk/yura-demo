@@ -36,7 +36,7 @@
 
     <div class="main__block main__block_light block-help">
         <div class="container">
-            <ui-title [title]="'Чим ми допомагаємо?'" [size]="'large'" [align]="'center'"></ui-title>
+            <ui-title [title]="'Чим ми допомагаємо?'" [theme]="'secondary'" [size]="'large'" [align]="'center'"></ui-title>
 
             <div class="help__cards help-cards">
                 <div class="help-cards__card">
@@ -91,7 +91,7 @@
 
     <div class="main__block main__block_light block-articles">
         <div class="container">
-            <ui-title [title]="'Популярні статті?'" [size]="'large'" [align]="'center'"></ui-title>
+            <ui-title [title]="'Популярні статті'" [theme]="'secondary'" [size]="'large'" [align]="'center'"></ui-title>
 
             <div class="articles__card-list articles-card-list">
                 @for (item of recommendedArticles(); track item.id) {

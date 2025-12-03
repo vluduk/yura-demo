@@ -34,7 +34,6 @@
     transform: scale(1.03);
 }
 
-/* Overlay */
 .preview__overlay {
     position: absolute;
     inset: 0;
@@ -57,12 +56,12 @@
     padding: 12px 24px;
     font-size: 14px;
     font-weight: 500;
-    color: var(--secondary-text-color);
+    color: var(--primary-text-color);
     cursor: pointer;
     background-color: var(--button-background-color);
     border: none;
     border-radius: 8px;
-    transition: background-color 0.2s ease, transform 0.2s ease;
+    transition: all 0.2s;
 }
 
 .overlay__button:hover {
@@ -79,4 +78,5 @@
     margin: 0;
     font-size: 16px;
     font-weight: 600;
+    color: var(--secondary-text-color);
 }
