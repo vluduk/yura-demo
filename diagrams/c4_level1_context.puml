@@ -1,0 +1,18 @@
+@startuml C4_Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+TITLE System Context Diagram - Yura Career Advisor
+
+Person(veteran, "Veteran", "A Ukrainian veteran seeking career transition, employment, or business opportunities.")
+Person(admin, "Administrator", "System administrator managing content and users.")
+
+System(yura, "Yura Platform", "AI-powered career advisor that helps veterans find jobs, start businesses, or learn new skills.")
+
+System_Ext(google_gemini, "Google Gemini API", "Provides LLM capabilities for chat, business validation, and vector embeddings.")
+
+Rel(veteran, yura, "Uses for career advice, resume building, and business planning")
+Rel(admin, yura, "Manages articles, knowledge base, and users")
+
+Rel(yura, google_gemini, "Sends prompts and text for analysis", "HTTPS/JSON")
+
+@enduml

@@ -1,0 +1,60 @@
+@startuml C4_Component_API
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+TITLE Component Diagram - API Application
+
+Container(spa, "Single Page Application", "Angular", "Provides the user interface for veterans to interact with the system.")
+
+ContainerDb(db, "Database", "PostgreSQL + pgvector", "Stores users, conversations, messages, business ideas, articles, and vector embeddings.")
+
+System_Ext(google_gemini, "Google Gemini API", "LLM & Embeddings Provider")
+
+Container_Boundary(api, "API Application") {
+    Component(auth_view, "Auth Views", "Django Rest Framework", "Handles user authentication (Login, Signup, Refresh, CSRF).")
+    Component(conversation_view, "Conversation Views", "Django Rest Framework", "Manages chat sessions and message history.")
+    Component(business_view, "Business Views", "Django Rest Framework", "Manages business ideas (CRUD).")
+    Component(article_view, "Article Views", "Django Rest Framework", "Serves articles and content.")
+    Component(file_view, "File Views", "Django Rest Framework", "Handles file uploads.")
+    Component(resume_view, "Resume Views", "Django Rest Framework", "Handles resume generation and parsing.")
+
+    Component(advisor_service, "Advisor Service", "Python Service", "Orchestrates AI advice, manages conversation context, and prompts.")
+    Component(langchain_service, "LangChain Service", "Python Service", "Encapsulates LangChain logic for complex tasks.")
+    
+    Component(business_chain, "Business Validation Chain", "LangChain", "Multi-step business idea validation (Market, Financials, Risks).")
+    Component(vector_rag, "Vector RAG", "LangChain + Chroma", "Retrieval Augmented Generation using vector search.")
+
+    Component(models, "Domain Models", "Django ORM", "Data access layer for Users, Conversations, Knowledge, etc.")
+}
+
+Rel(spa, auth_view, "Uses", "JSON/HTTPS")
+Rel(spa, conversation_view, "Uses", "JSON/HTTPS")
+Rel(spa, business_view, "Uses", "JSON/HTTPS")
+Rel(spa, article_view, "Uses", "JSON/HTTPS")
+Rel(spa, file_view, "Uses", "JSON/HTTPS")
+Rel(spa, resume_view, "Uses", "JSON/HTTPS")
+
+Rel(auth_view, models, "Reads/Writes User")
+Rel(conversation_view, models, "Reads/Writes Conversation, Message")
+Rel(business_view, models, "Reads/Writes BusinessIdea")
+Rel(article_view, models, "Reads Article")
+Rel(file_view, models, "Writes UploadedFile")
+Rel(resume_view, models, "Reads/Writes Resume")
+
+Rel(conversation_view, advisor_service, "Delegates AI response generation to")
+Rel(advisor_service, models, "Reads UserAssessment, Conversation History")
+
+Rel(advisor_service, google_gemini, "Generates responses using", "gRPC/HTTPS")
+Rel(advisor_service, langchain_service, "Uses for complex tasks")
+
+Rel(langchain_service, business_chain, "Executes")
+Rel(langchain_service, vector_rag, "Executes")
+
+Rel(business_chain, google_gemini, "Uses for analysis", "HTTPS")
+Rel(vector_rag, google_gemini, "Uses for embeddings", "HTTPS")
+
+Rel(vector_rag, models, "Reads KnowledgeDocument, Article")
+Rel(vector_rag, db, "Reads/Writes Vector Store (Chroma)", "Local FS")
+
+Rel(models, db, "Reads/Writes Data", "SQL")
+
+@enduml

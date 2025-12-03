@@ -1,0 +1,74 @@
+@startuml C4_Code_Advisor
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+TITLE Code Diagram - Advisor & AI Services
+
+class AdvisorService {
+    + generate_initial_message(user, conversation)
+    + generate_response(user, conversation, message)
+    - _get_system_prompt(conversation_type)
+    - _build_context(user, conversation)
+}
+
+class LangChainService {
+    + available: bool
+    + validate_market(idea)
+    + validate_financials(idea, market_data)
+    + validate_skills(idea, user_context)
+    + validate_risks(idea, ...)
+    + validate_verdict(idea, ...)
+}
+
+class BusinessValidationChain {
+    - llm: ChatGoogleGenerativeAI
+    + run(inputs): dict
+    - _create_market_analysis_chain()
+    - _create_financial_analysis_chain()
+    - _create_skills_match_chain()
+    - _create_risk_assessment_chain()
+    - _create_final_verdict_chain()
+}
+
+class VectorRAG {
+    - vectorstore: Chroma
+    - embeddings: GoogleGenerativeAIEmbeddings
+    + search(query, k): List[Document]
+    + initialize_vectorstore()
+    - _refresh_vectorstore()
+}
+
+class Conversation {
+    + user: User
+    + type: ConversationType
+    + messages: List[Message]
+}
+
+class Message {
+    + content: str
+    + is_user: bool
+    + created_at: datetime
+}
+
+AdvisorService --> LangChainService : Uses for complex tasks
+AdvisorService --> Conversation : Reads/Updates
+AdvisorService --> Message : Creates
+
+LangChainService *-- BusinessValidationChain : Composes
+LangChainService *-- VectorRAG : Composes
+
+BusinessValidationChain ..> "Google Gemini" : Calls
+VectorRAG ..> "Google Gemini" : Calls (Embeddings)
+VectorRAG ..> "ChromaDB" : Reads/Writes
+
+note right of AdvisorService
+  Main entry point for chat logic.
+  Selects system prompt based on
+  Conversation.type (Hiring, Business, etc.)
+end note
+
+note right of BusinessValidationChain
+  Executes multi-step reasoning
+  for business ideas.
+end note
+
+@enduml
