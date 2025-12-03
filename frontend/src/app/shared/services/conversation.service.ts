@@ -2,13 +2,10 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable, signal, WritableSignal } from "@angular/core";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { environment } from "@shared/environments/environment";
-import { ConversationCreateRequestType } from "@shared/types/ConversationCreateRequestType";
-import { ConversationGetRequestType } from "@shared/types/ConversationGetRequestType";
 import { ConversationType } from "@shared/types/ConversationType";
 import { ConversationTypeEnum } from "@shared/types/ConversationTypeEnum";
-import { MessageConversationRequestType } from "@shared/types/MessageConversationRequestType";
 import { MessageType } from "@shared/types/MessageType";
-import { firstValueFrom, Observable, Subscriber } from "rxjs";
+import { firstValueFrom, Observable } from "rxjs";
 
 @Injectable({
     providedIn: "root",
@@ -165,6 +162,37 @@ export class ConversationService {
         });
     }
 
+    public async uploadFile(file: File): Promise<string> {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await firstValueFrom<{ id: string }>(
+            this.httpClient.post<{ id: string }>(environment.serverURL + "/files/upload", formData),
+        );
+
+        return response.id;
+    }
+
+    public async deleteConversation(conversationId: string): Promise<void> {
+        await firstValueFrom(this.httpClient.delete(environment.serverURL + `/conversations/${conversationId}`));
+
+        this.sidebarConversations.update((list) => list.filter((conv) => conv.id !== conversationId));
+    }
+
+    public async renameConversation(conversationId: string, newTitle: string): Promise<ConversationType> {
+        const updated = await firstValueFrom<ConversationType>(
+            this.httpClient.patch<ConversationType>(environment.serverURL + `/conversations/${conversationId}`, {
+                title: newTitle,
+            }),
+        );
+
+        this.sidebarConversations.update((list) =>
+            list.map((conv) => (conv.id === conversationId ? { ...conv, title: newTitle } : conv)),
+        );
+
+        return updated;
+    }
+
     public getMessageResponse(
         conversationId: string,
         messageId: string,
@@ -172,7 +200,6 @@ export class ConversationService {
         convType?: ConversationTypeEnum,
         file?: File,
     ): Observable<string> {
-        // Call backend chat endpoint and consume SSE for character-by-character streaming
         return new Observable<string>((observer) => {
             const startStream = async () => {
                 let fileId: string | null = null;
@@ -195,17 +222,14 @@ export class ConversationService {
                     body.file_id = fileId;
                 }
 
-                // Add conversation_id if it exists (not a new conversation)
                 if (conversationId) {
                     body.conversation_id = conversationId;
                 }
 
-                // Add conv_type for new conversations
                 if (convType && !conversationId) {
                     body.conv_type = convType;
                 }
 
-                // Use fetchEventSource to attach to an SSE stream. Backend supports `?stream=1`.
                 const url = environment.serverURL + "/conversations/chat?stream=1";
 
                 try {
@@ -215,23 +239,27 @@ export class ConversationService {
                         headers: { "Content-Type": "application/json" },
                         credentials: "include",
                         onmessage(event) {
-                            // If the server sends a JSON object (e.g. the final message object), we might parse it
-                            // But for now, we assume the server sends chunks of text in `data`.
-                            // If the server sends a special event for "done", handle it.
-                            if (event.event === "end") {
+                            if (event.event === "end" || event.data === "[DONE]") {
                                 observer.complete();
                                 return;
                             }
-                            // Accumulate text
-                            // Note: The backend might send JSON or plain text.
-                            // If it sends JSON with { content: "..." }, parse it.
+
+                            if (!event.data || event.data.trim() === "") {
+                                return;
+                            }
+
                             try {
                                 const data = JSON.parse(event.data);
-                                if (data.content) {
+                                if (data.content !== undefined) {
                                     observer.next(data.content);
+                                } else if (data.text !== undefined) {
+                                    observer.next(data.text);
+                                } else if (data.chunk !== undefined) {
+                                    observer.next(data.chunk);
+                                } else if (typeof data === "string") {
+                                    observer.next(data);
                                 }
                             } catch (e) {
-                                // If not JSON, just send raw data
                                 observer.next(event.data);
                             }
                         },
@@ -239,8 +267,8 @@ export class ConversationService {
                             observer.complete();
                         },
                         onerror(err) {
+                            console.error("SSE error:", err);
                             observer.error(err);
-                            // rethrow to stop retries if needed
                             throw err;
                         },
                     });
@@ -251,99 +279,5 @@ export class ConversationService {
 
             startStream();
         });
-    }
-
-    private async uploadFile(file: File): Promise<string> {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await firstValueFrom(
-            this.httpClient.post<any>(environment.serverURL + "/files/upload/", formData, {
-                withCredentials: true,
-            }),
-        );
-        return response.id;
-    }
-
-    public regenerateMessageResponse(conversationId: string, messageId: string): Observable<string> {
-        return new Observable<string>((observer: Subscriber<string>) => {
-            fetchEventSource(environment.serverURL + `/conversations/${conversationId}/messages/${messageId}`, {
-                method: "POST",
-                headers: {},
-                credentials: "include",
-                onmessage(event) {
-                    console.log(event.data);
-                },
-                onclose() {
-                    observer.complete();
-                },
-                onerror(err) {
-                    observer.error(err);
-                },
-            });
-        });
-    }
-
-    public changeMessageRequest(
-        conversationId: string,
-        messageId: string,
-        requestText: string,
-        file?: File,
-    ): Observable<string> {
-        return new Observable<string>((observer: Subscriber<string>) => {
-            const formData = new FormData();
-
-            formData.append("requestText", requestText);
-            if (file) {
-                formData.append("file", file);
-            }
-
-            fetchEventSource(environment.serverURL + `/conversations/${conversationId}/messages/${messageId}`, {
-                method: "PUT",
-                body: formData,
-                headers: {},
-                credentials: "include",
-                onmessage(event) {
-                    console.log(event.data);
-                },
-                onclose() {
-                    observer.complete();
-                },
-                onerror(err) {
-                    observer.error(err);
-                },
-            });
-        });
-    }
-
-    public async deleteConversation(conversationId: string): Promise<void> {
-        try {
-            await firstValueFrom(this.httpClient.delete(`${environment.serverURL}/conversations/${conversationId}`, { withCredentials: true }));
-
-            // Remove from sidebar cache if present
-            const kept = this.sidebarConversations().filter((c) => c && c.id !== conversationId);
-            this.sidebarConversations.set(kept as any);
-        } catch (e) {
-            console.error('Failed to delete conversation', e);
-            throw e;
-        }
-    }
-
-    public async renameConversation(conversationId: string, newTitle: string): Promise<any> {
-        try {
-            const payload = { title: newTitle };
-            const updated = await firstValueFrom(
-                this.httpClient.patch<any>(`${environment.serverURL}/conversations/${conversationId}`, payload, { withCredentials: true }),
-            );
-
-            // Update sidebar cache if present
-            const updatedList = this.sidebarConversations().map((c) => (c && c.id === conversationId ? { ...c, title: updated.title } : c));
-            this.sidebarConversations.set(updatedList as any);
-
-            return updated;
-        } catch (e) {
-            console.error('Failed to rename conversation', e);
-            throw e;
-        }
     }
 }

@@ -1,6 +1,6 @@
 .chat-header {
     position: absolute;
-    top: 0;
+    top: -44px;
     right: 0;
     display: flex;
     align-items: center;
@@ -9,6 +9,13 @@
     height: var(--header-height);
     padding-right: 16px;
     padding-left: 24px;
+    background-color: var(--light-background-color);
+    transition: all 0.3s;
+}
+
+.chat-header:hover {
+    top: 0;
+    box-shadow: 0 2px 8px var(--shadow-color-2);
 }
 
 .chat-header__account {
@@ -22,4 +29,9 @@
     cursor: pointer;
     background-color: var(--button-background-color);
     border-radius: 50%;
+}
+
+.chat-header__nav {
+    display: flex;
+    gap: 16px;
 }

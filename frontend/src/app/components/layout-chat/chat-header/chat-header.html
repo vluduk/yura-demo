@@ -1,5 +1,9 @@
 <div class="chat-header">
-    <ui-link [label]="'Головна'" [routerLink]="['/']"></ui-link>
+    <div class="chat-header__nav">
+        <ui-link [type]="'light-line'" [label]="'Головна'" [routerLink]="['/']"></ui-link>
+        <ui-link [type]="'light-line'" [label]="'Резюме-конструктор'" [routerLink]="['/resume-templates']"></ui-link>
+        <ui-link [type]="'light-line'" [label]="'Статті'" [routerLink]="['/articles']"></ui-link>
+    </div>
 
     <span class="chat-header__account" (click)="showCabinet()">
         <i class="fa-regular fa-user"></i>

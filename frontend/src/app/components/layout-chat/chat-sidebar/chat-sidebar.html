@@ -1,13 +1,13 @@
-<div class="sidebar">
+<div class="sidebar" [class.sidebar_collapsed]="isSidebarCollapsed()">
     <div class="sidebar__header">
-        <i class="fa-solid fa-bars"></i>
-        <ui-logo [size]="'small'"></ui-logo>
+        <i class="header__collapse-button fa-solid fa-bars" (click)="toggleSidebarCollapse()"></i>
+        <ui-logo class="header__logo" [size]="'small'"></ui-logo>
     </div>
 
     <div class="sidebar__nav">
         <ui-button
             [label]="'Новий чат'"
-            [icon]="'fa-solid fa-pen'"
+            [icon]="'fa-solid fa-comment-dots'"
             [type]="'primary'"
             [align]="'left'"
             [isFullWidth]="true"
@@ -22,6 +22,14 @@
             (click)="showSearchPopup()"
         ></ui-button>
         <ui-button
+            [label]="'Резюме-конструктор'"
+            [icon]="'fa-solid fa-pen-ruler'"
+            [type]="'primary'"
+            [align]="'left'"
+            [isFullWidth]="true"
+            [routerLink]="'/resume-templates'"
+        ></ui-button>
+        <ui-button
             [label]="'Бібліотека'"
             [icon]="'fa-solid fa-book'"
             [type]="'primary'"
@@ -32,38 +40,51 @@
     </div>
 
     <div class="sidebar__history">
-        <div class="history__title">
+        <div class="history__title" (click)="toggleConversationsCollapse()">
             <span class="title__text">Минулі чати</span>
-            <i class="fa-solid fa-arrow-down"></i>
+            <i
+                class="fa-solid"
+                [class]="{ 'fa-angle-down': isConversationsCollapsed(), 'fa-angle-up': !isConversationsCollapsed() }"
+            ></i>
         </div>
-        <div class="history__list">
+        <div class="history__list" [class.history__list_collapsed]="isConversationsCollapsed()">
             @for (item of conversations(); track item.id) {
-                <div 
-                    class="history__item" 
+                <div
+                    class="history__item"
                     [class]="{ item_active: item.id === activeConversationId() }"
                     (click)="openConversation(item.id, item.conv_type)"
                 >
-                    <span class="item__icon">
-                        @if (item.conv_type === conversationTypes.Bussiness) {
-                            <i class="fa-solid fa-wallet"></i>
-                        } @else if (item.conv_type === conversationTypes.SelfEmployment) {
-                            <i class="fa-solid fa-briefcase"></i>
-                        } @else if (item.conv_type === conversationTypes.Hiring) {
-                            <i class="fa-solid fa-handshake"></i>
-                        } @else if (item.conv_type === conversationTypes.CareerPath) {
-                            <i class="fa-solid fa-signs-post"></i>
-                        } @else if (item.conv_type === conversationTypes.Education) {
-                            <i class="fa-solid fa-graduation-cap"></i>
-                        }
-                    </span>
-                    <span class="item__text">{{ item.title }}</span>
+                    <div class="item__item-title">
+                        <span class="item-title__icon">
+                            @if (item.conv_type === conversationTypes.Bussiness) {
+                                <i class="fa-solid fa-wallet"></i>
+                            } @else if (item.conv_type === conversationTypes.SelfEmployment) {
+                                <i class="fa-solid fa-briefcase"></i>
+                            } @else if (item.conv_type === conversationTypes.Hiring) {
+                                <i class="fa-solid fa-handshake"></i>
+                            } @else if (item.conv_type === conversationTypes.CareerPath) {
+                                <i class="fa-solid fa-signs-post"></i>
+                            } @else if (item.conv_type === conversationTypes.Education) {
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            }
+                        </span>
+                        <span class="item-title__text">{{ item.title }}</span>
+                    </div>
 
                     <div class="item__menu" (click)="$event.stopPropagation()">
-                        <button class="menu__toggle" (click)="showMenu(item.id)">⋯</button>
+                        <button class="menu__toggle" (click)="showMenu(item.id)">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </button>
                         @if (openMenuId() === item.id) {
-                            <div class="menu__dropdown">
-                                <button class="menu__action" (click)="renameConversation(item.id)">Rename</button>
-                                <button class="menu__action menu__danger" (click)="deleteConversation(item.id)">Delete</button>
+                            <div class="menu__dropdown menu-dropdown">
+                                <button class="menu-dropdown__action" (click)="renameConversation(item.id)">
+                                    <i class="fa-solid fa-pen"></i>
+                                    <span>Переназвати</span>
+                                </button>
+                                <button class="menu-dropdown__action" (click)="deleteConversation(item.id)">
+                                    <i class="fa-solid fa-trash"></i>
+                                    <span>Видалити</span>
+                                </button>
                             </div>
                         }
                     </div>

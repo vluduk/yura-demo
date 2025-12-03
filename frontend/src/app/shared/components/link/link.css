@@ -31,7 +31,7 @@
 .link_type_light,
 .link_type_light-line,
 .link_type_light-clear {
-    color: var(--secondary-text-color);
+    color: var(--primary-text-color);
 }
 
 .link_type_light:hover,

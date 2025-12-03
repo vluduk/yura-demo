@@ -3,19 +3,42 @@
         @for (message of messages(); track message.id) {
             @if (message.is_user) {
                 <div class="message-wrapper__message" [class.message-user]="message.is_user">
-                    <markdown class="message__content" [data]="message.content"></markdown>
-                    <div class="message__control">
-                        <ui-button
-                            class="control__copy control-button"
-                            [icon]="'fa-solid fa-copy'"
-                            [type]="'icon'"
-                        ></ui-button>
-                        <ui-button
-                            class="control__edit control-button"
-                            [icon]="'fa-solid fa-pencil'"
-                            [type]="'icon'"
-                        ></ui-button>
-                    </div>
+                    @if (isEditing(message.id)) {
+                        <div class="message__edit-wrapper">
+                            <textarea
+                                class="edit-wrapper__textarea"
+                                [value]="editingText()"
+                                (input)="editingText.set($any($event.target).value)"
+                                (keydown.escape)="cancelEditing()"
+                            ></textarea>
+                            <div class="edit-wrapper__actions">
+                                <button class="actions__btn actions__btn--cancel" (click)="cancelEditing()">
+                                    <i class="fa-solid fa-xmark"></i>
+                                    Скасувати
+                                </button>
+                                <button class="actions__btn actions__btn--confirm" (click)="confirmEditing()">
+                                    <i class="fa-solid fa-check"></i>
+                                    Підтвердити
+                                </button>
+                            </div>
+                        </div>
+                    } @else {
+                        <div class="message__content">{{ message.content }}</div>
+                        <div class="message__control">
+                            <ui-button
+                                class="control__copy control-button"
+                                [icon]="isCopied(message.id) ? 'fa-solid fa-check' : 'fa-solid fa-copy'"
+                                [type]="'icon'"
+                                (click)="copyMessage(message)"
+                            ></ui-button>
+                            <ui-button
+                                class="control__edit control-button"
+                                [icon]="'fa-solid fa-pencil'"
+                                [type]="'icon'"
+                                (click)="startEditing(message)"
+                            ></ui-button>
+                        </div>
+                    }
                 </div>
             } @else {
                 <div class="message-wrapper__message" [class.message-ai]="!message.is_user">
@@ -23,23 +46,34 @@
                     <div class="message__control">
                         <ui-button
                             class="control__copy control-button"
-                            [icon]="'fa-solid fa-copy'"
+                            [icon]="isCopied(message.id) ? 'fa-solid fa-check' : 'fa-solid fa-copy'"
                             [type]="'icon'"
+                            (click)="copyMessage(message)"
                         ></ui-button>
-                        <ui-button
-                            class="control__refresh control-button"
-                            [icon]="'fa-solid fa-arrows-rotate'"
-                            [type]="'icon'"
-                        ></ui-button>
+                        @if (isLastAiMessage(message.id)) {
+                            <ui-button
+                                class="control__refresh control-button"
+                                [icon]="'fa-solid fa-arrows-rotate'"
+                                [type]="'icon'"
+                                (click)="regenerateLastResponse()"
+                            ></ui-button>
+                        }
                     </div>
                 </div>
             }
         }
 
-        <!-- Streaming AI message -->
         @if (printingMessage().length > 0) {
             <div class="message-wrapper__message message-ai message-printing">
-                <markdown class="message__content" [data]="printingMessage()"></markdown>
+                <div class="message__content message__content--streaming">{{ printingMessage() }}</div>
+            </div>
+        }
+
+        @if (isLoading() && printingMessage().length === 0) {
+            <div class="message-wrapper__message message-ai message-loading">
+                <div class="message__content">
+                    <span class="loading-dots"> <span>.</span><span>.</span><span>.</span> </span>
+                </div>
             </div>
         }
     </div>

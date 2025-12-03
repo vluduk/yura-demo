@@ -1,11 +1,15 @@
 .conversation {
     position: relative;
     height: 100%;
-    padding-top: 20px;
+    padding-top: var(--header-height);
 }
 
 .conversation__message-wrapper {
-    height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: calc(100vh - 274px);
+    padding-top: 20px;
     overflow: auto;
 }
 
@@ -41,6 +45,15 @@
     border-radius: 16px;
 }
 
+.message__content--streaming {
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.message-loading .message__content {
+    padding: 12px 16px;
+}
+
 .control-button,
 :host ::ng-deep .message__control .button {
     height: 20px !important;
@@ -48,26 +61,149 @@
 }
 
 :host ::ng-deep .message__content p {
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 0;
 }
 
 :host ::ng-deep .message__content ul,
 :host ::ng-deep .message__content ol {
-    margin-left: 1.5rem;
     margin-bottom: 0.5rem;
+    margin-left: 1.5rem;
+}
+
+:host ::ng-deep .message__content li {
+    margin-top: 0.25rem;
+}
+
+:host ::ng-deep .message__content hr {
+    margin: 1rem 0;
+}
+
+:host ::ng-deep .message__content h3 {
+    margin: 2rem 0 1rem;
+    font-size: 24px;
 }
 
 :host ::ng-deep .message__content pre {
-    background: rgba(0, 0, 0, 0.2);
     padding: 1rem;
-    border-radius: 8px;
-    overflow-x: auto;
     margin-bottom: 0.5rem;
+    overflow-x: auto;
+    background: var(--shadow-color-2);
+    border-radius: 8px;
 }
 
 :host ::ng-deep .message__content code {
-    font-family: monospace;
-    background: rgba(0, 0, 0, 0.2);
     padding: 0.2rem 0.4rem;
+    font-family: monospace;
+    background: var(--shadow-color-2);
     border-radius: 4px;
+}
+
+.loading-dots {
+    display: inline-flex;
+    gap: 2px;
+    font-size: 50px;
+}
+
+.loading-dots span {
+    opacity: 0.3;
+    animation: loadingDot 1.4s infinite;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes loadingDot {
+    0%, 80%, 100% {
+        opacity: 0.3;
+    }
+
+    40% {
+        opacity: 1;
+    }
+}
+
+.control__copy:has(.fa-check) {
+    color: #22c55e;
+}
+
+:host ::ng-deep .control__copy .button--icon {
+    transition: color 0.2s ease;
+}
+
+:host ::ng-deep .control__copy .fa-check {
+    color: #22c55e;
+}
+
+/* Edit message styles */
+.message__edit-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 640px;
+}
+
+.edit-wrapper__textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--primary-text-color);
+    resize: vertical;
+    outline: none;
+    background-color: var(--card-background-color);
+    border: 2px solid var(--button-background-color);
+    border-radius: 12px;
+}
+
+.edit-wrapper__textarea:focus {
+    border-color: var(--button-hover-dark);
+}
+
+.edit-wrapper__actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.actions__btn {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.actions__btn:active {
+    transform: scale(0.98);
+}
+
+.actions__btn--cancel {
+    color: var(--primary-text-color);
+    background-color: var(--conversation-item-background-color);
+}
+
+.actions__btn--cancel:hover {
+    background-color: var(--shadow-color-2);
+}
+
+.actions__btn--confirm {
+    color: white;
+    background-color: var(--button-background-color);
+}
+
+.actions__btn--confirm:hover {
+    background-color: var(--button-hover-dark);
 }

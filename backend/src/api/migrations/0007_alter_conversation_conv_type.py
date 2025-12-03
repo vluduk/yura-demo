@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='conversation',
             name='conv_type',
-            field=models.CharField(blank=True, choices=[('Business', 'Власний бізнес'), ('SelfEmployment', 'Самозайнятість'), ('Hiring', 'Наймана праця'), ('CareerPath', 'Вибір напрямку'), ('Education', 'Навчання')], default='', max_length=50),
+            field=models.CharField(blank=True, choices=[('BUSINESS', 'Власний бізнес'), ('SELF_EMPLOYMENT', 'Самозайнятість'), ('HIRING', 'Наймана праця'), ('CAREER_PATH', 'Вибір напрямку'), ('EDUCATION', 'Навчання')], default='', max_length=50),
         ),
     ]

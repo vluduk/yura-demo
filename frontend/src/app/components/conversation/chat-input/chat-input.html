@@ -1,4 +1,17 @@
 <div class="chat-input">
+    @if (selectedFile()) {
+        <div class="chat-input__file-preview">
+            <div class="file-preview__info">
+                <i class="fa-solid fa-file"></i>
+                <span class="info__name">{{ selectedFile()!.name }}</span>
+                <span class="info__size">{{ formatFileSize(selectedFile()!.size) }}</span>
+            </div>
+            <button class="file-preview__remove" (click)="removeFile()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    }
+
     <div class="chat-input__input-wrapper">
         <ui-textarea
             [isFullWidth]="true"
@@ -6,7 +19,19 @@
             (keydown.enter)="send(); $event.preventDefault()"
         ></ui-textarea>
         <div class="input-wrapper__buttons">
-            <ui-button [icon]="'fa-solid fa-plus'" [type]="'icon'" [theme]="'dark'"></ui-button>
+            <input
+                type="file"
+                id="chat-file-input"
+                class="hidden-file-input"
+                (change)="onFileSelect($event)"
+                accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
+            />
+            <ui-button
+                [icon]="'fa-solid fa-plus'"
+                [type]="'icon'"
+                [theme]="'dark'"
+                (click)="triggerFileInput()"
+            ></ui-button>
             <ui-button [icon]="'fa-solid fa-arrow-up'" [type]="'icon'" [theme]="'dark'" (click)="send()"></ui-button>
         </div>
     </div>

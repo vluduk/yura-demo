@@ -32,3 +32,52 @@
     font-size: 12px;
     font-weight: 200;
 }
+
+.hidden-file-input {
+    display: none;
+}
+
+.chat-input__file-preview {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: var(--conversation-item-background-color);
+    border: 1px solid var(--light-background-color);
+    border-radius: 8px;
+}
+
+.file-preview__info {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    overflow: hidden;
+    font-size: 12px;
+}
+
+.info__name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-preview__remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    color: var(--primary-text-color);
+    cursor: pointer;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.file-preview__remove:hover {
+    background-color: var(--button-background-color);
+}
