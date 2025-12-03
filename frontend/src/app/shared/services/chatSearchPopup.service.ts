@@ -18,12 +18,12 @@ export class ChatSearchPopupService {
     private readonly conversationService: ConversationService = inject(ConversationService);
 
     private readonly MOCK_CONVERSATIONS: { id: string; title: string; type: ConversationTypeEnum }[] = [
-        { id: "1", title: "Business strategy planning", type: ConversationTypeEnum.Bussiness },
+        { id: "1", title: "Business strategy planning", type: ConversationTypeEnum.Business },
         { id: "2", title: "Hiring: frontend developer", type: ConversationTypeEnum.Hiring },
         { id: "3", title: "Self-employment tips and tricks", type: ConversationTypeEnum.SelfEmployment },
         { id: "4", title: "Education: learning Angular", type: ConversationTypeEnum.Education },
         { id: "5", title: "Career path: from junior to senior", type: ConversationTypeEnum.CareerPath },
-        { id: "6", title: "Business: market analysis", type: ConversationTypeEnum.Bussiness },
+        { id: "6", title: "Business: market analysis", type: ConversationTypeEnum.Business },
         { id: "7", title: "Hiring process improvements", type: ConversationTypeEnum.Hiring },
         { id: "8", title: "Freelance contracts for self-employment", type: ConversationTypeEnum.SelfEmployment },
         { id: "9", title: "Education roadmap for web developers", type: ConversationTypeEnum.Education },

@@ -1,5 +1,5 @@
 export enum ConversationTypeEnum {
-    Bussiness = "BUSINESS",
+    Business = "BUSINESS",
     Hiring = "HIRING",
     SelfEmployment = "SELF_EMPLOYMENT",
     Education = "EDUCATION",

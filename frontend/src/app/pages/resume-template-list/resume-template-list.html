@@ -13,7 +13,7 @@
                 <span>Шаблони не знайдено</span>
             </div>
         } @else {
-            <div class="content__grid" [class.content__grid--disabled]="isCreating()">
+            <div class="content__grid" [class.content__grid_disabled]="isCreating()">
                 @for (template of templates(); track template.id) {
                     <app-resume-template-card 
                         [template]="template"

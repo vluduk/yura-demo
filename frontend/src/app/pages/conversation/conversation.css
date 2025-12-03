@@ -45,7 +45,7 @@
     border-radius: 16px;
 }
 
-.message__content--streaming {
+.content-streaming {
     overflow-wrap: break-word;
     white-space: pre-wrap;
 }
@@ -131,7 +131,7 @@
     color: #22c55e;
 }
 
-:host ::ng-deep .control__copy .button--icon {
+:host ::ng-deep .control__copy {
     transition: color 0.2s ease;
 }
 
@@ -190,20 +190,20 @@
     transform: scale(0.98);
 }
 
-.actions__btn--cancel {
+.actions__cancel-button {
     color: var(--primary-text-color);
     background-color: var(--conversation-item-background-color);
 }
 
-.actions__btn--cancel:hover {
+.actions__cancel-button:hover {
     background-color: var(--shadow-color-2);
 }
 
-.actions__btn--confirm {
+.actions__confirm-button {
     color: white;
     background-color: var(--button-background-color);
 }
 
-.actions__btn--confirm:hover {
+.actions__confirm-button:hover {
     background-color: var(--button-hover-dark);
 }

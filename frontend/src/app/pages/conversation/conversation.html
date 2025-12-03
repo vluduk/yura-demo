@@ -12,11 +12,11 @@
                                 (keydown.escape)="cancelEditing()"
                             ></textarea>
                             <div class="edit-wrapper__actions">
-                                <button class="actions__btn actions__btn--cancel" (click)="cancelEditing()">
+                                <button class="actions__btn actions__cancel-button" (click)="cancelEditing()">
                                     <i class="fa-solid fa-xmark"></i>
                                     Скасувати
                                 </button>
-                                <button class="actions__btn actions__btn--confirm" (click)="confirmEditing()">
+                                <button class="actions__btn actions__confirm-button" (click)="confirmEditing()">
                                     <i class="fa-solid fa-check"></i>
                                     Підтвердити
                                 </button>
@@ -65,7 +65,7 @@
 
         @if (printingMessage().length > 0) {
             <div class="message-wrapper__message message-ai message-printing">
-                <div class="message__content message__content--streaming">{{ printingMessage() }}</div>
+                <div class="message__content content-streaming">{{ printingMessage() }}</div>
             </div>
         }
 

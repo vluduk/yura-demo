@@ -34,7 +34,7 @@
     gap: 24px;
 }
 
-.content__grid--disabled {
+.content__grid_disabled {
     pointer-events: none;
     opacity: 0.5;
 }

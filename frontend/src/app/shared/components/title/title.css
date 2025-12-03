@@ -66,14 +66,10 @@
 }
 
 .title_theme_primary {
-    color: var(--primary-color);
-}
-
-.title_theme_secondary {
     color: var(--primary-text-color);
 }
 
-.title_theme_light {
+.title_theme_secondary {
     color: var(--secondary-text-color);
 }
 

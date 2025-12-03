@@ -62,9 +62,8 @@ export class ConversationService {
     }
 
     public async createConversation(title?: string, convType?: ConversationTypeEnum): Promise<ConversationType> {
-        // Determine a sensible default title based on convType (server also has a fallback)
         const typeLabelMap: Record<ConversationTypeEnum, string> = {
-            [ConversationTypeEnum.Bussiness]: "Бізнес",
+            [ConversationTypeEnum.Business]: "Бізнес",
             [ConversationTypeEnum.SelfEmployment]: "Самозайнятість",
             [ConversationTypeEnum.Hiring]: "Найм",
             [ConversationTypeEnum.CareerPath]: "Кар'єра",
@@ -78,9 +77,8 @@ export class ConversationService {
         };
 
         if (convType) {
-            // Map frontend enum values to backend ConversationType choices
             const convTypeMap: Record<ConversationTypeEnum, string> = {
-                [ConversationTypeEnum.Bussiness]: "BUSINESS",
+                [ConversationTypeEnum.Business]: "BUSINESS",
                 [ConversationTypeEnum.SelfEmployment]: "SELF_EMPLOYMENT",
                 [ConversationTypeEnum.Hiring]: "HIRING",
                 [ConversationTypeEnum.CareerPath]: "CAREER_PATH",
