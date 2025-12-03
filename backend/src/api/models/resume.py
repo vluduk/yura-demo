@@ -3,31 +3,16 @@ from django.conf import settings
 import uuid
 
 
-class CVTemplate(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, unique=True)
-    preview_image_url = models.CharField(max_length=500, blank=True, null=True)
-    default_structure = models.JSONField(default=dict, blank=True)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        db_table = 'cv_templates'
-
-    def __str__(self):
-        return self.name
-
 
 class Resume(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='resumes')
-    template = models.ForeignKey(CVTemplate, on_delete=models.SET_NULL, null=True, related_name='resumes')
-    title = models.CharField(max_length=300, blank=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    professional_summary = models.TextField(blank=True)
-    contact_details = models.JSONField(default=dict, blank=True)
-    layout_order = models.JSONField(default=list, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='resumes', null=True, blank=True)
+    title = models.CharField(max_length=300, blank=True, null=True)
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
+    professional_summary = models.TextField(blank=True, null=True)
+    contact_details = models.JSONField(default=dict, blank=True, null=True)
+    layout_order = models.JSONField(default=list, blank=True, null=True)
     is_primary = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -41,14 +26,14 @@ class Resume(models.Model):
 
 class ExperienceEntry(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='experience_entries')
-    job_title = models.CharField(max_length=200)
-    employer = models.CharField(max_length=200, blank=True)
-    city = models.CharField(max_length=200, blank=True)
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='experience_entries', null=True, blank=True)
+    job_title = models.CharField(max_length=200, blank=True, null=True)
+    employer = models.CharField(max_length=200, blank=True, null=True)
+    city = models.CharField(max_length=200, blank=True, null=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     is_current = models.BooleanField(default=False)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     display_order = models.IntegerField(default=0)
 
     class Meta:
@@ -57,14 +42,14 @@ class ExperienceEntry(models.Model):
 
 class EducationEntry(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='education_entries')
-    institution = models.CharField(max_length=300)
-    degree = models.CharField(max_length=200, blank=True)
-    field_of_study = models.CharField(max_length=200, blank=True)
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='education_entries', null=True, blank=True)
+    institution = models.CharField(max_length=300, blank=True, null=True)
+    degree = models.CharField(max_length=200, blank=True, null=True)
+    field_of_study = models.CharField(max_length=200, blank=True, null=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     is_current = models.BooleanField(default=False)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     display_order = models.IntegerField(default=0)
 
     class Meta:
@@ -73,13 +58,13 @@ class EducationEntry(models.Model):
 
 class ExtraActivityEntry(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='extra_activity_entries')
-    title = models.CharField(max_length=300)
-    organization = models.CharField(max_length=300, blank=True)
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='extra_activity_entries', null=True, blank=True)
+    title = models.CharField(max_length=300, blank=True, null=True)
+    organization = models.CharField(max_length=300, blank=True, null=True)
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     is_current = models.BooleanField(default=False)
-    description = models.TextField(blank=True)
+    description = models.TextField(blank=True, null=True)
     display_order = models.IntegerField(default=0)
 
     class Meta:
@@ -88,9 +73,9 @@ class ExtraActivityEntry(models.Model):
 
 class SocialLink(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='social_links')
-    platform = models.CharField(max_length=100)
-    url = models.URLField()
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='social_links', null=True, blank=True)
+    platform = models.CharField(max_length=100, blank=True, null=True)
+    url = models.URLField(blank=True, null=True)
     display_order = models.IntegerField(default=0)
 
     class Meta:
@@ -99,9 +84,9 @@ class SocialLink(models.Model):
 
 class SkillEntry(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='skill_entries')
-    name = models.CharField(max_length=200)
-    level = models.CharField(max_length=100, blank=True)
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='skill_entries', null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    level = models.CharField(max_length=100, blank=True, null=True)
     display_order = models.IntegerField(default=0)
 
     class Meta:
@@ -110,9 +95,9 @@ class SkillEntry(models.Model):
 
 class LanguageEntry(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='language_entries')
-    language = models.CharField(max_length=100)
-    proficiency = models.CharField(max_length=100, blank=True)
+    resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name='language_entries', null=True, blank=True)
+    language = models.CharField(max_length=100, blank=True, null=True)
+    proficiency = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         db_table = 'language_entries'

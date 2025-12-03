@@ -3,7 +3,6 @@ from .article import Article, ArticleCategory
 from .conversation import Conversation
 from .message import Message
 from .resume import (
-	CVTemplate,
 	Resume,
 	ExperienceEntry,
 	EducationEntry,

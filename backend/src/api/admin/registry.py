@@ -4,7 +4,7 @@ from api.models.message import Message
 from api.models.business import BusinessIdea, ActionStep
 from api.models.knowledge import KnowledgeCategory, KnowledgeDocument
 from api.models.resume import (
-    CVTemplate, Resume, ExperienceEntry, EducationEntry, ExtraActivityEntry,
+    Resume, ExperienceEntry, EducationEntry, ExtraActivityEntry,
     SocialLink, SkillEntry, LanguageEntry
 )
 from api.models.article import Article, ArticleCategory
@@ -50,12 +50,6 @@ class KnowledgeDocumentAdmin(admin.ModelAdmin):
     search_fields = ('title', 'uploader__email', 'source_url')
     readonly_fields = ('created_at', 'embedding')
 
-
-@admin.register(CVTemplate)
-class CVTemplateAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'slug', 'is_active')
-    search_fields = ('name', 'slug')
-    prepopulated_fields = {'slug': ('name',)}
 
 
 @admin.register(Resume)

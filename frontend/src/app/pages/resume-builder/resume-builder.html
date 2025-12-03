@@ -52,6 +52,14 @@
                             (onRemove)="removeLanguage($event)"
                         ></app-resume-form-languages>
                     }
+                    @case ("extra_activities") {
+                        <app-resume-form-extra-activities
+                            [activities]="extraActivities()"
+                            (onAdd)="addExtraActivity()"
+                            (onUpdate)="updateExtraActivity($event.id, $event.field, $event.value)"
+                            (onRemove)="removeExtraActivity($event)"
+                        ></app-resume-form-extra-activities>
+                    }
                 }
             }
 

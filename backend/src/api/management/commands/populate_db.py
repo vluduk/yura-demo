@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from api.models.article import Article, ArticleCategory, ArticleTag
 from api.models.business import BusinessIdea, ActionStep
 from api.models.knowledge import KnowledgeCategory, KnowledgeDocument
-from api.models.resume import Resume, CVTemplate, ExperienceEntry, EducationEntry, LanguageEntry
+from api.models.resume import Resume, ExperienceEntry, EducationEntry, LanguageEntry
 from api.models.user_assesment import UserAssessment
 from django.utils import timezone
 import random
@@ -48,7 +48,6 @@ class Command(BaseCommand):
         KnowledgeDocument.objects.all().delete()
         KnowledgeCategory.objects.all().delete()
         Resume.objects.all().delete()
-        CVTemplate.objects.all().delete()
         # We do NOT delete Users here, except maybe we could, but the instruction said "except user"
         # implying we shouldn't mess with the user table too much, but we need an admin.
 
@@ -236,16 +235,8 @@ class Command(BaseCommand):
             )
 
     def create_resumes(self, user):
-        template, _ = CVTemplate.objects.get_or_create(
-            name="Modern Professional",
-            slug="modern-professional",
-            is_active=True,
-            default_structure={"sections": ["summary", "experience", "education", "skills"]}
-        )
-
         resume = Resume.objects.create(
             user=user,
-            template=template,
             title="Project Manager Resume",
             first_name=user.first_name,
             last_name=user.last_name,

@@ -19,6 +19,7 @@ import {
     PersonalInfoType,
     ExperienceType,
     EducationType,
+    ExtraActivityType,
     SkillType,
     LanguageType,
 } from "@shared/types/ResumeDataType";
@@ -31,13 +32,14 @@ import { ResumeFormExperience } from "@components/resume/resume-form-experience/
 import { ResumeFormEducation } from "@components/resume/resume-form-education/resume-form-education";
 import { ResumeFormSkills } from "@components/resume/resume-form-skills/resume-form-skills";
 import { ResumeFormLanguages } from "@components/resume/resume-form-languages/resume-form-languages";
+import { ResumeFormExtraActivities } from "@components/resume/resume-form-extra-activities/resume-form-extra-activities";
 import { IResumeTemplate } from "@shared/types/ResumeModel";
 import { NgComponentOutlet } from "@angular/common";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 type TabType = {
-    id: "personal" | "experience" | "education" | "skills" | "languages";
+    id: "personal" | "experience" | "education" | "skills" | "languages" | "extra_activities";
     label: string;
     icon: string;
 };
@@ -51,6 +53,7 @@ type TabType = {
         ResumeFormEducation,
         ResumeFormSkills,
         ResumeFormLanguages,
+        ResumeFormExtraActivities,
         NgComponentOutlet,
     ],
     templateUrl: "./resume-builder.html",
@@ -80,6 +83,7 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
     protected readonly educations: Signal<EducationType[]> = computed(() => this.resume()?.education ?? []);
     protected readonly skills: Signal<SkillType[]> = computed(() => this.resume()?.skills ?? []);
     protected readonly languages: Signal<LanguageType[]> = computed(() => this.resume()?.languages ?? []);
+    protected readonly extraActivities: Signal<ExtraActivityType[]> = computed(() => this.resume()?.extra_activities ?? []);
 
     protected readonly tabs: TabType[] = [
         { id: "personal", label: "Основне", icon: "fa-solid fa-user" },
@@ -87,6 +91,7 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         { id: "education", label: "Освіта", icon: "fa-solid fa-graduation-cap" },
         { id: "skills", label: "Навички", icon: "fa-solid fa-tools" },
         { id: "languages", label: "Мови", icon: "fa-solid fa-language" },
+        { id: "extra_activities", label: "Активність", icon: "fa-solid fa-star" },
     ];
 
     protected readonly progressWidth: Signal<number> = computed(() => {
@@ -259,6 +264,27 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
 
     public removeLanguage(id: string): void {
         this.resumeService.removeLanguage(id);
+        this.resume.set(this.resumeService.currentResume());
+    }
+
+    // Extra Activities
+    public addExtraActivity(): void {
+        const newActivity: ExtraActivityType = {
+            id: crypto.randomUUID(),
+            title: "",
+            organization: "",
+        };
+        this.resumeService.addExtraActivity(newActivity);
+        this.resume.set(this.resumeService.currentResume());
+    }
+
+    public updateExtraActivity(id: string, field: keyof ExtraActivityType, value: any): void {
+        this.resumeService.updateExtraActivity(id, { [field]: value });
+        this.resume.set(this.resumeService.currentResume());
+    }
+
+    public removeExtraActivity(id: string): void {
+        this.resumeService.removeExtraActivity(id);
         this.resume.set(this.resumeService.currentResume());
     }
 

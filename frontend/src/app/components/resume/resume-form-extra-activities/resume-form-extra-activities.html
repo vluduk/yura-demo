@@ -1,0 +1,56 @@
+<div class="form-extra-activities">
+    <div class="form__header">
+        <h3 class="form__title">Додаткова активність</h3>
+        <ui-button 
+            [label]="'Додати'"
+            [icon]="'fa-solid fa-plus'"
+            [type]="'secondary'"
+            (click)="addActivity()"
+        ></ui-button>
+    </div>
+
+    @for (act of activities(); track act.id) {
+        <div class="activity-item">
+            <div class="item__header">
+                <span class="item__number">{{ $index + 1 }}</span>
+                <button class="item__remove" (click)="removeActivity(act.id)">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+
+            <div class="form__row">
+                <div class="form__field">
+                    <label class="field__label">Організація</label>
+                    <input type="text" class="field__input" [value]="act.organization" (input)="updateActivity(act.id, 'organization', $event)" />
+                </div>
+                <div class="form__field">
+                    <label class="field__label">Назва / Роль</label>
+                    <input type="text" class="field__input" [value]="act.title" (input)="updateActivity(act.id, 'title', $event)" />
+                </div>
+            </div>
+
+            <div class="form__row">
+                <div class="form__field">
+                    <label class="field__label">Початок</label>
+                    <input type="month" class="field__input" [value]="act.start_date" (input)="updateActivity(act.id, 'start_date', $event)" />
+                </div>
+                <div class="form__field">
+                    <label class="field__label">Кінець</label>
+                    <input type="month" class="field__input" [value]="act.end_date" [disabled]="act.is_current" (input)="updateActivity(act.id, 'end_date', $event)" />
+                </div>
+            </div>
+
+            <div class="form__field form__field--checkbox">
+                <input type="checkbox" [checked]="act.is_current" (change)="updateActivity(act.id, 'is_current', $event)" />
+                <label>Триває зараз</label>
+            </div>
+
+            <div class="form__field">
+                <label class="field__label">Опис</label>
+                <textarea class="field__textarea" [value]="act.description || ''" (input)="updateActivity(act.id, 'description', $event)" rows="3"></textarea>
+            </div>
+        </div>
+    } @empty {
+        <p class="form__empty">Додайте додаткову активність (волонтерство, курси, проекти)</p>
+    }
+</div>

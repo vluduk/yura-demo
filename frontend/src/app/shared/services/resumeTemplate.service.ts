@@ -3,6 +3,8 @@ import { inject, Injectable, signal, WritableSignal, Type } from "@angular/core"
 import { ResumeDataType } from "@shared/types/ResumeDataType";
 import { IResumeTemplate } from "@shared/types/ResumeModel";
 import { ResumeTemplateType, TEMPLATES } from "@shared/types/ResumeTemplateType";
+import { firstValueFrom } from "rxjs";
+import { environment } from "@shared/environments/environment";
 
 @Injectable({
     providedIn: "root",
@@ -59,25 +61,26 @@ export class ResumeTemplateService {
     }
 
     public async createResume(templateId: string): Promise<ResumeDataType> {
-        // MOCK: simulate resume creation
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        // Create on backend
+        this.isLoading.set(true);
+        try {
+            const response = await firstValueFrom(
+                this.httpClient.post<any>(`${environment.serverURL}/resumes/`, { template_id: templateId }, { withCredentials: true })
+            );
 
-        const mockResume: ResumeDataType = {
-            id: crypto.randomUUID(),
-            template_id: templateId,
-            title: "Нове резюме",
-            is_primary: false,
-            created_at: new Date(),
-            updated_at: new Date(),
-        };
+            // Map backend response to frontend ResumeDataType
+            const resume: ResumeDataType = {
+                id: response.id,
+                template_id: response.template?.id,
+                title: response.title,
+                is_primary: response.is_primary,
+                created_at: response.created_at,
+                updated_at: response.updated_at,
+            };
 
-        return mockResume;
-
-        // Original code (uncomment when backend is ready):
-        // return await firstValueFrom<ResumeType>(
-        //     this.httpClient.post<ResumeType>(environment.serverURL + "/resumes", {
-        //         template_id: templateId,
-        //     }),
-        // );
+            return resume;
+        } finally {
+            this.isLoading.set(false);
+        }
     }
 }

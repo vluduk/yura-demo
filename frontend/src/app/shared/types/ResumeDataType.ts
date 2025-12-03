@@ -5,6 +5,7 @@ export type ResumeDataType = {
     personal_info?: PersonalInfoType;
     experience?: ExperienceType[];
     education?: EducationType[];
+    extra_activities?: ExtraActivityType[];
     skills?: SkillType[];
     languages?: LanguageType[];
     is_primary: boolean;
@@ -55,20 +56,6 @@ export type EducationType = {
     display_order?: number;
 };
 
-export type SkillType = {
-    id: string;
-    name: string;
-    level?: "beginner" | "intermediate" | "advanced" | "expert";
-    display_order?: number;
-};
-
-export type LanguageType = {
-    id: string;
-    language: string;
-    proficiency?: "a1" | "a2" | "b1" | "b2" | "c1" | "c2" | "native";
-    display_order?: number;
-};
-
 export type ExtraActivityType = {
     id: string;
     title: string;
@@ -79,3 +66,17 @@ export type ExtraActivityType = {
     description?: string;
     display_order?: number;
 };
+
+export type SkillType = {
+    id: string;
+    name: string;
+    level: string;
+    display_order?: number;
+};
+
+export type LanguageType = {
+    id: string;
+    language: string;
+    proficiency: string;
+};
+

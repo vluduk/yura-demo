@@ -108,4 +108,30 @@
             </div>
         </section>
     }
+
+    @if (data().extra_activities && data().extra_activities!.length > 0) {
+        <section class="template__section">
+            <h2 class="section__title">Додаткова активність</h2>
+            <div class="section__list">
+                @for (act of data().extra_activities; track act.id) {
+                    <div class="list__item">
+                        <div class="item__header">
+                            <span class="item__title">{{ act.title }}</span>
+                            <span class="item__date">
+                                {{ act.start_date }}
+                                @if (act.start_date) {
+                                    —
+                                }
+                                {{ act.is_current ? "теперішній час" : act.end_date }}
+                            </span>
+                        </div>
+                        <span class="item__subtitle">{{ act.organization }}</span>
+                        @if (act.description) {
+                            <p class="item__description">{{ act.description }}</p>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+    }
 </div>

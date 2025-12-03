@@ -5,7 +5,7 @@ from .business import BusinessIdeaSerializer, ActionStepSerializer
 from .knowledge import KnowledgeCategorySerializer, KnowledgeDocumentSerializer
 from .user_assessment import UserAssessmentSerializer
 from .resume import (
-	CVTemplateSerializer, ResumeSerializer, ExperienceEntrySerializer,
+	ResumeSerializer, ExperienceEntrySerializer,
 	EducationEntrySerializer, ExtraActivityEntrySerializer, SocialLinkSerializer,
 	SkillEntrySerializer, LanguageEntrySerializer
 )

@@ -7,6 +7,7 @@ import {
     PersonalInfoType,
     ExperienceType,
     EducationType,
+    ExtraActivityType,
     SkillType,
     LanguageType,
 } from "@shared/types/ResumeDataType";
@@ -31,11 +32,37 @@ export class ResumeService {
     public async getResumeById(id: string): Promise<ResumeDataType> {
         this.isLoading.set(true);
         try {
-            const resume = await firstValueFrom(
-                this.httpClient.get<ResumeDataType>(`${environment.serverURL}/resumes/${id}/`, {
+            const response = await firstValueFrom(
+                this.httpClient.get<any>(`${environment.serverURL}/resumes/${id}/`, {
                     withCredentials: true,
                 })
             );
+
+            // Map backend response to frontend structure
+            const resume: ResumeDataType = {
+                id: response.id,
+                template_id: response.template?.id,
+                title: response.title,
+                is_primary: response.is_primary,
+                created_at: response.created_at,
+                updated_at: response.updated_at,
+                personal_info: {
+                    first_name: response.first_name,
+                    last_name: response.last_name,
+                    summary: response.professional_summary,
+                    email: response.contact_details?.email,
+                    phone: response.contact_details?.phone,
+                    address: response.contact_details?.address,
+                    city: response.contact_details?.city,
+                    country: response.contact_details?.country,
+                },
+                experience: response.experience_entries,
+                education: response.education_entries,
+                extra_activities: response.extra_activity_entries,
+                skills: response.skill_entries,
+                languages: response.language_entries,
+            };
+
             this.currentResume.set(resume);
             return resume;
         } catch (error) {
@@ -171,6 +198,36 @@ export class ResumeService {
         }
     }
 
+    public addExtraActivity(activity: ExtraActivityType): void {
+        const resume = this.currentResume();
+        if (resume) {
+            this.currentResume.set({
+                ...resume,
+                extra_activities: [...(resume.extra_activities ?? []), activity],
+            });
+        }
+    }
+
+    public updateExtraActivity(id: string, data: Partial<ExtraActivityType>): void {
+        const resume = this.currentResume();
+        if (resume) {
+            this.currentResume.set({
+                ...resume,
+                extra_activities: (resume.extra_activities ?? []).map((act) => (act.id === id ? { ...act, ...data } : act)),
+            });
+        }
+    }
+
+    public removeExtraActivity(id: string): void {
+        const resume = this.currentResume();
+        if (resume) {
+            this.currentResume.set({
+                ...resume,
+                extra_activities: (resume.extra_activities ?? []).filter((act) => act.id !== id),
+            });
+        }
+    }
+
     public async saveResume(): Promise<void> {
         const resume = this.currentResume();
         if (!resume) return;
@@ -191,7 +248,44 @@ export class ResumeService {
             console.log("Resume saved successfully");
         } catch (error) {
             console.error("Error saving resume:", error);
-            // If 404, maybe try POST? But usually we create first.
+            // If resume doesn't exist on server (client generated id), create it via POST
+            // Detect HTTP 404 from Angular HttpErrorResponse
+            const status = (error as any)?.status;
+            if (status === 404) {
+                try {
+                    const created = await firstValueFrom(
+                        this.httpClient.post<any>(`${environment.serverURL}/resumes/`, resume, { withCredentials: true })
+                    );
+                    // Map response to local structure and set currentResume
+                    const mapped: ResumeDataType = {
+                        id: created.id,
+                        template_id: created.template?.id,
+                        title: created.title,
+                        personal_info: {
+                            first_name: created.first_name,
+                            last_name: created.last_name,
+                            summary: created.professional_summary,
+                            email: created.contact_details?.email,
+                            phone: created.contact_details?.phone,
+                            address: created.contact_details?.address,
+                            city: created.contact_details?.city,
+                            country: created.contact_details?.country,
+                        },
+                        experience: created.experience_entries,
+                        education: created.education_entries,
+                        extra_activities: created.extra_activity_entries,
+                        skills: created.skill_entries,
+                        languages: created.language_entries,
+                        is_primary: created.is_primary,
+                        created_at: created.created_at,
+                        updated_at: created.updated_at,
+                    };
+                    this.currentResume.set(mapped);
+                    console.log("Resume created on server and saved locally");
+                } catch (createErr) {
+                    console.error("Failed to create resume after 404:", createErr);
+                }
+            }
         } finally {
             this.isLoading.set(false);
         }
