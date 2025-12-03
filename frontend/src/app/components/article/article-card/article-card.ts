@@ -10,9 +10,7 @@ import { RouterLink } from "@angular/router";
 })
 export class ArticleCard {
     public readonly article: InputSignal<ArticleType> = input.required<ArticleType>();
-    public readonly variant: InputSignal<"default" | "small" | "horizontal"> = input<
-        "default" | "small" | "horizontal"
-    >("default");
+    public readonly variant: InputSignal<"vertical" | "horizontal"> = input<"vertical" | "horizontal">("vertical");
 
     public readonly onClick: OutputEmitterRef<ArticleType> = output<ArticleType>();
     public readonly onTagClick: OutputEmitterRef<string> = output<string>();

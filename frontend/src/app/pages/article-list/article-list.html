@@ -6,7 +6,6 @@
                 <ui-input
                     [(value)]="searchQuery"
                     [placeholder]="'Назва статті'"
-                    (onChange)="onSearchInput($any($event.target).value)"
                     (keydown.enter)="onSearch()"
                 ></ui-input>
                 <button class="search__button" (click)="onSearch()">
@@ -59,7 +58,7 @@
                     @for (article of recommendedArticles(); track article.id) {
                         <app-article-card 
                             [article]="article" 
-                            [variant]="'small'"
+                            [variant]="'vertical'"
                             (onTagClick)="onTagSelect($event)"
                         ></app-article-card>
                     }
@@ -74,7 +73,7 @@
     }
 
     <div class="article-list__all-wrapper">
-        <ui-title [title]="'Всі статті'" [size]="'medium'"></ui-title>
+        <ui-title [title]="'Всі статті'" [size]="'medium'" [align]="'center'"></ui-title>
 
         <div class="article-list__content">
             @if (isLoading()) {

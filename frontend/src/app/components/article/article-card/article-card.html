@@ -1,57 +1,102 @@
-<div 
-    class="article-card" 
-    [class.article-card--small]="variant() === 'small'"
-    [class.article-card--horizontal]="variant() === 'horizontal'"
->
-    @if (article().image) {
-        <div class="article-card__image-wrapper">
-            <img [src]="article().image" [alt]="article().title" class="article-card__image" />
-        </div>
-    }
-
-    <div class="article-card__content">
-        <h3 class="article-card__title">{{ article().title }}</h3>
-        
-        @if (article().summary) {
-            <p class="article-card__summary">{{ article().summary }}</p>
-        }
-
-        <div class="article-card__meta">
-            @if (article().views !== undefined) {
-                <span class="meta__views">
-                    <i class="fa-solid fa-eye"></i>
-                    {{ article().views }}
-                </span>
+<div class="article-card">
+    @if (variant() === "horizontal") {
+        <div class="article-card-horizontal" (click)="handleClick()">
+            @if (article().image) {
+                <div class="horizontal__image-wrapper">
+                    <img class="image-wrapper__image" [src]="article().image" [alt]="article().title" />
+                </div>
             }
-            @if (article().created_at) {
-                <span class="meta__date">
-                    <i class="fa-regular fa-calendar"></i>
-                    {{ formatDate(article().created_at!) }}
-                </span>
-            }
-        </div>
-    </div>
 
-    <div class="article-card__footer">
-        @if (article().tags && article().tags!.length > 0) {
-            <div class="article-card__tags">
-                @for (tag of article().tags; track tag) {
-                    <span class="article-card__tag" (click)="handleTagClick($event, tag)">#{{ tag }}</span>
+            <div class="horizontal__content">
+                <div class="content__header">
+                    <h3 class="header__title">{{ article().title }}</h3>
+                    @if (article().category) {
+                        <span class="header__category">{{ article().category }}</span>
+                    }
+                </div>
+
+                @if (article().summary) {
+                    <p class="content__summary">{{ article().summary }}</p>
+                }
+
+                <div class="content__footer">
+                    <div class="footer__meta">
+                        <span class="meta__date">
+                            <i class="fa-solid fa-calendar"></i>
+                            {{ formatDate(article().created_at!) }}
+                        </span>
+                        <span class="meta__views">
+                            <i class="fa-solid fa-eye"></i>
+                            {{ article().views }}
+                        </span>
+                    </div>
+
+                    @if (article().tags && article().tags!.length > 0) {
+                        <div class="footer__tags">
+                            @for (tag of article().tags; track tag) {
+                                <span class="tags__item" (click)="handleTagClick($event, tag)">#{{ tag }}</span>
+                            }
+                        </div>
+                    }
+
+                    <button
+                        class="footer__button"
+                        [routerLink]="['/article', article().id]"
+                        (click)="$event.stopPropagation()"
+                    >
+                        Читати
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    } @else {
+        <div class="article-card-vertical" (click)="handleClick()">
+            @if (article().image) {
+                <div class="vertical__image-wrapper">
+                    <img class="image-wrapper__image" [src]="article().image" [alt]="article().title" />
+                    <div class="image-wrapper__data">
+                        <span class="data__views">
+                            <i class="fa-solid fa-eye"></i>
+                            {{ article().views }}
+                        </span>
+                        <span class="data__date">{{ formatDate(article().created_at!) }}</span>
+                    </div>
+                </div>
+            }
+
+            <div class="vertical__content">
+                <h3 class="content__title">{{ article().title }}</h3>
+
+                @if (article().summary) {
+                    <p class="content__summary">{{ article().summary }}</p>
                 }
             </div>
-        }
 
-        @if (article().category) {
-            <span class="article-card__category">{{ article().category }}</span>
-        }
+            <div class="vertical__footer">
+                @if (article().tags && article().tags!.length > 0) {
+                    <div class="footer__tags">
+                        @for (tag of article().tags; track tag) {
+                            <span class="tags__item" (click)="handleTagClick($event, tag)">#{{ tag }}</span>
+                        }
+                    </div>
+                }
 
-        <button 
-            class="article-card__button"
-            [routerLink]="['/article', article().id]"
-            (click)="handleClick(); $event.stopPropagation()"
-        >
-            Читати
-            <i class="fa-solid fa-arrow-right"></i>
-        </button>
-    </div>
+                <div class="footer__actions">
+                    @if (article().category) {
+                        <span class="actions__category">{{ article().category }}</span>
+                    }
+
+                    <button
+                        class="actions__button"
+                        [routerLink]="['/article', article().id]"
+                        (click)="$event.stopPropagation()"
+                    >
+                        Читати
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
 </div>

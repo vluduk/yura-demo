@@ -25,14 +25,13 @@ export class ArticleList implements OnInit {
     protected readonly recommendedListRef: Signal<ElementRef> = viewChild.required<ElementRef>("recommendedList");
 
     private readonly articleService: ArticleService = inject(ArticleService);
-    private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
     ngOnInit(): void {
         this.loadArticles();
         this.loadRecommendedArticles();
     }
 
-    protected async loadArticles(): Promise<void> {
+    private async loadArticles(): Promise<void> {
         this.isLoading.set(true);
         try {
             const articles = await this.articleService.getArticles(
@@ -57,24 +56,7 @@ export class ArticleList implements OnInit {
         }
     }
 
-    protected onSearchInput(query: string): void {
-        this.searchQuery.set(query);
-
-        // Debounce search - wait 300ms after user stops typing
-        if (this.searchTimeout) {
-            clearTimeout(this.searchTimeout);
-        }
-
-        this.searchTimeout = setTimeout(() => {
-            this.loadArticles();
-        }, 300);
-    }
-
     protected onSearch(): void {
-        // Immediate search on button click or enter
-        if (this.searchTimeout) {
-            clearTimeout(this.searchTimeout);
-        }
         this.loadArticles();
     }
 

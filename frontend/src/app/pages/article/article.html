@@ -1,40 +1,73 @@
-<div class="article-page">
-    <div class="article-header">
-        <ui-button [type]="'secondary'" [routerLink]="['/articles']">
-            <i class="fa-solid fa-arrow-left"></i> Назад до статей
-        </ui-button>
-    </div>
+<div class="article container">
+    <ui-button
+        class="article__back-button"
+        [label]="'Назад до статей'"
+        [icon]="'fa-solid fa-arrow-left'"
+        [type]="'primary'"
+        [routerLink]="['/articles']"
+    ></ui-button>
 
     @if (isLoading()) {
         <div class="loading">Завантаження...</div>
     } @else if (article(); as article) {
-        <article class="article-content">
-            <div class="article-meta">
-                <span class="category">{{ article.category }}</span>
-                @if (article.tags && article.tags.length > 0) {
-                    <div class="tags">
-                        @for (tag of article.tags; track tag) {
-                            <span class="tag">#{{ tag }}</span>
-                        }
-                    </div>
-                }
-                <span class="date">{{ article.created_at | date:'dd.MM.yyyy' }}</span>
-                <span class="views"><i class="fa-solid fa-eye"></i> {{ article.views }}</span>
+        <article class="article__content article-content">
+            <div class="article-content__header article-header">
+                <div class="article-content__meta">
+                    <span class="meta__category">{{ article.category }}</span>
+                    @if (article.tags && article.tags.length > 0) {
+                        <div class="meta__tags">
+                            @for (tag of article.tags; track tag) {
+                                <span class="tags__tag">#{{ tag }}</span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <ui-title [title]="article.title" [size]="'large'" [theme]="'secondary'"></ui-title>
+
+                <div class="article-content__info">
+                    <span class="info__date">Дата публікації: {{ article.created_at | date: "dd.MM.yyyy" }}</span>
+                    <span class="info__views">Переглядів: {{ article.views }}</span>
+                </div>
             </div>
 
-            <ui-title [title]="article.title" [size]="'large'"></ui-title>
-
             @if (article.image) {
-                <div class="article-image">
-                    <img [src]="article.image" [alt]="article.title">
+                <div class="article-content__image">
+                    <img [src]="article.image" [alt]="article.title" />
                 </div>
             }
 
-            <div class="article-body">
+            <div class="article-content__body">
                 <markdown [data]="article.content"></markdown>
             </div>
         </article>
     } @else {
         <div class="not-found">Статтю не знайдено</div>
+    }
+</div>
+
+<div class="container">
+    @if (recommendedArticles().length !== 0) {
+        <div class="article-list__recommended-wrapper">
+            <ui-title [title]="'Рекомендовані статті'" [size]="'medium'"></ui-title>
+
+            <div class="recommended-wrapper__list-wrapper">
+                <ui-button
+                    [icon]="'fa-solid fa-chevron-left'"
+                    [type]="'icon'"
+                    (click)="scrollRecommended('left')"
+                ></ui-button>
+                <div class="list-wrapper__list" #recommendedList>
+                    @for (article of recommendedArticles(); track article.id) {
+                        <app-article-card [article]="article" [variant]="'vertical'"></app-article-card>
+                    }
+                </div>
+                <ui-button
+                    [icon]="'fa-solid fa-chevron-right'"
+                    [type]="'icon'"
+                    (click)="scrollRecommended('right')"
+                ></ui-button>
+            </div>
+        </div>
     }
 </div>

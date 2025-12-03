@@ -48,16 +48,16 @@
     justify-content: center;
     width: 44px;
     height: 44px;
-    color: white;
+    color: var(--primary-text-color);
     cursor: pointer;
-    background-color: var(--color-primary, #3b82f6);
+    background-color: var(--button-background-color);
     border: none;
     border-radius: 8px;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s;
 }
 
 .search__button:hover {
-    background-color: var(--color-primary-dark, #2563eb);
+    background-color: var(--button-hover-color);
 }
 
 .search__button i {
@@ -168,13 +168,6 @@
 
 .list-wrapper__list::-webkit-scrollbar-thumb:hover {
     background-color: var(--button-hover-color);
-}
-
-.list-wrapper__list app-article-card {
-    flex: 0 0 260px;
-    min-width: 260px;
-    max-width: 260px;
-    height: 280px;
 }
 
 .article-list__all-wrapper {
