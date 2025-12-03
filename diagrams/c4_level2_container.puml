@@ -1,0 +1,25 @@
+@startuml C4_Container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+TITLE Container Diagram - Yura Career Advisor
+
+Person(veteran, "Veteran", "A Ukrainian veteran seeking career transition.")
+
+System_Ext(google_gemini, "Google Gemini API", "LLM & Embeddings Provider")
+
+System_Boundary(yura, "Yura Platform") {
+    Container(spa, "Single Page Application", "Angular", "Provides the interactive UI for chat, resume building, and dashboard.")
+    
+    Container(api, "API Application", "Django + DRF", "Handles business logic, authentication, AI orchestration, and data persistence.")
+    
+    ContainerDb(db, "Database", "PostgreSQL + pgvector", "Stores user data, conversations, business ideas, and vector embeddings for RAG.")
+}
+
+Rel(veteran, spa, "Uses", "HTTPS")
+
+Rel(spa, api, "Makes API calls to", "JSON/HTTPS")
+
+Rel(api, db, "Reads/Writes data", "SQL/TCP")
+Rel(api, google_gemini, "Generates content & embeddings", "HTTPS/JSON")
+
+@enduml
