@@ -1,83 +1,71 @@
 <div class="form-personal">
-    <h3 class="form__title">Особисті дані</h3>
+    <ui-title [title]="'Особисті дані'" [size]="'medium'"></ui-title>
 
     <div class="form__row">
-        <div class="form__field">
-            <label class="field__label">Ім'я</label>
-            <input 
-                type="text" 
-                class="field__input"
-                [value]="personalInfo()?.first_name || ''"
-                (input)="updateField('first_name', $event)"
-                placeholder="Введіть ім'я"
-            />
-        </div>
-        <div class="form__field">
-            <label class="field__label">Прізвище</label>
-            <input 
-                type="text" 
-                class="field__input"
-                [value]="personalInfo()?.last_name || ''"
-                (input)="updateField('last_name', $event)"
-                placeholder="Введіть прізвище"
-            />
-        </div>
-    </div>
-
-    <div class="form__row">
-        <div class="form__field">
-            <label class="field__label">Email</label>
-            <input 
-                type="email" 
-                class="field__input"
-                [value]="personalInfo()?.email || ''"
-                (input)="updateField('email', $event)"
-                placeholder="example@email.com"
-            />
-        </div>
-        <div class="form__field">
-            <label class="field__label">Телефон</label>
-            <input 
-                type="tel" 
-                class="field__input"
-                [value]="personalInfo()?.phone || ''"
-                (input)="updateField('phone', $event)"
-                placeholder="+380..."
-            />
-        </div>
-    </div>
-
-    <div class="form__field">
-        <label class="field__label">Адреса</label>
-        <input 
-            type="text" 
+        <ui-input
             class="field__input"
-            [value]="personalInfo()?.address || ''"
-            (input)="updateField('address', $event)"
-            placeholder="Вулиця, будинок"
-        />
+            [label]="'Ім\'я'"
+            [value]="personalInfo()?.first_name ?? ''"
+            (valueChange)="updateField('first_name', $event)"
+            [placeholder]="'Іван'"
+        ></ui-input>
+        <ui-input
+            class="field__input"
+            [label]="'Прізвище'"
+            [value]="personalInfo()?.last_name ?? ''"
+            (valueChange)="updateField('last_name', $event)"
+            [placeholder]="'Іваненко'"
+        ></ui-input>
     </div>
 
     <div class="form__row">
-        <div class="form__field">
-            <label class="field__label">Місто</label>
-            <input 
-                type="text" 
-                class="field__input"
-                [value]="personalInfo()?.city || ''"
-                (input)="updateField('city', $event)"
-                placeholder="Київ"
-            />
-        </div>
-        <div class="form__field">
-            <label class="field__label">Країна</label>
-            <input 
-                type="text" 
-                class="field__input"
-                [value]="personalInfo()?.country || ''"
-                (input)="updateField('country', $event)"
-                placeholder="Україна"
-            />
-        </div>
+        <ui-input
+            class="field__input"
+            [label]="'Email'"
+            [value]="personalInfo()?.email ?? ''"
+            (valueChange)="updateField('email', $event)"
+            [placeholder]="'example@email.com'"
+        ></ui-input>
+        <ui-input
+            class="field__input"
+            [label]="'Телефон'"
+            [value]="personalInfo()?.phone ?? ''"
+            [type]="'phone'"
+            (valueChange)="updateField('phone', $event)"
+        ></ui-input>
+    </div>
+
+    <ui-input
+        class="field__input"
+        [label]="'Професія'"
+        [value]="personalInfo()?.profession ?? ''"
+        (valueChange)="updateField('profession', $event)"
+        [placeholder]="'Дизайнер'"
+    ></ui-input>
+    
+    <ui-input
+        class="field__input"
+        [label]="'Адреса'"
+        [value]="personalInfo()?.address ?? ''"
+        (valueChange)="updateField('address', $event)"
+        [placeholder]="'Вулиця, будинок'"
+    ></ui-input>
+
+    <div class="form__row">        
+        <ui-input
+            class="field__input"
+            [label]="'Місто'"
+            [value]="personalInfo()?.city ?? ''"
+            (valueChange)="updateField('city', $event)"
+            [placeholder]="'Київ'"
+        ></ui-input>
+
+        <ui-input
+            class="field__input"
+            [label]="'Країна'"
+            [value]="personalInfo()?.country ?? ''"
+            (valueChange)="updateField('country', $event)"
+            [placeholder]="'Україна'"
+        ></ui-input>
     </div>
 </div>

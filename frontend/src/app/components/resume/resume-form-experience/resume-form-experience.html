@@ -1,6 +1,6 @@
 <div class="form-experience">
     <div class="form__header">
-        <h3 class="form__title">Досвід роботи</h3>
+        <ui-title [title]="'Досвід роботи'" [size]="'medium'"></ui-title>
         <ui-button 
             [label]="'Додати'"
             [icon]="'fa-solid fa-plus'"
@@ -12,42 +12,138 @@
     @for (exp of experiences(); track exp.id) {
         <div class="experience-item">
             <div class="item__header">
-                <span class="item__number">{{ $index + 1 }}</span>
+                <span class="item__title">{{ exp.employer }} {{ exp.job_title }}</span>
                 <button class="item__remove" (click)="removeExperience(exp.id)">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
 
             <div class="form__row">
-                <div class="form__field">
-                    <label class="field__label">Компанія</label>
-                    <input type="text" class="field__input" [value]="exp.employer" (input)="updateExperience(exp.id, 'employer', $event)" />
-                </div>
-                <div class="form__field">
-                    <label class="field__label">Посада</label>
-                    <input type="text" class="field__input" [value]="exp.job_title" (input)="updateExperience(exp.id, 'job_title', $event)" />
-                </div>
+                <ui-input
+                    [label]="'Компанія'"
+                    [placeholder]="'Введіть назву компанії...'"
+                    [value]="exp.employer"
+                    (valueChange)="updateExperience(exp.id, 'employer', $event.toString())"
+                ></ui-input>
+                
+                <ui-input
+                    [label]="'Посада'"
+                    [placeholder]="'Введіть вашу посаду...'"
+                    [value]="exp.job_title"
+                    (valueChange)="updateExperience(exp.id, 'job_title', $event.toString())"
+                ></ui-input>
             </div>
 
             <div class="form__row">
                 <div class="form__field">
                     <label class="field__label">Початок</label>
-                    <input type="month" class="field__input" [value]="exp.start_date" (input)="updateExperience(exp.id, 'start_date', $event)" />
+                    <div class="date-selects">
+                        <select 
+                            class="field__select"
+                            [value]="parseDate(exp.start_date).month"
+                            (change)="onMonthChange($event, exp.id, 'start_date', parseDate(exp.start_date).year)">
+                            <option value="">Місяць</option>
+                            @for (month of months; track month.value) {
+                                <option 
+                                    [value]="month.value"
+                                    [disabled]="parseDate(exp.start_date).year && isOptionDisabled(exp, 'start_date', month.value, parseDate(exp.start_date).year)"
+                                >{{ month.label }}</option>
+                            }
+                        </select>
+                        <select 
+                            class="field__select"
+                            [value]="parseDate(exp.start_date).year"
+                            (change)="onYearChange($event, exp.id, 'start_date', parseDate(exp.start_date).month)">
+                            <option value="">Рік</option>
+                            @for (year of years; track year) {
+                                <option 
+                                    [value]="year"
+                                    [disabled]="parseDate(exp.start_date).month && isOptionDisabled(exp, 'start_date', parseDate(exp.start_date).month, year)"
+                                >{{ year }}</option>
+                            }
+                        </select>
+                    </div>
                 </div>
                 <div class="form__field">
                     <label class="field__label">Кінець</label>
-                    <input type="month" class="field__input" [value]="exp.end_date" [disabled]="exp.is_current" (input)="updateExperience(exp.id, 'end_date', $event)" />
+                    <div class="date-selects">
+                        <ui-select
+                            class="field__select"
+                            [value]="parseDate(exp.end_date).month"
+                            [isDisabled]="exp.is_current ?? false"
+                            (valueChange)="onMonthChange($event, exp.id, 'end_date', parseDate(exp.end_date).year)"    
+                        >
+                            <option value="">Місяць</option>
+                            @for (month of months; track month.value) {
+                                <option 
+                                    [value]="month.value"
+                                    [disabled]="parseDate(exp.end_date).year && isOptionDisabled(exp, 'end_date', month.value, parseDate(exp.end_date).year)"
+                                >{{ month.label }}</option>
+                            }
+                        </ui-select>
+                        <ui-select
+                            class="field__select"
+                            [value]="parseDate(exp.end_date).month"
+                            [isDisabled]="exp.is_current ?? false"
+                            (valueChange)="onMonthChange($event, exp.id, 'end_date', parseDate(exp.end_date).year)"    
+                        >
+                            <option value="">Місяць</option>
+                            @for (month of months; track month.value) {
+                                <option 
+                                    [value]="month.value"
+                                    [disabled]="parseDate(exp.end_date).year && isOptionDisabled(exp, 'end_date', month.value, parseDate(exp.end_date).year)"
+                                >{{ month.label }}</option>
+                            }
+                        </ui-select>
+                        <select 
+                            class="field__select"
+                            [value]="parseDate(exp.end_date).month"
+                            [disabled]="exp.is_current ?? false"
+                            (change)="onMonthChange($event.toString(), exp.id, 'end_date', parseDate(exp.end_date).year)">
+                            <option value="">Місяць</option>
+                            @for (month of months; track month.value) {
+                                <option 
+                                    [value]="month.value"
+                                    [disabled]="parseDate(exp.end_date).year && isOptionDisabled(exp, 'end_date', month.value, parseDate(exp.end_date).year)"
+                                >{{ month.label }}</option>
+                            }
+                        </select>
+                        <select 
+                            class="field__select"
+                            [value]="parseDate(exp.end_date).year"
+                            [disabled]="exp.is_current"
+                            (change)="onYearChange($event, exp.id, 'end_date', parseDate(exp.end_date).month)">
+                            <option value="">Рік</option>
+                            @for (year of years; track year) {
+                                <option 
+                                    [value]="year"
+                                    [disabled]="parseDate(exp.end_date).month && isOptionDisabled(exp, 'end_date', parseDate(exp.end_date).month, year)"
+                                >{{ year }}</option>
+                            }
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div class="form__field form-field__checkbox-wrapper">
-                <input type="checkbox" [checked]="exp.is_current" (change)="updateExperience(exp.id, 'is_current', $event)" />
-                <label>Працюю тут зараз</label>
-            </div>
-
+            <ui-checkbox
+                [label]="'Працюю тут зараз'"
+                [value]="exp.is_current ?? false"
+                (change)="updateExperience(exp.id, 'is_current', $event)"
+            ></ui-checkbox>
+            
             <div class="form__field">
-                <label class="field__label">Опис</label>
-                <textarea class="field__textarea" [value]="exp.description || ''" (input)="updateExperience(exp.id, 'description', $event)" rows="3"></textarea>
+                <div class="textarea__wrapper">
+                    <label class="field__label">Опис</label>
+                    <ui-button [label]="'Згенерувати самарі'" [icon]="'fa-solid fa-wand-magic-sparkles'" [type]="'secondary'"
+                        (click)="generateSummary()"></ui-button>
+                </div>
+                <ui-textarea
+                    class="field__textarea"
+                    [placeholder]="'Опишіть ваші обов’язки та досягнення...'"
+                    [isFullWidth]="true"
+                    [value]="exp.description ?? ''"
+                    (valueChange)="updateExperience(exp.id, 'description', $event)"
+                ></ui-textarea>
             </div>
         </div>
     } @empty {

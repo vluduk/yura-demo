@@ -1,11 +1,5 @@
 import { Component, input, InputSignal, signal, WritableSignal } from "@angular/core";
-import {
-    ResumeDataType,
-    ExperienceType,
-    EducationType,
-    SkillType,
-    PersonalInfoType,
-} from "@shared/types/ResumeDataType";
+import { ResumeDataType } from "@shared/types/ResumeDataType";
 import { Button } from "@shared/components/button/button";
 import { Textarea } from "@shared/components/textarea/textarea";
 
@@ -20,5 +14,5 @@ export class ResumeFormSummary {
 
     protected readonly summaryText: WritableSignal<string> = signal<string>("");
 
-    protected generateSummary(): void {}
+    protected generateSummary(): void { }
 }

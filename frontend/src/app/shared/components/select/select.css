@@ -78,7 +78,7 @@
 }
 
 .select_theme_primary::placeholder {
-    color: var(--gray-text-color);
+    color: var(--placeholder-text-color);
 }
 
 .select_theme_primary:hover {

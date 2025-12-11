@@ -1,20 +1,14 @@
-<label class="label">
-    @if (label()) {
-        <span class="label__text">{{ label() }}</span>
-    }
-
-    <textarea
-        class="textarea"
-        [placeholder]="placeholder()"
-        [ngClass]="{
-            textarea_size_small: size() == 'small',
-            textarea_size_large: size() == 'large',
-            textarea_theme_default: theme() == 'default',
-            textarea_theme_primary: theme() == 'primary',
-            textarea_width_full: isFullWidth(),
-        }"
-        [value]="value()"
-        (input)="handleChange($event)"
-        [disabled]="isDisabled()"
-    ></textarea>
-</label>
+<textarea
+    class="textarea"
+    [placeholder]="placeholder()"
+    [ngClass]="{
+        textarea_size_small: size() == 'small',
+        textarea_size_large: size() == 'large',
+        textarea_theme_default: theme() == 'default',
+        textarea_theme_primary: theme() == 'primary',
+        textarea_width_full: isFullWidth(),
+    }"
+    [value]="value()"
+    (input)="handleChange($event)"
+    [disabled]="isDisabled()"
+></textarea>

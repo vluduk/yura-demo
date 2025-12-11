@@ -1,31 +1,11 @@
-.label {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    user-select: none;
-}
-
-.label__text {
-    padding-left: 16px;
-    font-size: 16px;
-    font-weight: 400;
-    color: var(--primary-text-color);
-}
-
-@media screen and (max-width: 565px) {
-    .label__text {
-        font-size: 14px;
-    }
-}
-
 .textarea {
     max-height: 400px;
     font-family: Inter;
     font-size: 16px;
     resize: none;
     outline: none;
-    background-color: transparent;
+    color: var(--secondary-text-color);
+    background-color: var(--card-background-color);
     border: none;
     transition: border-color 0.3s;
 }
@@ -74,7 +54,7 @@
 }
 
 .textarea_theme_primary::placeholder {
-    color: var(--gray-text-color);
+    color: var(--placeholder-text-color);
 }
 
 .textarea_theme_primary:hover {

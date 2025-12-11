@@ -49,6 +49,7 @@ export class ResumeService {
                 personal_info: {
                     first_name: response.first_name,
                     last_name: response.last_name,
+                    profession: response.profession,
                     summary: response.professional_summary,
                     email: response.contact_details?.email,
                     phone: response.contact_details?.phone,
@@ -87,6 +88,7 @@ export class ResumeService {
                 personal_info: {
                     first_name: data.first_name ?? resume.personal_info?.first_name ?? "",
                     last_name: data.last_name ?? resume.personal_info?.last_name ?? "",
+                    profession: data.profession ?? resume.personal_info?.profession ?? "",
                     email: data.email ?? resume.personal_info?.email ?? "",
                     phone: data.phone ?? resume.personal_info?.phone ?? "",
                     address: data.address ?? resume.personal_info?.address ?? "",
@@ -264,6 +266,7 @@ export class ResumeService {
                         personal_info: {
                             first_name: created.first_name,
                             last_name: created.last_name,
+                            profession: created.profession,
                             summary: created.professional_summary,
                             email: created.contact_details?.email,
                             phone: created.contact_details?.phone,

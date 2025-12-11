@@ -19,16 +19,20 @@
     align-items: center;
     justify-content: center;
     height: 40px;
-    font-size: 16px;
+    font-size: 14px;
     color: var(--primary-text-color);
     content: "+38";
+}
+
+.label:has(.input_theme_primary)::before {
+    color: var(--secondary-text-color);
 }
 
 @media screen and (max-width: 1199px) {
     .label:has(.input_type_phone)::before {
         left: 12px;
         height: 36px;
-        font-size: 14px;
+        font-size: 12px;
     }
 }
 
@@ -103,7 +107,7 @@
 }
 
 .input_theme_primary::placeholder {
-    color: var(--gray-text-color);
+    color: var(--placeholder-text-color);
 }
 
 .input_theme_primary:hover:not(:disabled) {

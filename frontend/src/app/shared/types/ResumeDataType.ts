@@ -16,6 +16,7 @@ export type ResumeDataType = {
 export type PersonalInfoType = {
     first_name: string;
     last_name: string;
+    profession: string;
     email?: string;
     phone?: string;
     address?: string;
