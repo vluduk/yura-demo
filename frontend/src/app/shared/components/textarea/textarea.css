@@ -63,4 +63,4 @@
 
 .textarea_width_full {
     width: 100%;
-}
+}.textarea:disabled { opacity: 0.6; cursor: not-allowed; }

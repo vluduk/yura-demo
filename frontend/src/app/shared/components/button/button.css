@@ -160,6 +160,11 @@
     border-color: var(--disabled-border-color);
 }
 
+.button_type_icon.button_disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .button__loader-wrapper {
     position: absolute;
     top: 0;
@@ -186,7 +191,7 @@
     }
 }
 
-.button__loader-wrapper ~ .button__label,
-.button__loader-wrapper ~ .button__icon-wrapper {
+.button__loader-wrapper~.button__label,
+.button__loader-wrapper~.button__icon-wrapper {
     opacity: 0;
 }
