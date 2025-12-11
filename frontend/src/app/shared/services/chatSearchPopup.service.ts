@@ -44,25 +44,6 @@ export class ChatSearchPopupService {
             this.page.set(1);
         }
 
-        const requestedSearch = searchField ? searchField.trim().toLowerCase() : null;
-        const requestedType = type ?? null;
-
-        const filtered = this.MOCK_CONVERSATIONS.filter((c) => {
-            if (requestedType && c.type !== requestedType) {
-                return false;
-            }
-            if (!requestedSearch) {
-                return false;
-            } else if (requestedSearch.length > 0) {
-                return c.title.toLowerCase().includes(requestedSearch);
-            }
-            return true;
-        });
-
-        const response: ConversationType[] = filtered.map((c) => ({ id: c.id, title: c.title, type: c.type }));
-
-        this.results.set(response);
-
         if (searchField) {
             this.searchField.set(searchField);
         }
@@ -70,21 +51,11 @@ export class ChatSearchPopupService {
             this.type.set(type);
         }
 
-        this.page.update((page: number) => page + 1);
-
-        // this.conversationService
-        //     .getConversations(this.page(), 20, searchField ?? undefined, type ?? undefined)
-        //     .then((response: ConversationType[]) => {
-        //         this.results.set(response);
-
-        //         if (searchField) {
-        //             this.searchField.set(searchField);
-        //         }
-        //         if (type) {
-        //             this.type.set(type);
-        //         }
-
-        //         this.page.update((page: number) => page + 1);
-        //     });
+        this.conversationService
+            .getConversations(this.page(), 20, searchField ?? undefined, type ?? undefined)
+            .then((response: ConversationType[]) => {
+                this.results.set(response);
+                this.page.update((page: number) => page + 1);
+            });
     }
 }

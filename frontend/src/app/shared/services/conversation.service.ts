@@ -56,7 +56,12 @@ export class ConversationService {
         // Get conversations from backend
         return await firstValueFrom<ConversationType[]>(
             this.httpClient.get<ConversationType[]>(environment.serverURL + "/conversations/", {
-                params: { page: page.toString(), limit: limit.toString() },
+                params: {
+                    page: page.toString(),
+                    limit: limit.toString(),
+                    ...(search ? { search } : {}),
+                    ...(type ? { type } : {})
+                },
             }),
         );
     }

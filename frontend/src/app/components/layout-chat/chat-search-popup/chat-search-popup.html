@@ -13,12 +13,12 @@
             ></ui-input>
             <div class="body__results">
                 @if (results().length === 0) {
-                    <span class="results__no-results">Немає результатів</span>
+                    <span class="results__no-results">Немає чатів</span>
                 } @else {
                     @for (result of results(); track result.id) {
-                        <div class="results__item">
-                            <span class="item__chat-title">{{ result.id }}</span>
-                            <span class="item__message-snippet">{{ result.title }}</span>
+                        <div class="results__item" (click)="openConversation(result.id)">
+                            <span class="item__chat-title">{{ result.title || 'Без назви' }}</span>
+                            <span class="item__message-snippet">{{ result.type || 'Загальний' }}</span>
                         </div>
                     }
                 }
