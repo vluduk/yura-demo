@@ -1,19 +1,35 @@
 from rest_framework import viewsets, permissions, status
-import logging
 from rest_framework.decorators import action
 from rest_framework.response import Response
+import logging
 from api.models.resume import Resume
 from api.serializers.resume import ResumeSerializer
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework import status
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 
 class ResumeViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing resumes.
+    
+    Provides full CRUD operations plus AI suggestion functionality.
+    """
     serializer_class = ResumeSerializer
     permission_classes = [permissions.IsAuthenticated]
-
     logger = logging.getLogger(__name__)
 
+    def get_queryset(self):
+        """Return only resumes owned by the authenticated user."""
+        return Resume.objects.filter(user=self.request.user).order_by('-updated_at')
+
+    def perform_create(self, serializer):
+        """Create a resume owned by the authenticated user."""
+        serializer.save(user=self.request.user)
+
+    @swagger_auto_schema(tags=['Resumes'])
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(tags=['Resumes'])
     def create(self, request, *args, **kwargs):
         """Override create to log serializer validation errors for debugging."""
         serializer = self.get_serializer(data=request.data)
@@ -27,16 +43,47 @@ class ResumeViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def get_queryset(self):
-        return Resume.objects.filter(user=self.request.user).order_by('-updated_at')
+    @swagger_auto_schema(tags=['Resumes'])
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    @swagger_auto_schema(tags=['Resumes'])
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(tags=['Resumes'])
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+
+    @swagger_auto_schema(tags=['Resumes'])
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
 
     @action(detail=True, methods=['post'], url_path='ai-suggest')
+    @swagger_auto_schema(
+        tags=['Resumes', 'AI'],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['field'],
+            properties={
+                'field': openapi.Schema(type=openapi.TYPE_STRING, description='Field to generate content for'),
+                'context': openapi.Schema(type=openapi.TYPE_STRING, description='Optional context for generation'),
+            },
+        ),
+        responses={
+            200: openapi.Response('AI-generated content', openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={'content': openapi.Schema(type=openapi.TYPE_STRING)}
+            )),
+            400: 'Bad request - field is required'
+        }
+    )
     def ai_suggest(self, request, pk=None):
-        """
-        Generate AI content for a specific field in the resume.
+        """Generate AI content for a specific field in the resume.
+        
+        Request body:
+        - field: The field to generate content for (required)
+        - context: Optional context to help with generation
         """
         resume = self.get_object()
         field = request.data.get('field')
@@ -49,5 +96,3 @@ class ResumeViewSet(viewsets.ModelViewSet):
         content = AdvisorService.generate_resume_content(request.user, resume, field, context)
         
         return Response({'content': content})
-
-# CVTemplate endpoints removed — templates are now maintained on the frontend.

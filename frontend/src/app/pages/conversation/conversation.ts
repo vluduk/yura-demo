@@ -306,6 +306,8 @@ export class Conversation {
                 lastUserMessage.id,
                 lastUserMessage.content,
                 this.currentConversationType() || undefined,
+                undefined,
+                true
             )
             .subscribe({
                 next: (chunk) => {

@@ -1,8 +1,10 @@
-from django.urls import path
-from api.views.articles import ArticleListCreateView, PromotedArticlesView, ArticleDetailView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from api.views.articles import ArticleViewSet
+
+router = DefaultRouter()
+router.register(r'articles', ArticleViewSet, basename='article')
 
 urlpatterns = [
-    path('articles/', ArticleListCreateView.as_view(), name='article-list-create'),
-    path('articles/promoted/', PromotedArticlesView.as_view(), name='promoted-articles'),
-    path('articles/<uuid:pk>/', ArticleDetailView.as_view(), name='article-detail'),
+    path('', include(router.urls)),
 ]

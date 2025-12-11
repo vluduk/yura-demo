@@ -1,8 +1,7 @@
-from rest_framework import permissions, status
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.renderers import JSONRenderer
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics
 from django.utils import timezone
 from django.conf import settings
 from django.http import StreamingHttpResponse
@@ -18,19 +17,21 @@ from api.serializers.conversation import ConversationSerializer
 from api.serializers.message import MessageSerializer
 
 
-class ConversationListCreateView(generics.ListCreateAPIView):
+class ConversationViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing conversations.
+    
+    Provides standard CRUD operations (list, create, retrieve, update, destroy)
+    plus a custom 'chat' action for interacting with the AI assistant.
+    """
     serializer_class = ConversationSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        """Only return conversations owned by the authenticated user."""
         return Conversation.objects.filter(user=self.request.user).order_by('-last_active_at')
 
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            return [permissions.IsAuthenticated()]
-        return [permissions.IsAuthenticated()]
-    
     def perform_create(self, serializer):
-        # Ensure the conversation is owned by the requesting user
+        """Create a conversation owned by the requesting user with optional initial AI message."""
         conv = serializer.save(user=self.request.user)
 
         # If the new conversation has no messages, ask the LLM to generate an initial assistant message
@@ -40,58 +41,52 @@ class ConversationListCreateView(generics.ListCreateAPIView):
             # Generate a starter assistant message
             initial_text = AdvisorService.generate_initial_message(self.request.user, conv)
             if initial_text:
-                from api.models.message import Message
                 Message.objects.create(conversation=conv, content=initial_text, is_user=False)
         except Exception:
             # Do not block creation on LLM failures; conversation exists regardless
             logger = logging.getLogger(__name__)
             logger.exception('Failed to generate initial assistant message during conversation creation')
 
-
-class ConversationDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """Retrieve or delete a conversation belonging to the authenticated user.
-
-    DELETE /api/conversations/<uuid:pk> will remove the conversation and cascade-delete related messages
-    because the Message model uses `on_delete=models.CASCADE` for the conversation FK.
-    """
-    serializer_class = ConversationSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        # Only allow access to conversations owned by the requesting user
-        return Conversation.objects.filter(user=self.request.user)
-
     def perform_destroy(self, instance):
-        # Optionally log deletion and perform any cleanup before deletion
+        """Delete conversation with logging."""
         logger = logging.getLogger(__name__)
-        logger.info("Deleting conversation", extra={"conversation_id": str(instance.id), "user": getattr(self.request.user, 'email', None)})
+        logger.info("Deleting conversation", extra={
+            "conversation_id": str(instance.id), 
+            "user": getattr(self.request.user, 'email', None)
+        })
         instance.delete()
 
-
-class ConversationChatView(APIView):
-    """Accepts a user message, stores it, calls Google LLM (if configured), stores the AI reply, and returns it.
-
-    Request JSON: { 
-        "conversation_id": <uuid, optional>, 
-        "content": "user message", 
-        "title": "optional title for new conv",
-        "conv_type": "optional conversation type"
-    }
-    """
-    permission_classes = [permissions.IsAuthenticated]
-    # Allow DRF to negotiate text/event-stream for streaming clients
-    renderer_classes = (EventStreamRenderer, JSONRenderer)
-
-    def post(self, request, *args, **kwargs):
+    @action(detail=False, methods=['post'], renderer_classes=[EventStreamRenderer, JSONRenderer])
+    def chat(self, request):
+        """Accept a user message, call Google LLM, and return the AI reply.
+        
+        Supports both streaming and non-streaming responses based on the 'stream' parameter.
+        
+        Request JSON: { 
+            "conversation_id": <uuid, optional>, 
+            "content": "user message", 
+            "title": "optional title for new conv",
+            "conv_type": "optional conversation type",
+            "file_id": "optional file uuid",
+            "stream": true/false (optional, can also be query param)
+        }
+        """
         user = request.user
         logger = logging.getLogger(__name__)
-        logger.debug('ConversationChatView POST called', extra={'user': getattr(user, 'email', None), 'path': request.path})
+        logger.debug('ConversationViewSet.chat called', extra={
+            'user': getattr(user, 'email', None), 
+            'path': request.path
+        })
+        
         conversation_id = request.data.get('conversation_id')
         content = request.data.get('content')
         file_id = request.data.get('file_id')
 
         if not content:
-            logger.warning('Chat request missing content', extra={'user': getattr(user, 'email', None), 'data': request.data})
+            logger.warning('Chat request missing content', extra={
+                'user': getattr(user, 'email', None), 
+                'data': request.data
+            })
             logger.debug('Request headers: %s', dict(request.headers))
             return Response({'detail': 'content is required'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -112,12 +107,14 @@ class ConversationChatView(APIView):
             try:
                 conv = Conversation.objects.get(id=conversation_id, user=user)
             except Conversation.DoesNotExist:
-                logger.warning('Conversation not found for user', extra={'user': getattr(user, 'email', None), 'conversation_id': conversation_id})
+                logger.warning('Conversation not found for user', extra={
+                    'user': getattr(user, 'email', None), 
+                    'conversation_id': conversation_id
+                })
                 logger.debug('Request headers: %s', dict(request.headers))
                 return Response({'detail': 'conversation not found'}, status=status.HTTP_404_NOT_FOUND)
         else:
             # Create new conversation with optional title and conv_type
-            # Use provided title or a sensible default for new conversations
             provided_title = request.data.get('title')
             conv_type = request.data.get('conv_type', '')
             
@@ -131,8 +128,38 @@ class ConversationChatView(APIView):
                 conv_type=conv_type
             )
 
-        # Save user message
-        user_msg = Message.objects.create(conversation=conv, content=content, is_user=True)
+        # Handle regeneration logic
+        regenerate = request.data.get('regenerate', False)
+        
+        if regenerate and conversation_id:
+            # If regenerating, we might need to clean up the last AI message
+            # and avoid creating a duplicate user message
+            try:
+                # Get the conversation
+                conv = Conversation.objects.get(id=conversation_id, user=user)
+                last_msg = conv.messages.order_by('-created_at').first()
+
+                if last_msg and not last_msg.is_user:
+                    # If the very last message is from AI, delete it so we can re-generate
+                    last_msg.delete()
+                    # Re-fetch last message, which should now be the user's message
+                    last_msg = conv.messages.order_by('-created_at').first()
+
+                if last_msg and last_msg.is_user:
+                    # Use the last user message content if not provided or to ensure consistency
+                    # In regeneration, we typically re-run the last prompt.
+                    content = last_msg.content
+                    # DO NOT create a new user message, as we are re-running existing one
+                else:
+                    # Fallback: if proper history structure isn't found, treat as new message
+                    user_msg = Message.objects.create(conversation=conv, content=content, is_user=True)
+            except Exception as e:
+                logger.error(f"Error during regeneration cleanup: {e}")
+                # Fallback to standard flow if something goes wrong
+                user_msg = Message.objects.create(conversation=conv, content=content, is_user=True)
+        else:
+            # Standard flow: Save user message
+            user_msg = Message.objects.create(conversation=conv, content=content, is_user=True)
 
         # Check for streaming request
         stream = request.GET.get('stream') or request.data.get('stream')
@@ -141,7 +168,10 @@ class ConversationChatView(APIView):
         from api.services.advisor import AdvisorService
 
         if is_streaming:
-            logger.info('Client requested streaming response', extra={'user': getattr(user, 'email', None), 'conversation_id': str(conv.id)})
+            logger.info('Client requested streaming response', extra={
+                'user': getattr(user, 'email', None), 
+                'conversation_id': str(conv.id)
+            })
             
             def event_stream():
                 full_ai_text = ""

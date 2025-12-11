@@ -55,7 +55,7 @@ export class ConversationService {
     ): Promise<ConversationType[]> {
         // Get conversations from backend
         return await firstValueFrom<ConversationType[]>(
-            this.httpClient.get<ConversationType[]>(environment.serverURL + "/conversations", {
+            this.httpClient.get<ConversationType[]>(environment.serverURL + "/conversations/", {
                 params: { page: page.toString(), limit: limit.toString() },
             }),
         );
@@ -89,7 +89,7 @@ export class ConversationService {
         }
 
         return await firstValueFrom<ConversationType>(
-            this.httpClient.post<ConversationType>(environment.serverURL + "/conversations", body),
+            this.httpClient.post<ConversationType>(environment.serverURL + "/conversations/", body),
         );
     }
 
@@ -97,7 +97,7 @@ export class ConversationService {
         try {
             // Get conversation to fetch its messages
             const conversation = await firstValueFrom<any>(
-                this.httpClient.get<any>(environment.serverURL + `/conversations/${conversationId}`),
+                this.httpClient.get<any>(environment.serverURL + `/conversations/${conversationId}/`),
             );
 
             // Return messages from conversation (they're included in the conversation object)
@@ -143,7 +143,7 @@ export class ConversationService {
 
         toDelete.forEach((conv) => {
             try {
-                const url = `${environment.serverURL}/conversations/${conv.id}`;
+                const url = `${environment.serverURL}/conversations/${conv.id}/`;
                 // Use fetch with keepalive so browser attempts it during unload
                 if (typeof fetch === "function") {
                     try {
@@ -165,21 +165,21 @@ export class ConversationService {
         formData.append("file", file);
 
         const response = await firstValueFrom<{ id: string }>(
-            this.httpClient.post<{ id: string }>(environment.serverURL + "/files/upload", formData),
+            this.httpClient.post<{ id: string }>(environment.serverURL + "/files/", formData),
         );
 
         return response.id;
     }
 
     public async deleteConversation(conversationId: string): Promise<void> {
-        await firstValueFrom(this.httpClient.delete(environment.serverURL + `/conversations/${conversationId}`));
+        await firstValueFrom(this.httpClient.delete(environment.serverURL + `/conversations/${conversationId}/`));
 
         this.sidebarConversations.update((list) => list.filter((conv) => conv.id !== conversationId));
     }
 
     public async renameConversation(conversationId: string, newTitle: string): Promise<ConversationType> {
         const updated = await firstValueFrom<ConversationType>(
-            this.httpClient.patch<ConversationType>(environment.serverURL + `/conversations/${conversationId}`, {
+            this.httpClient.patch<ConversationType>(environment.serverURL + `/conversations/${conversationId}/`, {
                 title: newTitle,
             }),
         );
@@ -197,6 +197,7 @@ export class ConversationService {
         requestText: string,
         convType?: ConversationTypeEnum,
         file?: File,
+        regenerate: boolean = false
     ): Observable<string> {
         return new Observable<string>((observer) => {
             const startStream = async () => {
@@ -214,6 +215,7 @@ export class ConversationService {
 
                 const body: any = {
                     content: requestText,
+                    regenerate: regenerate,
                 };
 
                 if (fileId) {
@@ -228,7 +230,7 @@ export class ConversationService {
                     body.conv_type = convType;
                 }
 
-                const url = environment.serverURL + "/conversations/chat?stream=1";
+                const url = environment.serverURL + "/conversations/chat/?stream=1";
 
                 try {
                     await fetchEventSource(url, {
