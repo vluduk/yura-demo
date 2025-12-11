@@ -1,4 +1,4 @@
-import { Component, output, OutputEmitterRef, signal, WritableSignal } from "@angular/core";
+import { Component, input, InputSignal, output, OutputEmitterRef, signal, WritableSignal } from "@angular/core";
 import { Textarea } from "@shared/components/textarea/textarea";
 import { Button } from "@shared/components/button/button";
 
@@ -17,9 +17,13 @@ export class ChatInput {
     protected readonly inputText: WritableSignal<string> = signal<string>("");
     protected readonly selectedFile: WritableSignal<File | null> = signal<File | null>(null);
 
+    public readonly isLoading: InputSignal<boolean> = input<boolean>(false);
+
     public readonly onSend: OutputEmitterRef<ChatInputMessage> = output<ChatInputMessage>();
 
     protected send(): void {
+        if (this.isLoading()) return;
+
         const text = this.inputText().trim();
         if (text.length > 0 || this.selectedFile()) {
             this.onSend.emit({

@@ -1,38 +1,27 @@
 <div class="chat-input">
     @if (selectedFile()) {
-        <div class="chat-input__file-preview">
-            <div class="file-preview__info">
-                <i class="fa-solid fa-file"></i>
-                <span class="info__name">{{ selectedFile()!.name }}</span>
-                <span class="info__size">{{ formatFileSize(selectedFile()!.size) }}</span>
-            </div>
-            <button class="file-preview__remove" (click)="removeFile()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+    <div class="chat-input__file-preview">
+        <div class="file-preview__info">
+            <i class="fa-solid fa-file"></i>
+            <span class="info__name">{{ selectedFile()!.name }}</span>
+            <span class="info__size">{{ formatFileSize(selectedFile()!.size) }}</span>
         </div>
+        <button class="file-preview__remove" (click)="removeFile()" [disabled]="isLoading()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
     }
 
     <div class="chat-input__input-wrapper">
-        <ui-textarea
-            [isFullWidth]="true"
-            [(value)]="inputText"
-            (keydown.enter)="send(); $event.preventDefault()"
-        ></ui-textarea>
+        <ui-textarea [isFullWidth]="true" [(value)]="inputText" [isDisabled]="isLoading()"
+            (keydown.enter)="!isLoading() && (send(); $event.preventDefault())"></ui-textarea>
         <div class="input-wrapper__buttons">
-            <input
-                type="file"
-                id="chat-file-input"
-                class="hidden-file-input"
-                (change)="onFileSelect($event)"
-                accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg"
-            />
-            <ui-button
-                [icon]="'fa-solid fa-plus'"
-                [type]="'icon'"
-                [theme]="'dark'"
-                (click)="triggerFileInput()"
-            ></ui-button>
-            <ui-button [icon]="'fa-solid fa-arrow-up'" [type]="'icon'" [theme]="'dark'" (click)="send()"></ui-button>
+            <input type="file" id="chat-file-input" class="hidden-file-input" (change)="onFileSelect($event)"
+                accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" [disabled]="isLoading()" />
+            <ui-button [icon]="'fa-solid fa-plus'" [type]="'icon'" [theme]="'dark'" (click)="triggerFileInput()"
+                [isDisabled]="isLoading()"></ui-button>
+            <ui-button [icon]="'fa-solid fa-arrow-up'" [type]="'icon'" [theme]="'dark'" (click)="send()"
+                [isDisabled]="isLoading()" [isLoading]="isLoading()"></ui-button>
         </div>
     </div>
 

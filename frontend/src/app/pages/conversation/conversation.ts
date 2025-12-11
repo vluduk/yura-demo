@@ -93,6 +93,10 @@ export class Conversation {
     }
 
     protected async getResponse(message?: ChatInputMessage): Promise<void> {
+        if (this.isLoading()) {
+            return;
+        }
+
         if (!message || (!message.text && !message.file)) {
             return;
         }

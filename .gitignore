@@ -8,3 +8,5 @@ venv/
 *.sqlite3
 postgres_data/
 .DS_Store
+dev.env
+node_modules
