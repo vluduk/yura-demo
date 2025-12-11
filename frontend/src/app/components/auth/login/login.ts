@@ -17,10 +17,12 @@ export class Login {
     protected readonly password: WritableSignal<string> = signal<string>("");
 
     protected readonly isLoading: WritableSignal<boolean> = signal<boolean>(false);
+    
+    protected readonly errorMessage: WritableSignal<string> = signal<string>("");
 
     private readonly hasSubmitted: WritableSignal<boolean> = signal<boolean>(false);
 
-    private router: Router = inject(Router);
+    private readonly router: Router = inject(Router);
 
     protected isFieldValid(field: string): boolean {
         if (!this.hasSubmitted) {
@@ -44,7 +46,13 @@ export class Login {
     protected async onSubmit(): Promise<void> {
         this.hasSubmitted.set(true);
 
-        if (!this.isFieldValid("email") || !this.isFieldValid("password")) {
+        if (!this.isFieldValid("email")) {
+            this.errorMessage.set("Будь ласка, введіть дійсну електронну адресу.");
+            return;
+        }
+
+        if (!this.isFieldValid("password")) {
+            this.errorMessage.set("Пароль повинен містити мінімум 6 символів.");
             return;
         }
 
@@ -55,10 +63,12 @@ export class Login {
                 email: this.email(),
                 password: this.password(),
             });
-            await this.router.navigate(["/conversation"]);
+            await this.router.navigate(["/"]);
         } catch (error) {
             console.error("Login failed", error);
-            // TODO: Show error message to user
+            
+            const msg: string = (error as any)?.error?.message || (error as any)?.message || 'Signup failed';
+            this.errorMessage.set(msg);
         } finally {
             this.isLoading.set(false);
         }

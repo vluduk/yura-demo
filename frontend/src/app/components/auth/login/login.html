@@ -1,13 +1,20 @@
 <div class="login">
     <div class="login__login-wrapper">
-        <ui-logo [size]="'large'"></ui-logo>
+        <ui-logo class="login__logo" [size]="'large'"></ui-logo>
 
         <div class="login__inputs">
             <ui-input [(value)]="email" [label]="'Електронна пошта'"></ui-input>
             <ui-input [(value)]="password" [label]="'Пароль'" [type]="'password'"></ui-input>
         </div>
 
-        <ui-button [label]="'Увійти'" [isLoading]="isLoading()" (click)="onSubmit()"></ui-button>
+
+        <div class="login__button-wrapper">
+            <ui-button [label]="'Увійти'" [size]="'medium'" [isLoading]="isLoading()" (click)="onSubmit()"></ui-button>
+
+            @if (errorMessage()) {
+            <div class="login__error">{{ errorMessage() }}</div>
+            }
+        </div>
 
         <span class="login__option-text">
             Не маєш облікового запису?

@@ -1,6 +1,6 @@
 <div class="signup">
     <div class="signup__signup-wrapper">
-        <ui-logo [size]="'large'"></ui-logo>
+        <ui-logo class="signup__logo" [size]="'large'"></ui-logo>
 
         <div class="signup__inputs">
             <div class="inputs__row">
@@ -12,9 +12,14 @@
             <ui-input [(value)]="confirmPassword" [label]="'Повторіть пароль'" [type]="'password'"></ui-input>
         </div>
 
-        <ui-button [label]="'Зареєструватися'" [isLoading]="isLoading()" (click)="onSubmit()"></ui-button>
+        <div class="signup__button-wrapper">
+            <ui-button [label]="'Зареєструватися'" [size]="'medium'" [isLoading]="isLoading()"
+                (click)="onSubmit()"></ui-button>
 
-        <div *ngIf="errorMessage()" class="signup__error">{{ errorMessage() }}</div>
+            @if (errorMessage()) {
+            <div class="signup__error">{{ errorMessage() }}</div>
+            }
+        </div>
 
         <span class="signup__option-text">
             Вже маєш обліковий запис?

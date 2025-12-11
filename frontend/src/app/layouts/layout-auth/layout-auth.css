@@ -6,10 +6,24 @@
     flex-shrink: 0;
     width: 40%;
     height: 100vh;
-    padding-top: 30vh;
+    padding: 30vh 20px 0;
     background-color: var(--dark-background-color);
 }
 
 .layout__main {
     width: 100%;
+}
+
+:host ::ng-deep .side-top h3 {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+:host ::ng-deep .side-bottom h3 {
+    margin-top: 20px;
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--contrast-color);
 }

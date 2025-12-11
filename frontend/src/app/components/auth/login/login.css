@@ -7,5 +7,29 @@
 }
 
 .login__login-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
     transform: translateY(-20%);
+}
+
+.login__logo {
+    margin: 0 auto;
+}
+
+.login__inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.login__button-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.login__error {
+    width: 300px;
+    font-size: 12px;
 }
