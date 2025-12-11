@@ -230,10 +230,14 @@ class ConversationViewSet(viewsets.ModelViewSet):
                         # Title generation logic
                         try:
                             msg_count = conv.messages.count()
-                            type_label = dict(ConversationType.choices).get(conv.conv_type, 'Загальна')
-                            default_title_pattern = f"{type_label} - новий чат"
                             
-                            if msg_count >= 2 and (not conv.title or conv.title == default_title_pattern or conv.title == 'Нова розмова'):
+                            is_default_title = (
+                                not conv.title or 
+                                conv.title == 'Нова розмова' or 
+                                conv.title.endswith(' - новий чат')
+                            )
+                            
+                            if msg_count >= 2 and is_default_title:
                                 AdvisorService.generate_conversation_title(conv)
                         except Exception:
                             logger.exception('Unexpected error while attempting to set conversation title')
@@ -260,10 +264,14 @@ class ConversationViewSet(viewsets.ModelViewSet):
             # Title generation logic
             try:
                 msg_count = conv.messages.count()
-                type_label = dict(ConversationType.choices).get(conv.conv_type, 'Загальна')
-                default_title_pattern = f"{type_label} - новий чат"
                 
-                if msg_count >= 2 and (not conv.title or conv.title == default_title_pattern or conv.title == 'Нова розмова'):
+                is_default_title = (
+                    not conv.title or 
+                    conv.title == 'Нова розмова' or 
+                    conv.title.endswith(' - новий чат')
+                )
+                
+                if msg_count >= 2 and is_default_title:
                     AdvisorService.generate_conversation_title(conv)
             except Exception:
                 logger.exception('Unexpected error while attempting to set conversation title')
