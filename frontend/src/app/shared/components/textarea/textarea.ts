@@ -8,6 +8,7 @@ import { Component, input, InputSignal, model, ModelSignal } from "@angular/core
     styleUrl: "./textarea.css",
 })
 export class Textarea {
+    public readonly label: InputSignal<string> = input<string>("");
     public readonly placeholder: InputSignal<string> = input<string>("");
     public readonly size: InputSignal<"small" | "large"> = input<"small" | "large">("small");
     public readonly resize: InputSignal<"none" | "horizontal" | "vertical" | "both"> = input<
