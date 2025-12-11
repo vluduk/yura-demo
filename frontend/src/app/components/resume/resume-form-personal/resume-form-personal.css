@@ -49,3 +49,9 @@
     min-height: 80px;
     resize: vertical;
 }
+
+.field__ai {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

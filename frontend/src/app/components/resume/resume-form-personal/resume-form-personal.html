@@ -82,16 +82,15 @@
     </div>
 
     <div class="form__field">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <div class="field__ai">
             <label class="field__label" style="margin-bottom: 0;">Про себе</label>
             <ui-button 
-                type="secondary" 
-                size="small" 
+                [label]="'Автозаповнення AI'"
+                [icon]="'fa-solid fa-wand-magic-sparkles'"
+                [size]="'small'" 
+                [type]="'secondary'"
                 (click)="generateSummary()"
-                icon="fa-solid fa-wand-magic-sparkles"
-            >
-                Автозаповнення AI
-            </ui-button>
+            ></ui-button>
         </div>
         <textarea 
             class="field__textarea"

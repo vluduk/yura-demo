@@ -25,6 +25,12 @@
                     {{ data().personal_info?.country }}
                 </span>
             }
+            @if (data().personal_info?.address) {
+                <span class="contacts__item">
+                    <i class="fa-solid fa-house"></i>
+                    {{ data().personal_info?.address }}
+                </span>
+            }
         </div>
     </header>
 
