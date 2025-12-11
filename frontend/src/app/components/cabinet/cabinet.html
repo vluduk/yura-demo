@@ -1,28 +1,28 @@
 <div class="cabinet" [class]="{ cabinet_visible: isVisible() }">
     <div class="cabinet__menu">
         @for (tab of tabs(); track tab.id) {
-            <div
-                class="menu__item"
-                [class]="{ item_active: activeTab()?.id === tab.id }"
-                (click)="setActiveTab(tab)"
-            >
-                {{ tab.label }}
-            </div>
+        <div class="menu__item" [class]="{ item_active: activeTab()?.id === tab.id }" (click)="setActiveTab(tab)">
+            {{ tab.label }}
+        </div>
         }
+
+        <ui-button class="menu__logout-button" [label]="'Вийти з акаунта'" [size]="'small'" [isFullWidth]="true"
+            (click)="logout()"></ui-button>
     </div>
 
     <div class="cabinet__content">
         <div class="content__header">
             <ui-title [title]="activeTab()?.label ?? ''" [size]="'medium'"></ui-title>
-            <span class="header__close-button" (click)="hideCabinet()">×</span>
+            <ui-button class="header__close-button" [icon]="'fa-solid fa-xmark'" [type]="'icon'" [size]="'small'"
+                (click)="hideCabinet()"></ui-button>
         </div>
 
         <div class="content__main">
             @if (activeTab()?.id === "account") {
-                <cabinet-account></cabinet-account>
+            <cabinet-account></cabinet-account>
             }
             @else if (activeTab()?.id === "settings") {
-                <cabinet-settings></cabinet-settings>
+            <cabinet-settings></cabinet-settings>
             }
         </div>
     </div>

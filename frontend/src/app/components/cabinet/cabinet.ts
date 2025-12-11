@@ -3,6 +3,9 @@ import { CabinetPopupService } from "@shared/services/cabinetPopup.service";
 import { Account } from "./account/account";
 import { Settings } from "./settings/settings";
 import { Title } from "@shared/components/title/title";
+import { Button } from "@shared/components/button/button";
+import { AuthService } from "@shared/services/auth.service";
+import { Router } from "@angular/router";
 
 type CabinetTab = {
     label: string;
@@ -11,7 +14,7 @@ type CabinetTab = {
 
 @Component({
     selector: "cabinet-popup",
-    imports: [Account, Settings, Title],
+    imports: [Account, Settings, Title, Button],
     templateUrl: "./cabinet.html",
     styleUrl: "./cabinet.css",
 })
@@ -22,6 +25,8 @@ export class CabinetPopup implements OnInit {
     protected readonly activeTab: WritableSignal<CabinetTab | null> = signal<CabinetTab | null>(null);
 
     private readonly cabinetPopupService: CabinetPopupService = inject(CabinetPopupService);
+    private readonly authService: AuthService = inject(AuthService);
+    private readonly router: Router = inject(Router);
 
     ngOnInit(): void {
         this.isVisible = this.cabinetPopupService.isVisible;
@@ -40,5 +45,12 @@ export class CabinetPopup implements OnInit {
 
     protected setActiveTab(tab: CabinetTab): void {
         this.activeTab.set(tab);
+    }
+
+    protected async logout(): Promise<void> {
+        await this.authService.logout().then(() => {
+            this.cabinetPopupService.hideCabinetPopup();
+            this.router.navigate(["/"]);
+        });
     }
 }

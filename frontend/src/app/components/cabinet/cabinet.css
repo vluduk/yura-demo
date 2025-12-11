@@ -43,6 +43,10 @@
     cursor: pointer;
 }
 
+:host ::ng-deep .header__close-button .button__icon {
+    font-size: 20px;
+}
+
 .cabinet__content {
     display: flex;
     flex-direction: column;
@@ -75,6 +79,10 @@
     cursor: pointer;
     border-radius: 12px;
     transition: background-color 0.2s;
+}
+
+.menu__logout-button {
+    margin-top: auto;
 }
 
 .item_active {
