@@ -89,6 +89,7 @@
         </div>
     </div>
 
+    @if (recommendedArticles().length > 0) {
     <div class="main__block main__block_light block-articles">
         <div class="container">
             <ui-title [title]="'Популярні статті'" [theme]="'secondary'" [size]="'large'" [align]="'center'"></ui-title>
@@ -119,4 +120,5 @@
             ></ui-button>
         </div>
     </div>
+    }
 </div>

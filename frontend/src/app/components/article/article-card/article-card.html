@@ -1,6 +1,6 @@
 <div class="article-card">
     @if (variant() === "horizontal") {
-        <div class="article-card-horizontal" (click)="handleClick()">
+        <div class="article-card-horizontal" (click)="handleClick()" [routerLink]="['/article', article().id]">
             @if (article().image) {
                 <div class="horizontal__image-wrapper">
                     <img class="image-wrapper__image" [src]="article().image" [alt]="article().title" />
@@ -39,11 +39,7 @@
                         </div>
                     }
 
-                    <button
-                        class="footer__button"
-                        [routerLink]="['/article', article().id]"
-                        (click)="$event.stopPropagation()"
-                    >
+                    <button class="footer__button">
                         Читати
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>
@@ -51,7 +47,7 @@
             </div>
         </div>
     } @else {
-        <div class="article-card-vertical" (click)="handleClick()">
+        <div class="article-card-vertical" (click)="handleClick()" [routerLink]="['/article', article().id]">
             @if (article().image) {
                 <div class="vertical__image-wrapper">
                     <img class="image-wrapper__image" [src]="article().image" [alt]="article().title" />
@@ -87,11 +83,7 @@
                         <span class="actions__category">{{ article().category }}</span>
                     }
 
-                    <button
-                        class="actions__button"
-                        [routerLink]="['/article', article().id]"
-                        (click)="$event.stopPropagation()"
-                    >
+                    <button class="actions__button">
                         Читати
                         <i class="fa-solid fa-arrow-right"></i>
                     </button>

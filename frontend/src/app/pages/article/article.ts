@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, Signal, signal, viewChild, WritableSignal } from "@angular/core";
+import { Component, ElementRef, inject, Input, Signal, signal, viewChild, WritableSignal } from "@angular/core";
 import { ActivatedRoute, RouterLink } from "@angular/router";
 import { ArticleService } from "@shared/services/article.service";
 import { ArticleType } from "@shared/types/ArticleType";
@@ -14,7 +14,8 @@ import { ArticleCard } from "@components/article/article-card/article-card";
     templateUrl: "./article.html",
     styleUrl: "./article.css",
 })
-export class Article implements OnInit {
+export class Article {
+    protected readonly articleId: WritableSignal<string> = signal<string>("");
     protected readonly article: WritableSignal<ArticleType | null> = signal<ArticleType | null>(null);
     protected readonly isLoading: WritableSignal<boolean> = signal<boolean>(false);
 
@@ -25,13 +26,14 @@ export class Article implements OnInit {
     private readonly route = inject(ActivatedRoute);
     private readonly articleService = inject(ArticleService);
 
-    async ngOnInit(): Promise<void> {
-        const id = this.route.snapshot.paramMap.get("id");
+    @Input()
+    set id(id: string) {
         if (id) {
-            await this.loadArticle(id);
+            this.articleId.set(id);
+            this.loadArticle(id);
+            this.loadRecommendedArticles();
+            console.log('Article ID set to:', id);
         }
-
-        await this.loadRecommendedArticles();
     }
 
     private async loadArticle(id: string): Promise<void> {
@@ -46,7 +48,8 @@ export class Article implements OnInit {
 
     protected async loadRecommendedArticles(): Promise<void> {
         try {
-            const recommended = await this.articleService.getRecommendedArticles(5);
+            const recommended = (await this.articleService.getRecommendedArticles(5)).filter(article => article.id !== this.articleId());
+
             this.recommendedArticles.set(recommended);
         } catch (error) {
             console.error("Error loading recommended articles:", error);
