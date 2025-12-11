@@ -80,6 +80,43 @@ export class ResumeService {
         }
     }
 
+    public async getResumes(): Promise<ResumeDataType[]> {
+        this.isLoading.set(true);
+        try {
+            const list = await firstValueFrom<any[]>(
+                this.httpClient.get<any[]>(`${environment.serverURL}/resumes/`, {
+                    withCredentials: true,
+                })
+            );
+
+            // Map list if necessary, for now assume partial match is okay or map minimally
+            return list.map(item => ({
+                id: item.id,
+                title: item.title,
+                updated_at: item.updated_at,
+                created_at: item.created_at,
+                is_primary: item.is_primary,
+                // Partial data is fine for list view
+                personal_info: {
+                    first_name: item.first_name,
+                    last_name: item.last_name,
+                    profession: item.profession || "",
+                    email: item.contact_details?.email,
+                    phone: item.contact_details?.phone,
+                    address: item.contact_details?.address,
+                    city: item.contact_details?.city,
+                    country: item.contact_details?.country,
+                    summary: item.professional_summary,
+                }
+            }));
+        } catch (error) {
+            console.error("Error fetching resume list:", error);
+            return [];
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
+
     public updatePersonalInfo(data: Partial<PersonalInfoType>): void {
         const resume = this.currentResume();
         if (resume) {
@@ -241,7 +278,7 @@ export class ResumeService {
             // For simplicity, we'll try PUT to update.
             // If the ID is not valid on server, this will fail.
             // Ideally, we should have createResume() method.
-            
+
             await firstValueFrom(
                 this.httpClient.put(`${environment.serverURL}/resumes/${resume.id}/`, resume, {
                     withCredentials: true,
@@ -293,7 +330,7 @@ export class ResumeService {
             this.isLoading.set(false);
         }
     }
-    
+
     public async createResume(templateId: string): Promise<ResumeDataType> {
         this.isLoading.set(true);
         try {

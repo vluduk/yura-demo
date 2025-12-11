@@ -1,14 +1,17 @@
 <div class="header">
     <div class="container">
         <ui-logo [size]="'large'"></ui-logo>
-        
+
         <nav class="header__nav">
             <ui-link [label]="'Головна'" [type]="'primary'" [routerLink]="'/'"></ui-link>
             <ui-link [label]="'Консультант'" [type]="'primary'" [routerLink]="'/conversation'"></ui-link>
             <ui-link [label]="'Статті'" [type]="'primary'" [routerLink]="'/articles'"></ui-link>
-            <ui-link [label]="'Резюме-конструктор'" [type]="'primary'" [routerLink]="'/resume-templates'"></ui-link>
+            <ui-link [label]="'Створити резюме'" [type]="'primary'" [routerLink]="'/resume-templates'"></ui-link>
+            <ui-link [label]="'Мої резюме'" [type]="'primary'" [routerLink]="'/resumes'"></ui-link>
+            <ui-link [label]="'Налаштування'" [type]="'primary'" [routerLink]="'/settings'"></ui-link>
 
-            <ui-button [label]="'Почати чат'" [type]="'secondary'" [size]="'medium'" [routerLink]="'/conversation'"></ui-button>
+            <ui-button [label]="'Почати чат'" [type]="'secondary'" [size]="'medium'"
+                [routerLink]="'/conversation'"></ui-button>
         </nav>
     </div>
 </div>

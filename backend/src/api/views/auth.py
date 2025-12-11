@@ -265,6 +265,19 @@ class MeView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        tags=['Auth'],
+        request_body=UserSerializer,
+        responses={200: openapi.Response('Updated user info', UserSerializer)}
+    )
+    def patch(self, request):
+        """Update current authenticated user information"""
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class CreateAdminView(APIView):
     permission_classes = (AllowAny,)  # Should be restricted in production

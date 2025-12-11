@@ -24,9 +24,18 @@ export const routes: Routes = [
                 canActivate: [AuthGuard],
             },
             {
-                path: "resume-templates",
                 loadComponent: () =>
                     import("@pages/resume-template-list/resume-template-list").then((m) => m.ResumeTemplateList),
+                canActivate: [AuthGuard],
+            },
+            {
+                path: "resumes",
+                loadComponent: () => import("@pages/resume-library/resume-library").then((m) => m.ResumeLibraryComponent),
+                canActivate: [AuthGuard],
+            },
+            {
+                path: "settings",
+                loadComponent: () => import("@pages/settings/settings").then((m) => m.SettingsComponent),
                 canActivate: [AuthGuard],
             },
         ],

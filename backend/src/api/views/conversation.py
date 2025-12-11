@@ -66,67 +66,34 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'], renderer_classes=[EventStreamRenderer, JSONRenderer])
     def chat(self, request):
-        """Accept a user message, call Google LLM, and return the AI reply.
-        
-        Supports both streaming and non-streaming responses based on the 'stream' parameter.
-        
-        Request JSON: { 
-            "conversation_id": <uuid, optional>, 
-            "content": "user message", 
-            "title": "optional title for new conv",
-            "conv_type": "optional conversation type",
-            "file_id": "optional file uuid",
-            "stream": true/false (optional, can also be query param)
-        }
-        """
+        """Accept a user message, call Google LLM, and return the AI reply."""
         user = request.user
         logger = logging.getLogger(__name__)
-        logger.debug('ConversationViewSet.chat called', extra={
-            'user': getattr(user, 'email', None), 
-            'path': request.path
-        })
         
         conversation_id = request.data.get('conversation_id')
         content = request.data.get('content')
         file_id = request.data.get('file_id')
 
         if not content:
-            logger.warning('Chat request missing content', extra={
-                'user': getattr(user, 'email', None), 
-                'data': request.data
-            })
-            logger.debug('Request headers: %s', dict(request.headers))
             return Response({'detail': 'content is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         file_content = None
         if file_id:
             try:
                 uploaded_file = UploadedFile.objects.get(id=file_id, user=user)
-                try:
-                    with uploaded_file.file.open('rb') as f:
-                        raw_content = f.read()
-                        file_content = raw_content.decode('utf-8', errors='ignore')
-                except Exception as e:
-                    logger.error(f"Error reading file {file_id}: {e}")
-            except UploadedFile.DoesNotExist:
-                logger.warning(f"File {file_id} not found for user")
+                with uploaded_file.file.open('rb') as f:
+                    file_content = f.read().decode('utf-8', errors='ignore')
+            except Exception as e:
+                logger.warning(f"File {file_id} error: {e}")
 
         if conversation_id:
             try:
                 conv = Conversation.objects.get(id=conversation_id, user=user)
             except Conversation.DoesNotExist:
-                logger.warning('Conversation not found for user', extra={
-                    'user': getattr(user, 'email', None), 
-                    'conversation_id': conversation_id
-                })
-                logger.debug('Request headers: %s', dict(request.headers))
                 return Response({'detail': 'conversation not found'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            # Create new conversation with optional title and conv_type
             provided_title = request.data.get('title')
             conv_type = request.data.get('conv_type', '')
-            
-            # Determine default title based on type
             type_label = dict(ConversationType.choices).get(conv_type, 'Загальна')
             default_title = f"{type_label} - новий чат"
             
@@ -136,145 +103,103 @@ class ConversationViewSet(viewsets.ModelViewSet):
                 conv_type=conv_type
             )
 
-        # Handle regeneration logic
-        regenerate = request.data.get('regenerate', False)
+        # Locking mechanism
+        lock_id = f"chat_lock_{conv.id}"
+        if cache.get(lock_id):
+            return Response({'detail': 'Processing previous request'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         
-        if regenerate and conversation_id:
-            # If regenerating, we might need to clean up the last AI message
-            # and avoid creating a duplicate user message
-            try:
-                # Get the conversation
-                conv = Conversation.objects.get(id=conversation_id, user=user)
-                last_msg = conv.messages.order_by('-created_at').first()
+        cache.set(lock_id, "true", timeout=60)
 
-                if last_msg and not last_msg.is_user:
-                    # If the very last message is from AI, delete it so we can re-generate
-                    last_msg.delete()
-                    # Re-fetch last message, which should now be the user's message
-                    last_msg = conv.messages.order_by('-created_at').first()
-
-                if last_msg and last_msg.is_user:
-                    # Use the last user message content if not provided or to ensure consistency
-                    # In regeneration, we typically re-run the last prompt.
-                    content = last_msg.content
-                    # DO NOT create a new user message, as we are re-running existing one
-                else:
-                    # Fallback: if proper history structure isn't found, treat as new message
-                    user_msg = Message.objects.create(conversation=conv, content=content, is_user=True)
-            except Exception as e:
-                logger.error(f"Error during regeneration cleanup: {e}")
-                # Fallback to standard flow if something goes wrong
-                user_msg = Message.objects.create(conversation=conv, content=content, is_user=True)
-        else:
-            # Standard flow: Save user message
-            user_msg = Message.objects.create(conversation=conv, content=content, is_user=True)
-
-        # Check for streaming request
-        stream = request.GET.get('stream') or request.data.get('stream')
-        is_streaming = stream in (True, '1', 'true', 'True', 'yes')
-        
-        from api.services.advisor import AdvisorService
-
-        if is_streaming:
-            logger.info('Client requested streaming response', extra={
-                'user': getattr(user, 'email', None), 
-                'conversation_id': str(conv.id)
-            })
-            
-            def event_stream():
-                full_ai_text = ""
+        try:
+            # Regeneration logic
+            regenerate = request.data.get('regenerate', False)
+            if regenerate and conversation_id:
                 try:
-                    # Use the new streaming method
-                    ai_generator = AdvisorService.get_ai_response_stream(user, conv, content, file_content)
+                    last_msg = conv.messages.order_by('-created_at').first()
+                    if last_msg and not last_msg.is_user:
+                        last_msg.delete()
+                        last_msg = conv.messages.order_by('-created_at').first()
                     
-                    for chunk in ai_generator:
-                        full_ai_text += chunk
-                        # Yield chunk to client
-                        payload = json.dumps({"chunk": chunk})
+                    if last_msg and last_msg.is_user:
+                        # If content is provided and different, update the message
+                        if content and content != last_msg.content:
+                            last_msg.content = content
+                            last_msg.save(update_fields=['content'])
+                        
+                        # Use the (potentially updated) content
+                        content = last_msg.content
+                    else:
+                        Message.objects.create(conversation=conv, content=content, is_user=True)
+                except Exception:
+                    Message.objects.create(conversation=conv, content=content, is_user=True)
+            else:
+                Message.objects.create(conversation=conv, content=content, is_user=True)
+
+            # Streaming check
+            stream = request.GET.get('stream') or request.data.get('stream')
+            is_streaming = stream in (True, '1', 'true', 'True', 'yes')
+            
+            from api.services.advisor import AdvisorService
+
+            if is_streaming:
+                def event_stream():
+                    full_ai_text = ""
+                    try:
+                        ai_generator = AdvisorService.get_ai_response_stream(user, conv, content, file_content)
+                        for chunk in ai_generator:
+                            full_ai_text += chunk
+                            payload = json.dumps({"chunk": chunk})
+                            yield f"data: {payload}\n\n"
+                        yield "event: done\n"
+                        yield "data: {}\n\n"
+                    except Exception as e:
+                        logger.exception("Error during streaming")
+                        payload = json.dumps({"error": str(e)})
                         yield f"data: {payload}\n\n"
-                    
-                    # signal completion
-                    yield "event: done\n"
-                    yield "data: {}\n\n"
+                    finally:
+                        cache.delete(lock_id)
+                        if full_ai_text:
+                            ai_msg = Message.objects.create(conversation=conv, content=full_ai_text, is_user=False)
+                            conv.last_active_at = timezone.now()
+                            conv.save(update_fields=('last_active_at',))
+                            self._generate_title_if_needed(conv)
+                
+                return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
 
+            else:
+                # Non-streaming
+                try:
+                    ai_text = AdvisorService.get_ai_response(user, conv, content, file_content)
                 except Exception as e:
-                    logger.exception("Error during streaming")
-                    payload = json.dumps({"error": str(e)})
-                    yield f"data: {payload}\n\n"
-                finally:
-                    # After streaming is done (or failed), save the message and process updates
-                    if full_ai_text:
-                        # Save AI message
-                        ai_msg = Message.objects.create(conversation=conv, content=full_ai_text, is_user=False)
-                        
-                        # Process JSON updates
-                        try:
-                            from api.models.user_assesment import UserAssessment
-                            assessment = UserAssessment.objects.filter(user=user).order_by('-updated_at').first()
-                            if not assessment:
-                                assessment = UserAssessment.objects.create(user=user)
-                                
-                            clean_text = AdvisorService._process_response(assessment, full_ai_text)
-                            
-                            # Update the message with clean text if it differs
-                            if clean_text != full_ai_text:
-                                ai_msg.content = clean_text
-                                ai_msg.save()
-                        except Exception:
-                            logger.exception("Error processing post-stream updates")
-
-                        # Update conversation last active
-                        conv.last_active_at = timezone.now()
-                        conv.save(update_fields=('last_active_at',))
-                        
-                        # Title generation logic
-                        try:
-                            msg_count = conv.messages.count()
-                            
-                            is_default_title = (
-                                not conv.title or 
-                                conv.title == 'Нова розмова' or 
-                                conv.title.endswith(' - новий чат')
-                            )
-                            
-                            if msg_count >= 2 and is_default_title:
-                                AdvisorService.generate_conversation_title(conv)
-                        except Exception:
-                            logger.exception('Unexpected error while attempting to set conversation title')
-
-            return StreamingHttpResponse(event_stream(), content_type='text/event-stream')
-
-        else:
-            # Non-streaming flow
-            try:
-                ai_text = AdvisorService.get_ai_response(user, conv, content, file_content)
-            except Exception as e:
-                logger.exception('AdvisorService.get_ai_response raised an exception')
-                ai_text = f"(Помилка LLM) {str(e)}"
-
-            logger.debug('AI response generated', extra={'ai_length': len(ai_text) if ai_text else 0})
-
-            # Save AI message (full text)
-            ai_msg = Message.objects.create(conversation=conv, content=ai_text, is_user=False)
-
-            # Update conversation last active
-            conv.last_active_at = timezone.now()
-            conv.save(update_fields=('last_active_at',))
-
-            # Title generation logic
-            try:
-                msg_count = conv.messages.count()
+                    ai_text = f"(Помилка LLM) {str(e)}"
                 
-                is_default_title = (
-                    not conv.title or 
-                    conv.title == 'Нова розмова' or 
-                    conv.title.endswith(' - новий чат')
-                )
+                ai_msg = Message.objects.create(conversation=conv, content=ai_text, is_user=False)
+                conv.last_active_at = timezone.now()
+                conv.save(update_fields=('last_active_at',))
+                self._generate_title_if_needed(conv)
                 
-                if msg_count >= 2 and is_default_title:
-                    AdvisorService.generate_conversation_title(conv)
-            except Exception:
-                logger.exception('Unexpected error while attempting to set conversation title')
+                # Release lock before return
+                cache.delete(lock_id)
+                
+                serializer = MessageSerializer(ai_msg)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-            serializer = MessageSerializer(ai_msg)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            cache.delete(lock_id)
+            logger.exception("Unexpected error in chat view")
+            return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _generate_title_if_needed(self, conv):
+        try:
+            from api.services.advisor import AdvisorService
+            msg_count = conv.messages.count()
+            is_default_title = (
+                not conv.title or 
+                conv.title == 'Нова розмова' or 
+                conv.title.endswith(' - новий чат')
+            )
+            if msg_count >= 2 and is_default_title:
+                AdvisorService.generate_conversation_title(conv)
+        except Exception:
+            pass
+

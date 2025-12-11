@@ -25,22 +25,22 @@ export class UserService {
     ): Promise<null> {
         const body: Partial<UserType> = {};
 
-        if (!first_name) {
+        if (first_name) {
             body.first_name = first_name;
         }
-        if (!last_name) {
+        if (last_name) {
             body.last_name = last_name;
         }
-        if (!email) {
+        if (email) {
             body.email = email;
         }
-        if (!phone) {
+        if (phone) {
             body.phone = phone;
         }
-        if (!avatar_url) {
+        if (avatar_url) {
             body.avatar_url = avatar_url;
         }
-        if (!career_selected) {
+        if (career_selected !== undefined) {
             body.career_selected = career_selected;
         }
 

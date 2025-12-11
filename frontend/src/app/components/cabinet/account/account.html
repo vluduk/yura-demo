@@ -1,1 +1,36 @@
-<p>account works!</p>
+<div class="account-form">
+    <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <label>Ім'я</label>
+            <input type="text" formControlName="first_name" placeholder="Ваше ім'я" />
+        </div>
+
+        <div class="form-group">
+            <label>Прізвище</label>
+            <input type="text" formControlName="last_name" placeholder="Ваше прізвище" />
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" formControlName="email" placeholder="email@example.com" />
+            <span class="hint">Email не змінюється</span>
+        </div>
+
+        <div class="form-group">
+            <label>Телефон</label>
+            <input type="tel" formControlName="phone" placeholder="+380..." />
+        </div>
+
+        @if (successMessage()) {
+        <div class="success-message">
+            <i class="fa-solid fa-check"></i>
+            {{ successMessage() }}
+        </div>
+        }
+
+        <div class="actions">
+            <ui-button [label]="isLoading() ? 'Збереження...' : 'Зберегти'" [type]="'primary'" [isFullWidth]="true"
+                [isDisabled]="isLoading() || accountForm.invalid" (click)="onSubmit()"></ui-button>
+        </div>
+    </form>
+</div>

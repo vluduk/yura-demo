@@ -1,40 +1,32 @@
-import { Component, inject, OnInit, signal, WritableSignal, effect } from "@angular/core";
+import { Component, inject, OnInit, signal, WritableSignal } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { UserService } from "@shared/services/user.service";
-import { CabinetPopupService } from "@shared/services/cabinetPopup.service";
 import { Button } from "@shared/components/button/button";
 import { UserType } from "@shared/types/UserType";
 
 @Component({
-    selector: "cabinet-account",
+    selector: "app-settings",
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule, Button],
-    templateUrl: "./account.html",
-    styleUrls: ["./account.css"],
+    templateUrl: "./settings.html",
+    styleUrls: ["./settings.css"],
 })
-export class Account implements OnInit {
+export class SettingsComponent implements OnInit {
     private userService = inject(UserService);
-    private cabinetPopupService = inject(CabinetPopupService);
     private fb = inject(FormBuilder);
 
-    protected accountForm: FormGroup;
+    protected settingsForm: FormGroup;
     protected isLoading = signal<boolean>(false);
     protected currentUser = signal<UserType | null>(null);
     protected successMessage = signal<string | null>(null);
 
     constructor() {
-        this.accountForm = this.fb.group({
+        this.settingsForm = this.fb.group({
             first_name: ["", [Validators.required]],
             last_name: ["", [Validators.required]],
-            email: [{ value: "", disabled: true }],
+            email: [{ value: "", disabled: true }], // Email usually not editable directly
             phone: [""],
-        });
-
-        effect(() => {
-            if (this.cabinetPopupService.isVisible()) {
-                this.loadUserData();
-            }
         });
     }
 
@@ -47,7 +39,7 @@ export class Account implements OnInit {
         try {
             const user = await this.userService.getPersonalData();
             this.currentUser.set(user);
-            this.accountForm.patchValue({
+            this.settingsForm.patchValue({
                 first_name: user.first_name,
                 last_name: user.last_name,
                 email: user.email,
@@ -61,24 +53,21 @@ export class Account implements OnInit {
     }
 
     protected async onSubmit(): Promise<void> {
-        if (this.accountForm.invalid) return;
+        if (this.settingsForm.invalid) return;
 
         this.isLoading.set(true);
         this.successMessage.set(null);
 
-        const { first_name, last_name, phone } = this.accountForm.value;
+        const { first_name, last_name, phone } = this.settingsForm.value;
 
         try {
             await this.userService.updatePersonalData(first_name, last_name, undefined, phone);
-            this.successMessage.set("Дані оновлено");
+            this.successMessage.set("Дані успішно оновлено");
 
             // Reload to ensure sync
             await this.loadUserData();
-
-            // Clear success message after 3 seconds
-            setTimeout(() => this.successMessage.set(null), 3000);
         } catch (error) {
-            console.error("Error updating account:", error);
+            console.error("Error updating settings:", error);
         } finally {
             this.isLoading.set(false);
         }
