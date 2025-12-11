@@ -80,24 +80,4 @@
             />
         </div>
     </div>
-
-    <div class="form__field">
-        <div class="field__ai">
-            <label class="field__label" style="margin-bottom: 0;">Про себе</label>
-            <ui-button 
-                [label]="'Автозаповнення AI'"
-                [icon]="'fa-solid fa-wand-magic-sparkles'"
-                [size]="'small'" 
-                [type]="'secondary'"
-                (click)="generateSummary()"
-            ></ui-button>
-        </div>
-        <textarea 
-            class="field__textarea"
-            [value]="personalInfo()?.summary || ''"
-            (input)="updateField('summary', $event)"
-            placeholder="Короткий опис про себе..."
-            rows="4"
-        ></textarea>
-    </div>
 </div>

@@ -1,0 +1,18 @@
+<div class="resume-form-summary">
+    <div class="summary__controls">
+        <ui-button [label]="'Згенерувати самарі'" [type]="'primary'" (click)="generateSummary()"></ui-button>
+    </div>
+
+    <div class="summary__editor">
+        <ui-textarea
+            class="summary__textarea"
+            [label]="'Короткий підсумок резюме'"
+            [placeholder]="'Ваше резюме в короткому описі...'"
+            [(value)]="summaryText"
+        ></ui-textarea>
+    </div>
+
+    <div class="summary__note">
+        <small>Натисніть "Згенерувати самарі" для створення короткого опису резюме на основі доступних даних.</small>
+    </div>
+</div>

@@ -2,10 +2,12 @@ import { Component, input, InputSignal, output, OutputEmitterRef } from "@angula
 import { FormsModule } from "@angular/forms";
 import { EducationType } from "@shared/types/ResumeDataType";
 import { Button } from "@shared/components/button/button";
+import { Input } from "@shared/components/input/input";
+import { Checkbox } from "@shared/components/checkbox/checkbox";
 
 @Component({
     selector: "app-resume-form-education",
-    imports: [FormsModule, Button],
+    imports: [FormsModule, Button, Input, Checkbox],
     templateUrl: "./resume-form-education.html",
     styleUrl: "./resume-form-education.css",
 })
@@ -20,9 +22,13 @@ export class ResumeFormEducation {
         this.onAdd.emit();
     }
 
-    protected updateEducation(id: string, field: keyof EducationType, event: Event): void {
+    protected updateEducation(id: string, field: keyof EducationType, value: string | number | boolean): void {
+        this.onUpdate.emit({ id, field, value });
+    }
+
+    protected updateCheckboxEducation(id: string, field: keyof EducationType, event: Event): void {
         const target = event.target as HTMLInputElement;
-        const value = target.type === "checkbox" ? target.checked : target.value;
+        const value = target.checked;
         this.onUpdate.emit({ id, field, value });
     }
 

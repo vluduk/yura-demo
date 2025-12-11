@@ -37,9 +37,10 @@ import { IResumeTemplate } from "@shared/types/ResumeModel";
 import { NgComponentOutlet } from "@angular/common";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { ResumeFormSummary } from "@components/resume/resume-form-summary/resume-form-summary";
 
 type TabType = {
-    id: "personal" | "experience" | "education" | "skills" | "languages" | "extra_activities";
+    id: "personal" | "experience" | "education" | "skills" | "languages" | "extra_activities" | "summary";
     label: string;
     icon: string;
 };
@@ -54,6 +55,7 @@ type TabType = {
         ResumeFormSkills,
         ResumeFormLanguages,
         ResumeFormExtraActivities,
+        ResumeFormSummary,
         NgComponentOutlet,
     ],
     templateUrl: "./resume-builder.html",
@@ -83,7 +85,9 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
     protected readonly educations: Signal<EducationType[]> = computed(() => this.resume()?.education ?? []);
     protected readonly skills: Signal<SkillType[]> = computed(() => this.resume()?.skills ?? []);
     protected readonly languages: Signal<LanguageType[]> = computed(() => this.resume()?.languages ?? []);
-    protected readonly extraActivities: Signal<ExtraActivityType[]> = computed(() => this.resume()?.extra_activities ?? []);
+    protected readonly extraActivities: Signal<ExtraActivityType[]> = computed(
+        () => this.resume()?.extra_activities ?? [],
+    );
 
     protected readonly tabs: TabType[] = [
         { id: "personal", label: "Основне", icon: "fa-solid fa-user" },
@@ -92,12 +96,27 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         { id: "skills", label: "Навички", icon: "fa-solid fa-tools" },
         { id: "languages", label: "Мови", icon: "fa-solid fa-language" },
         { id: "extra_activities", label: "Активність", icon: "fa-solid fa-star" },
+        { id: "summary", label: "Підсумок", icon: "fa-solid fa-file" },
     ];
 
-    protected readonly progressWidth: Signal<number> = computed(() => {
+    protected readonly topProgressWidth: Signal<number> = computed(() => {
         const tabIndex = this.tabs.findIndex((tab: TabType) => tab.id === this.activeTab());
+        if (tabIndex > 2) {
+            return 100;
+        }
 
-        const progress = (tabIndex / (this.tabs.length - 1)) * 100;
+        const progress = (tabIndex / 2) * 100;
+
+        return progress;
+    });
+
+    protected readonly bottomProgressWidth: Signal<number> = computed(() => {
+        const tabIndex = this.tabs.findIndex((tab: TabType) => tab.id === this.activeTab());
+        if (tabIndex < 3) {
+            return 0;
+        }
+
+        const progress = ((tabIndex - 3) / (this.tabs.length - 4)) * 100;
 
         return progress;
     });

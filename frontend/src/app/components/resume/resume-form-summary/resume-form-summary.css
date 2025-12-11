@@ -1,0 +1,33 @@
+.resume-form-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.summary__controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.summary__editor {
+    width: 100%;
+}
+
+.summary__textarea {
+    width: 100%;
+    min-height: 160px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid var(--shadow-color-1);
+    border-radius: 8px;
+    resize: vertical;
+    background: var(--card-background-color);
+    color: var(--primary-text-color);
+}
+
+.summary__note {
+    color: var(--secondary-text-color);
+}

@@ -2,8 +2,18 @@
     <div class="resume-builder__content">
         <div class="content__form">
             <div class="form__header">
-                <div class="header__tabs" [style.--progress-width]="`${progressWidth()}%`">
-                    @for (tab of tabs; track tab.id) {
+                <div class="header__tabs tabs-top" [style.--progress-width]="`${topProgressWidth()}%`">
+                    @for (tab of tabs.slice(0, 3); track tab.id) {
+                        <ui-button
+                            class="tabs__item"
+                            [label]="tab.label"
+                            [icon]="tab.icon"
+                            (click)="setActiveTab(tab)"
+                        ></ui-button>
+                    }
+                </div>
+                <div class="header__tabs tabs-bottom" [style.--progress-width]="`${bottomProgressWidth()}%`">
+                    @for (tab of tabs.slice(3); track tab.id) {
                         <ui-button
                             class="tabs__item"
                             [label]="tab.label"
@@ -59,6 +69,9 @@
                             (onUpdate)="updateExtraActivity($event.id, $event.field, $event.value)"
                             (onRemove)="removeExtraActivity($event)"
                         ></app-resume-form-extra-activities>
+                    }
+                    @case ("summary") {
+                        <app-resume-form-summary [data]="resume()!"></app-resume-form-summary>
                     }
                 }
             }
