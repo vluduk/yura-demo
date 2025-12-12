@@ -1,6 +1,6 @@
 <div class="form-extra-activities">
     <div class="form__header">
-        <h3 class="form__title">Додаткова активність</h3>
+        <ui-title [title]="'Додаткова активність'" [size]="'medium'"></ui-title>
         <ui-button 
             [label]="'Додати'"
             [icon]="'fa-solid fa-plus'"
@@ -12,42 +12,111 @@
     @for (act of activities(); track act.id) {
         <div class="activity-item">
             <div class="item__header">
-                <span class="item__number">{{ $index + 1 }}</span>
+                <span class="item__title">{{ act.organization }} {{ act.title }}</span>
                 <button class="item__remove" (click)="removeActivity(act.id)">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
 
             <div class="form__row">
+                <ui-input
+                    [label]="'Компанія'"
+                    [placeholder]="'Введіть назву компанії...'"
+                    [value]="act.organization"
+                    (valueChange)="updateActivity(act.id, 'organization', $event.toString())"
+                ></ui-input>
+                <ui-input
+                    [label]="'Назва / Роль'"
+                    [placeholder]="'Введіть назву / роль...'"
+                    [value]="act.title"
+                    (valueChange)="updateActivity(act.id, 'title', $event.toString())"
+                ></ui-input>
+            </div>
+
+            <div class="form__row">
                 <div class="form__field">
-                    <label class="field__label">Організація</label>
-                    <input type="text" class="field__input" [value]="act.organization" (input)="updateActivity(act.id, 'organization', $event)" />
+                    <ui-select
+                        [label]="'Початок (місяць)'"
+                        [value]="parseDate(act.start_date).month"
+                        (valueChange)="onDatePartChange(act.id, 'start_date', 'month', $event)"
+                    >
+                        @for (month of months; track month.value) {
+                            <option 
+                                [value]="month.value"
+                                [disabled]="parseDate(act.start_date).year && isOptionDisabled(act, 'start_date', month.value, parseDate(act.start_date).year)"
+                            >{{ month.label }}</option>
+                        }
+                    </ui-select>
                 </div>
                 <div class="form__field">
-                    <label class="field__label">Назва / Роль</label>
-                    <input type="text" class="field__input" [value]="act.title" (input)="updateActivity(act.id, 'title', $event)" />
+                    <ui-select
+                        [label]="'Рік'"
+                        [value]="parseDate(act.start_date).year"
+                        (valueChange)="onDatePartChange(act.id, 'start_date', 'year', $event)"
+                    >
+                        @for (year of years; track year) {
+                            <option 
+                                [value]="year"
+                                [disabled]="parseDate(act.start_date).month && isOptionDisabled(act, 'start_date', parseDate(act.start_date).month, year)"
+                            >{{ year }}</option>
+                        }
+                    </ui-select>
                 </div>
             </div>
 
             <div class="form__row">
                 <div class="form__field">
-                    <label class="field__label">Початок</label>
-                    <input type="month" class="field__input" [value]="act.start_date" (input)="updateActivity(act.id, 'start_date', $event)" />
+                    <ui-select
+                        [label]="'Кінець (місяць)'"
+                        [value]="parseDate(act.end_date).month"
+                        [isDisabled]="act.is_current ?? false"
+                        (valueChange)="onDatePartChange(act.id, 'end_date', 'month', $event)"
+                    >
+                        @for (month of months; track month.value) {
+                            <option 
+                                [value]="month.value"
+                                [disabled]="parseDate(act.end_date).year && isOptionDisabled(act, 'end_date', month.value, parseDate(act.end_date).year)"
+                            >{{ month.label }}</option>
+                        }
+                    </ui-select>
                 </div>
                 <div class="form__field">
-                    <label class="field__label">Кінець</label>
-                    <input type="month" class="field__input" [value]="act.end_date" [disabled]="act.is_current" (input)="updateActivity(act.id, 'end_date', $event)" />
+                    <ui-select
+                        [label]="'Рік'"
+                        [value]="parseDate(act.end_date).year"
+                        [isDisabled]="act.is_current ?? false"
+                        (valueChange)="onDatePartChange(act.id, 'end_date', 'year', $event)"
+                    >
+                        @for (year of years; track year) {
+                            <option 
+                                [value]="year"
+                                [disabled]="parseDate(act.end_date).month && isOptionDisabled(act, 'end_date', parseDate(act.end_date).month, year)"
+                            >{{ year }}</option>
+                        }
+                    </ui-select>
                 </div>
             </div>
 
-            <div class="form__field form-field__checkbox-wrapper">
-                <input type="checkbox" [checked]="act.is_current" (change)="updateActivity(act.id, 'is_current', $event)" />
-                <label>Триває зараз</label>
-            </div>
+            <ui-checkbox
+                class="form__checkbox"
+                [label]="'Працюю тут зараз'"
+                [value]="act.is_current ?? false"
+                (change)="updateActivity(act.id, 'is_current', $event)"
+            ></ui-checkbox>
 
             <div class="form__field">
-                <label class="field__label">Опис</label>
-                <textarea class="field__textarea" [value]="act.description || ''" (input)="updateActivity(act.id, 'description', $event)" rows="3"></textarea>
+                <div class="textarea__wrapper">
+                    <span class="field__label">Опис</span>
+                    <ui-button [label]="'Згенерувати самарі'" [icon]="'fa-solid fa-wand-magic-sparkles'" [type]="'secondary'"
+                        (click)="generateSummary()"></ui-button>
+                </div>
+                <ui-textarea
+                    class="field__textarea"
+                    [placeholder]="'Опишіть ваші обов’язки та досягнення...'"
+                    [isFullWidth]="true"
+                    [value]="act.description ?? ''"
+                    (valueChange)="updateActivity(act.id, 'description', $event)"
+                ></ui-textarea>
             </div>
         </div>
     } @empty {

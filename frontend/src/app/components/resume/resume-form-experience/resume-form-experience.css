@@ -21,7 +21,7 @@
     flex-direction: column;
     gap: 12px;
     padding: 16px;
-    border: 1px solid var(--color-border, #e0e0e0);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .item__remove {
-    color: #ef4444;
+    color: var(--primary-text-color);
     cursor: pointer;
     background: none;
     border: none;
@@ -50,26 +50,8 @@
     gap: 6px;
 }
 
-.form__field--checkbox {
-    flex-direction: row;
-    gap: 8px;
-    align-items: center;
-}
-
-.field__label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-}
-
-.field__date-input {
-    height: 40px;
-    padding: 10px 12px;
-    font-size: 14px;
-    border-radius: 20px;
-    background-color: var(--card-background-color);
-    border: 0;
-    outline: 0;
+.form__checkbox {
+    margin-left: 20px;
 }
 
 .textarea__wrapper {
