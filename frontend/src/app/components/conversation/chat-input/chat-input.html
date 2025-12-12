@@ -14,13 +14,13 @@
 
     <div class="chat-input__input-wrapper">
         <ui-textarea [isFullWidth]="true" [(value)]="inputText" [isDisabled]="isLoading()"
-            (keydown.enter)="!isLoading() && (send(); $event.preventDefault())"></ui-textarea>
+            (keydown.enter)="send($event)"></ui-textarea>
         <div class="input-wrapper__buttons">
             <input type="file" id="chat-file-input" class="hidden-file-input" (change)="onFileSelect($event)"
                 accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" [disabled]="isLoading()" />
             <ui-button [icon]="'fa-solid fa-plus'" [type]="'icon'" [theme]="'dark'" (click)="triggerFileInput()"
                 [isDisabled]="isLoading()"></ui-button>
-            <ui-button [icon]="'fa-solid fa-arrow-up'" [type]="'icon'" [theme]="'dark'" (click)="send()"
+            <ui-button [icon]="'fa-solid fa-arrow-up'" [type]="'icon'" [theme]="'dark'" (click)="send($event)"
                 [isDisabled]="isLoading()" [isLoading]="isLoading()"></ui-button>
         </div>
     </div>

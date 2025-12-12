@@ -21,8 +21,12 @@ export class ChatInput {
 
     public readonly onSend: OutputEmitterRef<ChatInputMessage> = output<ChatInputMessage>();
 
-    protected send(): void {
-        if (this.isLoading()) return;
+    protected send(event: Event): void {
+        event.preventDefault();
+
+        if (this.isLoading()) {
+            return;
+        }
 
         const text = this.inputText().trim();
         if (text.length > 0 || this.selectedFile()) {
@@ -33,6 +37,7 @@ export class ChatInput {
             this.inputText.set("");
             this.selectedFile.set(null);
         }
+        
     }
 
     protected onFileSelect(event: Event): void {
