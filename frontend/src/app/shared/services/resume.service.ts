@@ -96,6 +96,7 @@ export class ResumeService {
                 updated_at: item.updated_at,
                 created_at: item.created_at,
                 is_primary: item.is_primary,
+                template_id: item.template?.id || "",
                 // Partial data is fine for list view
                 personal_info: {
                     first_name: item.first_name,

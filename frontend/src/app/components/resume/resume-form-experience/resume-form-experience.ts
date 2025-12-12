@@ -114,16 +114,24 @@ export class ResumeFormExperience {
     }
 
     // Методи-обгортки для обробки змін місяця з валідацією
-    protected onMonthChange(event: string, expId: string, field: 'start_date' | 'end_date', currentYear: string): void {
-        console.log(event)
-        
-        if (event && currentYear) {
+    protected onMonthChange(event: Event | string, expId: string, field: 'start_date' | 'end_date', currentYear: string): void {
+        // Accept either the event object from native select or a direct string value
+        let monthValue: string = '';
+        if (typeof event === 'string') {
+            monthValue = event;
+        } else if ((event as Event).target) {
+            const target = (event as Event).target as HTMLSelectElement;
+            monthValue = target.value;
+        }
+
+        if (monthValue && currentYear) {
             const experience = this.experiences().find(exp => exp.id === expId);
-            if (experience && this.isValidDate(experience, field, `${currentYear}-${event}`)) {
-                this.updateDateField(expId, field, event, currentYear);
+            if (experience && this.isValidDate(experience, field, `${currentYear}-${monthValue}`)) {
+                this.updateDateField(expId, field, monthValue, currentYear);
             } else {
-                // Скидаємо вибір на попереднє значення
-                event = this.parseDate(field === 'start_date' ? experience?.start_date : experience?.end_date).month;
+                // Reset to previous value
+                const prev = this.parseDate(field === 'start_date' ? experience?.start_date : experience?.end_date).month;
+                monthValue = prev;
             }
         }
     }

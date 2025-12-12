@@ -1,8 +1,16 @@
-.PHONY: build up down logs migrate makemigrations superuser shell devUp reset-db reset-db-force
+.PHONY: build up down logs migrate makemigrations superuser shell devUp devScratchUp reset-db reset-db-force
 
 devUp:
 	docker compose down
 	docker compose up -d --build
+	docker compose ps
+
+# devScratchUp: development bring up without using Docker build cache
+# Useful when you changed base images or want a completely fresh image build
+devScratchUp:
+	docker compose down
+	docker compose build --no-cache
+	docker compose up -d --force-recreate
 	docker compose ps
 
 build:

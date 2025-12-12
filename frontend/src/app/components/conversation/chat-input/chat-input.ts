@@ -35,6 +35,13 @@ export class ChatInput {
         }
     }
 
+    protected onEnter(event: Event): void {
+        if (this.isLoading()) return;
+
+        event.preventDefault();
+        this.send();
+    }
+
     protected onFileSelect(event: Event): void {
         const input = event.target as HTMLInputElement;
         if (input.files && input.files.length > 0) {

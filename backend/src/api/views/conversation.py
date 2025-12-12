@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from api.renderers.event_stream import EventStreamRenderer
+from django.core.cache import cache
 import os
 import json
 import logging

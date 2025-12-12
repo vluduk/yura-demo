@@ -14,7 +14,7 @@
 
     <div class="chat-input__input-wrapper">
         <ui-textarea [isFullWidth]="true" [(value)]="inputText" [isDisabled]="isLoading()"
-            (keydown.enter)="!isLoading() && (send(); $event.preventDefault())"></ui-textarea>
+            (keydown.enter)="onEnter($event)"></ui-textarea>
         <div class="input-wrapper__buttons">
             <input type="file" id="chat-file-input" class="hidden-file-input" (change)="onFileSelect($event)"
                 accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" [disabled]="isLoading()" />

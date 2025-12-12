@@ -18,7 +18,7 @@
                     @for (result of results(); track result.id) {
                         <div class="results__item" (click)="openConversation(result.id)">
                             <span class="item__chat-title">{{ result.title || 'Без назви' }}</span>
-                            <span class="item__message-snippet">{{ result.type || 'Загальний' }}</span>
+                            <span class="item__message-snippet">{{ result.conv_type ?? 'Загальний' }}</span>
                         </div>
                     }
                 }
