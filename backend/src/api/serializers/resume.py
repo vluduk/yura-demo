@@ -56,6 +56,10 @@ class ResumeSerializer(serializers.ModelSerializer):
     social_links = SocialLinkSerializer(many=True, read_only=True)
     skill_entries = SkillEntrySerializer(many=True, read_only=True)
     language_entries = LanguageEntrySerializer(many=True, read_only=True)
+
+    # Backward-compat for frontend mapping: response.template?.id
+    template = serializers.SerializerMethodField(read_only=True)
+
     # Write-only fields to accept frontend data structure
     personal_info = serializers.DictField(write_only=True, required=False)
     experience = ExperienceEntrySerializer(many=True, write_only=True, required=False)
@@ -67,7 +71,7 @@ class ResumeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resume
         fields = (
-            'id', 'user', 'title', 'first_name', 'last_name', 'professional_summary',
+            'id', 'user', 'template_id', 'template', 'title', 'first_name', 'last_name', 'profession', 'professional_summary',
             'contact_details', 'layout_order', 'is_primary', 'created_at', 'updated_at',
             'experience_entries', 'education_entries', 'extra_activity_entries', 'social_links',
             'skill_entries', 'language_entries',
@@ -78,8 +82,15 @@ class ResumeSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'first_name': {'required': False, 'allow_blank': True},
             'last_name': {'required': False, 'allow_blank': True},
+            'profession': {'required': False, 'allow_blank': True},
+            'template_id': {'required': False, 'allow_blank': True},
             'user': {'required': False},
         }
+
+    def get_template(self, instance):
+        if not instance.template_id:
+            return None
+        return {'id': str(instance.template_id)}
 
     def update(self, instance, validated_data):
         personal_info = validated_data.pop('personal_info', None)
@@ -94,6 +105,7 @@ class ResumeSerializer(serializers.ModelSerializer):
             if personal_info:
                 instance.first_name = personal_info.get('first_name', instance.first_name)
                 instance.last_name = personal_info.get('last_name', instance.last_name)
+                instance.profession = personal_info.get('profession', instance.profession)
                 instance.professional_summary = personal_info.get('summary', instance.professional_summary)
                 
                 # Update contact details
@@ -149,12 +161,14 @@ class ResumeSerializer(serializers.ModelSerializer):
             # Prepare base fields
             first_name = None
             last_name = None
+            profession = None
             professional_summary = None
             contact_details = {}
 
             if personal_info:
                 first_name = personal_info.get('first_name')
                 last_name = personal_info.get('last_name')
+                profession = personal_info.get('profession')
                 professional_summary = personal_info.get('summary')
                 contact_fields = ['email', 'phone', 'address', 'city', 'country']
                 for field in contact_fields:
@@ -164,8 +178,10 @@ class ResumeSerializer(serializers.ModelSerializer):
             # Build resume create kwargs
             resume_kwargs = {
                 'user': user,
+                'template_id': validated_data.get('template_id'),
                 'first_name': first_name or validated_data.get('first_name', ''),
                 'last_name': last_name or validated_data.get('last_name', ''),
+                'profession': profession or validated_data.get('profession', ''),
                 'professional_summary': professional_summary or validated_data.get('professional_summary', ''),
                 'contact_details': contact_details or validated_data.get('contact_details', {}),
                 'title': validated_data.get('title', ''),

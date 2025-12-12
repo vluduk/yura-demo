@@ -7,9 +7,11 @@ import uuid
 class Resume(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='resumes', null=True, blank=True)
+    template_id = models.CharField(max_length=50, blank=True, null=True)
     title = models.CharField(max_length=300, blank=True, null=True)
     first_name = models.CharField(max_length=100, blank=True, null=True)
     last_name = models.CharField(max_length=100, blank=True, null=True)
+    profession = models.CharField(max_length=200, blank=True, null=True)
     professional_summary = models.TextField(blank=True, null=True)
     contact_details = models.JSONField(default=dict, blank=True, null=True)
     layout_order = models.JSONField(default=list, blank=True, null=True)
