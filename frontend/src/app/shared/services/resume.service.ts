@@ -18,7 +18,6 @@ import {
 export class ResumeService {
     private httpClient = inject(HttpClient);
     public readonly currentResume: WritableSignal<ResumeDataType | null> = signal<ResumeDataType | null>(null);
-    public readonly isLoading: WritableSignal<boolean> = signal<boolean>(false);
 
     private createEmptyResume(id: string, templateId: string): ResumeDataType {
         return {
@@ -30,7 +29,6 @@ export class ResumeService {
     }
 
     public async getResumeById(id: string): Promise<ResumeDataType> {
-        this.isLoading.set(true);
         try {
             const response = await firstValueFrom(
                 this.httpClient.get<any>(`${environment.serverURL}/resumes/${id}/`, {
@@ -75,8 +73,6 @@ export class ResumeService {
             const empty = this.createEmptyResume(id, "1");
             this.currentResume.set(empty);
             return empty;
-        } finally {
-            this.isLoading.set(false);
         }
     }
 
@@ -234,7 +230,6 @@ export class ResumeService {
         const resume = this.currentResume();
         if (!resume) return;
 
-        this.isLoading.set(true);
         try {
             // If it's a new resume (no ID or temp ID), we might need POST, but here we assume ID exists or we use PUT/PATCH
             // If ID is UUID, it's likely existing.
@@ -289,13 +284,10 @@ export class ResumeService {
                     console.error("Failed to create resume after 404:", createErr);
                 }
             }
-        } finally {
-            this.isLoading.set(false);
         }
     }
     
     public async createResume(templateId: string): Promise<ResumeDataType> {
-        this.isLoading.set(true);
         try {
             const newResume = await firstValueFrom(
                 this.httpClient.post<ResumeDataType>(`${environment.serverURL}/resumes/`, {
@@ -310,13 +302,10 @@ export class ResumeService {
         } catch (error) {
             console.error("Error creating resume:", error);
             throw error;
-        } finally {
-            this.isLoading.set(false);
         }
     }
 
     public async generateAIContent(resumeId: string, field: string, context?: any): Promise<string> {
-        this.isLoading.set(true);
         try {
             const response = await firstValueFrom(
                 this.httpClient.post<{ content: string }>(
@@ -329,8 +318,6 @@ export class ResumeService {
         } catch (error) {
             console.error("Error generating AI content:", error);
             return "";
-        } finally {
-            this.isLoading.set(false);
         }
     }
 }

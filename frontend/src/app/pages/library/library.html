@@ -1,1 +1,36 @@
-<p>library works!</p>
+<div class="library">
+    <div class="library__header">
+        <h1 class="library__title">Мої резюме</h1>
+        <ui-button [label]="'Створити нове'" [icon]="'fa-solid fa-plus'" [type]="'secondary'" [size]="'medium'"
+            (click)="createNew()">
+        </ui-button>
+    </div>
+
+    @if (resumes().length != 0) {
+    <div class="library__grid">
+        @for (resume of resumes(); track resume.id) {
+        <div class="library__card" (click)="viewResume(resume.id)">
+            <div class="library__card-preview">
+                <div class="library__card-initials">{{ getInitials(resume) }}</div>
+            </div>
+            <div class="library__card-content">
+                <h3 class="library__card-title">{{ resume.title }}</h3>
+                <span class="library__card-info">
+                    {{ resume.personal_info?.first_name }} {{ resume.personal_info?.last_name }}
+                </span>
+                <span class="library__card-date">
+                    Оновлено: {{ formatDate(resume.updated_at) }}
+                </span>
+            </div>
+            <div class="library__card-actions">
+                <ui-button [icon]="'fa-solid fa-pen'" [type]="'icon'" [theme]="'dark'"></ui-button>
+            </div>
+        </div>
+        }
+    </div>
+    } @else {
+    <div class="library__empty">
+        <span>У вас ще немає резюме.</span>
+    </div>
+    }
+</div>
