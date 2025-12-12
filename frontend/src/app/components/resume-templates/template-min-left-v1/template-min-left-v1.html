@@ -80,6 +80,38 @@
         </section>
     }
 
+    @if (data().extra_activities && data().extra_activities!.length > 0) {
+        <section class="template__section section-extra-activities">
+            <h2 class="section__title">Додаткова активність</h2>
+
+            @for (act of data().extra_activities; track act.id) {
+                <div class="section-extra-activities__entry extra-activity-entry resume-entry">
+                    <div class="resume-entry__header extra-activity-entry-header">
+                        <div class="extra-activity-entry-header__main extra-activity-entry-main entry-main">
+                            <span class="entry-main__bold">{{ act.title }}</span>
+                            <span class="entry-main__separator">, </span>
+                            <span class="entry-main__italic">{{ act.organization }}</span>
+                        </div>
+
+                        <div class="extra-activity-entry-header__meta extra-activity-entry-meta entry-meta">
+                            <span class="entry-meta__date">
+                                {{ act.start_date }}
+                                @if (act.start_date) {
+                                    —
+                                }
+                                {{ act.is_current ? "теперішній час" : act.end_date }}
+                            </span>
+                        </div>
+                    </div>
+
+                    @if (act.description) {
+                        <div class="extra-activity-entry__content">{{ act.description }}</div>
+                    }
+                </div>
+            }
+        </section>
+    }
+
     @if (data().education && data().education!.length > 0) {
         <section class="template__section section-education">
             <h2 class="section__title">Освіта</h2>
@@ -142,38 +174,6 @@
                     </div>
                 }
             </div>
-        </section>
-    }
-
-    @if (data().extra_activities && data().extra_activities!.length > 0) {
-        <section class="template__section section-extra-activities">
-            <h2 class="section__title">Додаткова активність</h2>
-
-            @for (act of data().extra_activities; track act.id) {
-                <div class="section-extra-activities__entry extra-activity-entry resume-entry">
-                    <div class="resume-entry__header extra-activity-entry-header">
-                        <div class="extra-activity-entry-header__main extra-activity-entry-main entry-main">
-                            <span class="entry-main__bold">{{ act.title }}</span>
-                            <span class="entry-main__separator">, </span>
-                            <span class="entry-main__italic">{{ act.organization }}</span>
-                        </div>
-
-                        <div class="extra-activity-entry-header__meta extra-activity-entry-meta entry-meta">
-                            <span class="entry-meta__date">
-                                {{ act.start_date }}
-                                @if (act.start_date) {
-                                    —
-                                }
-                                {{ act.is_current ? "теперішній час" : act.end_date }}
-                            </span>
-                        </div>
-                    </div>
-
-                    @if (act.description) {
-                        <div class="extra-activity-entry__content">{{ act.description }}</div>
-                    }
-                </div>
-            }
         </section>
     }
 </div>

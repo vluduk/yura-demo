@@ -202,13 +202,16 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
-    // Personal info
     public updatePersonalInfo(field: keyof PersonalInfoType, value: string): void {
         this.resumeService.updatePersonalInfo({ [field]: value });
         this.resume.set(this.resumeService.currentResume());
     }
 
-    // Experience
+    public updateSummary(summary: string): void {
+        this.resumeService.updatePersonalInfo({ summary: summary });
+        this.resume.set(this.resumeService.currentResume());
+    }
+
     public addExperience(): void {
         const newExp: ExperienceType = {
             id: crypto.randomUUID(),
@@ -229,7 +232,6 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         this.resume.set(this.resumeService.currentResume());
     }
 
-    // Education
     public addEducation(): void {
         const newEdu: EducationType = {
             id: crypto.randomUUID(),
@@ -250,7 +252,6 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         this.resume.set(this.resumeService.currentResume());
     }
 
-    // Skills
     public addSkill(name: string, level: SkillType["level"]): void {
         if (name.trim()) {
             const newSkill: SkillType = {
@@ -268,7 +269,6 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         this.resume.set(this.resumeService.currentResume());
     }
 
-    // Languages
     public addLanguage(language: string, proficiency: LanguageType["proficiency"]): void {
         if (language.trim()) {
             const newLang: LanguageType = {
@@ -286,7 +286,6 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         this.resume.set(this.resumeService.currentResume());
     }
 
-    // Extra Activities
     public addExtraActivity(): void {
         const newActivity: ExtraActivityType = {
             id: crypto.randomUUID(),

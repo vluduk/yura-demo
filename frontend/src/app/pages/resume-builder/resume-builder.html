@@ -71,7 +71,7 @@
                         ></app-resume-form-extra-activities>
                     }
                     @case ("summary") {
-                        <app-resume-form-summary [data]="resume()!"></app-resume-form-summary>
+                        <app-resume-form-summary [data]="resume()!" (onUpdate)="updateSummary($event)"></app-resume-form-summary>
                     }
                 }
             }
