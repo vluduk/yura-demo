@@ -69,6 +69,8 @@ export class Login {
             
             const msg: string = (error as any)?.error?.message || (error as any)?.message || 'Signup failed';
             this.errorMessage.set(msg);
+            
+            setTimeout(() => this.errorMessage.set(""), 3000);
         } finally {
             this.isLoading.set(false);
         }

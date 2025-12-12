@@ -10,7 +10,7 @@ import { UserType } from "@shared/types/UserType";
     standalone: true,
     imports: [CommonModule, ReactiveFormsModule, Button],
     templateUrl: "./settings.html",
-    styleUrls: ["./settings.css"],
+    styleUrl: "./settings.css",
 })
 export class SettingsComponent implements OnInit {
     private userService = inject(UserService);

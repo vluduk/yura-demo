@@ -1,1 +1,26 @@
-<p>account works!</p>
+<div class="account">
+    <div class="account__list">
+        <ui-input [label]="'Ім\'я'" [(value)]="userFirstName" [placeholder]="'Іван'"
+            [isDisabled]="isLoading()"></ui-input>
+
+        <ui-input [label]="'Прізвище'" [(value)]="userLastName" [placeholder]="'Іваненко'"
+            [isDisabled]="isLoading()"></ui-input>
+
+        <ui-input [label]="'Електронна пошта'" [(value)]="userEmail" [placeholder]="'email@example.com'"
+            [isDisabled]="isLoading()"></ui-input>
+
+        <ui-input [label]="'Телефон'" [(value)]="userPhone" [type]="'phone'" [isDisabled]="isLoading()"></ui-input>
+    </div>
+
+    <div class="account__actions">
+        <div class="error-message">
+            @if (errorMessage()) {
+            <i class="fa-solid fa-exclamation"></i>
+            {{ errorMessage() }}
+            }
+        </div>
+
+        <ui-button [label]="'Зберегти'" [type]="'primary'" [size]="'medium'" [isDisabled]="isLoading()"
+            (click)="onSubmit()"></ui-button>
+    </div>
+</div>

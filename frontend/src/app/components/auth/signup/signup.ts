@@ -11,7 +11,7 @@ import { Logo } from "@shared/components/logo/logo";
     selector: "auth-signup",
     imports: [CommonModule, Logo, Input, Button, Link],
     templateUrl: "./signup.html",
-    styleUrls: ["./signup.css"],
+    styleUrl: "./signup.css",
 })
 export class Signup {
     protected readonly name: WritableSignal<string> = signal<string>("");
@@ -97,6 +97,8 @@ export class Signup {
 
             const msg: string = (error as any)?.error?.message || (error as any)?.message || 'Signup failed';
             this.errorMessage.set(msg);
+
+            setTimeout(() => this.errorMessage.set(""), 3000);
         } finally {
             this.isLoading.set(false);
         }
