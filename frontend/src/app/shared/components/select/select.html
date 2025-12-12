@@ -12,11 +12,11 @@
     <select
         class="select"
         [ngClass]="{
-        'select_size_small': size() == 'small',
-        'select_size_large': size() == 'large',
-        'select_theme_primary': theme() == 'primary',
-        'select_width_full': isFullWidth()
-    }"
+            'select_size_small': size() == 'small',
+            'select_size_large': size() == 'large',
+            'select_theme_primary': theme() == 'primary',
+            'select_width_full': isFullWidth()
+        }"
         [value]="value()"
         (change)="handleChange($event)"
         [disabled]="isDisabled()"
