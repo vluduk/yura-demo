@@ -2,6 +2,9 @@
     <header class="template__header">
         <h1 class="header__name">{{ data().personal_info?.first_name }} {{ data().personal_info?.last_name }}</h1>
 
+        <h2 class="header__profession">{{ data().personal_info?.profession }}</h2>
+
+
         <div class="header__contacts">
             @if (data().personal_info?.email) {
                 <span class="contacts__item">
@@ -36,14 +39,14 @@
 
     @if (data().personal_info?.summary) {
         <section class="template__section section-summary">
-            <h2 class="section__title">Professional Summary</h2>
+            <h2 class="section__title">Резюме</h2>
             <p class="section-summary__text">{{ data().personal_info?.summary }}</p>
         </section>
     }
 
     @if (data().experience && data().experience!.length > 0) {
         <section class="template__section section-experience">
-            <h2 class="section__title">Experience</h2>
+            <h2 class="section__title">Досвід роботи</h2>
 
             @for (job of data().experience; track job.id) {
                 <div class="section-experience__entry experience-entry resume-entry">
@@ -79,7 +82,7 @@
 
     @if (data().education && data().education!.length > 0) {
         <section class="template__section section-education">
-            <h2 class="section__title">Education</h2>
+            <h2 class="section__title">Освіта</h2>
 
             @for (edu of data().education; track edu.id) {
                 <div class="section-education-entry education-entry resume-entry">
@@ -101,7 +104,7 @@
                     <div class="education-entry__subtitle entry-subtitle">
                         <span class="education-entry__degree">{{ edu.degree }}</span>
                         @if (edu.field_of_study) {
-                            <span> in {{ edu.field_of_study }}</span>
+                            <span>, {{ edu.field_of_study }}</span>
                         }
                     </div>
                 </div>
@@ -111,10 +114,9 @@
 
     @if ((data().skills?.length || 0) > 0) {
         <section class="template__section section-skills">
-            <h2 class="section__title">Skills</h2>
+            <h2 class="section__title">Навички</h2>
 
             <div class="section-skills__content skill-content">
-                <span class="skill-content__label">Technical: </span>
                 <span class="skill-content__list">
                     @for (skill of data().skills; track skill.id; let last = $last) {
                         {{ skill.name }}
@@ -127,9 +129,25 @@
         </section>
     }
 
+    @if ((data().languages?.length || 0) > 0) {
+        <section class="template__section section-languages">
+            <h2 class="section__title">Мови</h2>
+
+            <div class="section-languages__content languages-content">
+                @for (lang of data().languages; track lang.id) {
+                    <div class="languages-content__item language-item">
+                        <span class="language-item__name">{{ lang.language }}</span>
+                        <span class="language-item__separator"> — </span>
+                        <span class="language-item__level">{{ translateProficiency(lang.proficiency) }}</span>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
     @if (data().extra_activities && data().extra_activities!.length > 0) {
         <section class="template__section section-extra-activities">
-            <h2 class="section__title">Extra Activities</h2>
+            <h2 class="section__title">Додаткова активність</h2>
 
             @for (act of data().extra_activities; track act.id) {
                 <div class="section-extra-activities__entry extra-activity-entry resume-entry">
