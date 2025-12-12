@@ -2,6 +2,8 @@
     <header class="template__header">
         <h1 class="header__name">{{ data().personal_info?.first_name }} {{ data().personal_info?.last_name }}</h1>
 
+        <h2 class="header__profession">{{ data().personal_info?.profession }}</h2>
+
         <div class="header__contacts">
             @if (data().personal_info?.email) {
                 <span class="contacts__item">

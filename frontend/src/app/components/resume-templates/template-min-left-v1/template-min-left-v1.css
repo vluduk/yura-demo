@@ -3,7 +3,8 @@
     --font-family-serif: "Georgia", "Times New Roman", serif;
     --font-size-base: 10.5pt;
     --font-size-h1: 22pt;
-    --font-size-h2: 11pt;
+    --font-size-h2: 16pt;
+    --font-size-h3: 11pt;
     --line-height-base: 1.4;
     --spacing-section: 18px;
     --spacing-item: 12px;
@@ -33,11 +34,16 @@
 
 .header__name {
     padding: 0;
-    margin-bottom: 8px;
     font-size: var(--font-size-h1);
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 1px;
+}
+
+.header__profession {
+    margin-bottom: 8px;
+    font-size: var(--font-size-h2);
+    color: var(--color-text-secondary);
 }
 
 .header__contacts {
@@ -61,7 +67,7 @@
 .section__title {
     padding-bottom: 3px;
     margin-bottom: 10px;
-    font-size: var(--font-size-h2);
+    font-size: var(--font-size-h3);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -117,4 +123,30 @@
 
 .skill-content__label {
     font-weight: 700;
+}
+
+.languages-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.language-item {
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
+}
+
+.language-item__name {
+    font-weight: 600;
+}
+
+.language-item__separator {
+    color: var(--color-text-secondary);
+}
+
+.language-item__level {
+    font-size: 9pt;
+    color: var(--color-text-secondary);
+    font-variant-numeric: tabular-nums;
 }

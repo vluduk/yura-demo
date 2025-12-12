@@ -1,19 +1,28 @@
 <div class="form-skills">
-    <h3 class="form__title">Навички</h3>
+    <ui-title [title]="'Навички'" [size]="'medium'"></ui-title>
+
     <div class="form__add">
-        <input type="text" class="field__input" placeholder="Назва навички" [value]="newSkill()" (input)="newSkill.set($any($event.target).value)" (keydown.enter)="addSkill()" />
-        <select class="field__select" [value]="newLevel()" (change)="newLevel.set($any($event.target).value)">
-            @for (level of levels; track level.value) { <option [value]="level.value">{{ level.label }}</option> }
-        </select>
-        <ui-button [icon]="'fa-solid fa-plus'" [type]="'primary'" (click)="addSkill()"></ui-button>
+        <ui-input [(value)]="newSkill" [label]="'Назва навички'" (keydown.enter)="addSkill()"></ui-input>
+
+        <ui-select class="add__level" [label]="'Рівень володіння'" [value]="newLevel()"
+            (valueChange)="newLevel.set($event)">
+            @for (level of levels; track level.value) {
+            <option [value]="level.value">{{ level.label }}</option>
+            }
+        </ui-select>
+
+        <ui-button [icon]="'fa-solid fa-plus'" [type]="'icon'" [size]="'medium'" (click)="addSkill()"></ui-button>
     </div>
+
     <div class="skills__list">
         @for (skill of skills(); track skill.id) {
-            <div class="skill-item">
-                <span class="skill__name">{{ skill.name }}</span>
-                <span class="skill__level">{{ skill.level }}</span>
-                <button class="skill__remove" (click)="removeSkill(skill.id)"><i class="fa-solid fa-times"></i></button>
-            </div>
-        } @empty { <p class="form__empty">Додайте свої навички</p> }
+        <div class="skill-item" (click)="removeSkill(skill.id)">
+            <span class="skill__name">{{ skill.name }}</span>
+            <span class="skill__level">{{ skill.level }}</span>
+            <span class="skill__remove"><i class="fa-solid fa-times"></i></span>
+        </div>
+        } @empty {
+        <p class="form__empty">Додайте свої навички</p>
+        }
     </div>
 </div>

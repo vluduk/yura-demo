@@ -1,24 +1,38 @@
 <div class="popup" [class]="{ popup_visible: isVisible() }">
     <div class="popup__content">
         <div class="popup__header">
-            <span class="header__title">Пошук в чатах</span>
-            <span class="header__close-button" (click)="hidePopup()">×</span>
+            <ui-title [title]="'Пошук в чатах'" [size]="'medium'"></ui-title>
+
+            <ui-button class="header__close-button" [icon]="'fa-solid fa-xmark'" [type]="'icon'" [size]="'small'"
+                (click)="hidePopup()"></ui-button>
         </div>
         <div class="popup__body">
-            <ui-input
-                class="body__search-input"
-                [placeholder]="'Введіть текст для пошуку...'"
-                [(value)]="searchField"
-                (valueChange)="getSearchResults()"
-            ></ui-input>
+            <div class="body__input-wrapper">
+                <ui-input
+                    class="body__search-input"
+                    [placeholder]="'Введіть текст для пошуку...'"
+                    [(value)]="searchField"
+                    (valueChange)="getSearchResults()"
+                ></ui-input>
+
+                <ui-select
+                    class="body__type-select"
+                    [(value)]="type"
+                    (valueChange)="getSearchResults()"
+                >
+                    @for (convType of conversationTypes; track convType.value) {
+                        <option [value]="convType.value">{{ convType.label }}</option>
+                    }
+                </ui-select>
+            </div>
             <div class="body__results">
                 @if (results().length === 0) {
                     <span class="results__no-results">Немає чатів</span>
                 } @else {
                     @for (result of results(); track result.id) {
                         <div class="results__item" (click)="openConversation(result.id)">
-                            <span class="item__chat-title">{{ result.title || 'Без назви' }}</span>
-                            <span class="item__message-snippet">{{ result.conv_type ?? 'Загальний' }}</span>
+                            <span class="item__chat-title">{{ result.title }}</span>
+                            <span class="item__message-snippet">{{ getConversationType(result.conv_type!) }}</span>
                         </div>
                     }
                 }

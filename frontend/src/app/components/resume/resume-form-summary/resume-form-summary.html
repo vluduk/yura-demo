@@ -7,5 +7,5 @@
     </div>
 
     <ui-textarea class="editor__textarea" [placeholder]="'Ваше резюме в короткому описі...'" [isFullWidth]="true"
-        [(value)]="summaryText"></ui-textarea>
+        [value]="summaryText()" (valueChange)="onSummaryChange($event)"></ui-textarea>
 </div>

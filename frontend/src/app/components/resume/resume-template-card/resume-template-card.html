@@ -1,6 +1,6 @@
 <div class="template-card" (click)="handleSelect()">
     <div class="template-card__preview">
-        <img [src]="`assets/${template().preview_image}`" [alt]="template().name" class="preview__image" />
+        <img [src]="`${template().preview_image}`" [alt]="template().name" class="preview__image" />
         
         <div class="preview__overlay">
             <button class="overlay__button">

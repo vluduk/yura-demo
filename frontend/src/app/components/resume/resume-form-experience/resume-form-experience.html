@@ -36,96 +36,70 @@
 
             <div class="form__row">
                 <div class="form__field">
-                    <label class="field__label">Початок</label>
-                    <div class="date-selects">
-                        <select 
-                            class="field__select"
-                            [value]="parseDate(exp.start_date).month"
-                            (change)="onMonthChange($event, exp.id, 'start_date', parseDate(exp.start_date).year)">
-                            <option value="">Місяць</option>
-                            @for (month of months; track month.value) {
-                                <option 
-                                    [value]="month.value"
-                                    [disabled]="parseDate(exp.start_date).year && isOptionDisabled(exp, 'start_date', month.value, parseDate(exp.start_date).year)"
-                                >{{ month.label }}</option>
-                            }
-                        </select>
-                        <select 
-                            class="field__select"
-                            [value]="parseDate(exp.start_date).year"
-                            (change)="onYearChange($event, exp.id, 'start_date', parseDate(exp.start_date).month)">
-                            <option value="">Рік</option>
-                            @for (year of years; track year) {
-                                <option 
-                                    [value]="year"
-                                    [disabled]="parseDate(exp.start_date).month && isOptionDisabled(exp, 'start_date', parseDate(exp.start_date).month, year)"
-                                >{{ year }}</option>
-                            }
-                        </select>
-                    </div>
+                    <ui-select
+                        [label]="'Початок (місяць)'"
+                        [value]="parseDate(exp.start_date).month"
+                        (valueChange)="onDatePartChange(exp.id, 'start_date', 'month', $event)"
+                    >
+                        @for (month of months; track month.value) {
+                            <option 
+                                [value]="month.value"
+                                [disabled]="parseDate(exp.start_date).year && isOptionDisabled(exp, 'start_date', month.value, parseDate(exp.start_date).year)"
+                            >{{ month.label }}</option>
+                        }
+                    </ui-select>
                 </div>
                 <div class="form__field">
-                    <label class="field__label">Кінець</label>
-                    <div class="date-selects">
-                        <ui-select
-                            class="field__select"
-                            [value]="parseDate(exp.end_date).month"
-                            [isDisabled]="exp.is_current ?? false"
-                            (valueChange)="onMonthChange($event, exp.id, 'end_date', parseDate(exp.end_date).year)"    
-                        >
-                            <option value="">Місяць</option>
-                            @for (month of months; track month.value) {
-                                <option 
-                                    [value]="month.value"
-                                    [disabled]="parseDate(exp.end_date).year && isOptionDisabled(exp, 'end_date', month.value, parseDate(exp.end_date).year)"
-                                >{{ month.label }}</option>
-                            }
-                        </ui-select>
-                        <ui-select
-                            class="field__select"
-                            [value]="parseDate(exp.end_date).month"
-                            [isDisabled]="exp.is_current ?? false"
-                            (valueChange)="onMonthChange($event, exp.id, 'end_date', parseDate(exp.end_date).year)"    
-                        >
-                            <option value="">Місяць</option>
-                            @for (month of months; track month.value) {
-                                <option 
-                                    [value]="month.value"
-                                    [disabled]="parseDate(exp.end_date).year && isOptionDisabled(exp, 'end_date', month.value, parseDate(exp.end_date).year)"
-                                >{{ month.label }}</option>
-                            }
-                        </ui-select>
-                        <select 
-                            class="field__select"
-                            [value]="parseDate(exp.end_date).month"
-                            [disabled]="exp.is_current ?? false"
-                            (change)="onMonthChange($event.toString(), exp.id, 'end_date', parseDate(exp.end_date).year)">
-                            <option value="">Місяць</option>
-                            @for (month of months; track month.value) {
-                                <option 
-                                    [value]="month.value"
-                                    [disabled]="parseDate(exp.end_date).year && isOptionDisabled(exp, 'end_date', month.value, parseDate(exp.end_date).year)"
-                                >{{ month.label }}</option>
-                            }
-                        </select>
-                        <select 
-                            class="field__select"
-                            [value]="parseDate(exp.end_date).year"
-                            [disabled]="exp.is_current"
-                            (change)="onYearChange($event, exp.id, 'end_date', parseDate(exp.end_date).month)">
-                            <option value="">Рік</option>
-                            @for (year of years; track year) {
-                                <option 
-                                    [value]="year"
-                                    [disabled]="parseDate(exp.end_date).month && isOptionDisabled(exp, 'end_date', parseDate(exp.end_date).month, year)"
-                                >{{ year }}</option>
-                            }
-                        </select>
-                    </div>
+                    <ui-select
+                        [label]="'Рік'"
+                        [value]="parseDate(exp.start_date).year"
+                        (valueChange)="onDatePartChange(exp.id, 'start_date', 'year', $event)"
+                    >
+                        @for (year of years; track year) {
+                            <option 
+                                [value]="year"
+                                [disabled]="parseDate(exp.start_date).month && isOptionDisabled(exp, 'start_date', parseDate(exp.start_date).month, year)"
+                            >{{ year }}</option>
+                        }
+                    </ui-select>
+                </div>
+            </div>
+
+            <div class="form__row">
+                <div class="form__field">
+                    <ui-select
+                        [label]="'Кінець (місяць)'"
+                        [value]="parseDate(exp.end_date).month"
+                        [isDisabled]="exp.is_current ?? false"
+                        (valueChange)="onDatePartChange(exp.id, 'end_date', 'month', $event)"
+                    >
+                        @for (month of months; track month.value) {
+                            <option 
+                                [value]="month.value"
+                                [disabled]="parseDate(exp.end_date).year && isOptionDisabled(exp, 'end_date', month.value, parseDate(exp.end_date).year)"
+                            >{{ month.label }}</option>
+                        }
+                    </ui-select>
+                </div>
+                <div class="form__field">
+                    <ui-select
+                        [label]="'Рік'"
+                        [value]="parseDate(exp.end_date).year"
+                        [isDisabled]="exp.is_current ?? false"
+                        (valueChange)="onDatePartChange(exp.id, 'end_date', 'year', $event)"
+                    >
+                        @for (year of years; track year) {
+                            <option 
+                                [value]="year"
+                                [disabled]="parseDate(exp.end_date).month && isOptionDisabled(exp, 'end_date', parseDate(exp.end_date).month, year)"
+                            >{{ year }}</option>
+                        }
+                    </ui-select>
                 </div>
             </div>
 
             <ui-checkbox
+                class="form__checkbox"
                 [label]="'Працюю тут зараз'"
                 [value]="exp.is_current ?? false"
                 (change)="updateExperience(exp.id, 'is_current', $event)"
@@ -133,7 +107,7 @@
             
             <div class="form__field">
                 <div class="textarea__wrapper">
-                    <label class="field__label">Опис</label>
+                    <span class="field__label">Опис</span>
                     <ui-button [label]="'Згенерувати самарі'" [icon]="'fa-solid fa-wand-magic-sparkles'" [type]="'secondary'"
                         (click)="generateSummary()"></ui-button>
                 </div>

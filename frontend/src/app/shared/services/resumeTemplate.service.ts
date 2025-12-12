@@ -16,18 +16,8 @@ export class ResumeTemplateService {
     private readonly MOCK_TEMPLATES: ResumeTemplateType[] = [
         TEMPLATES["min-left-v1"],
         TEMPLATES["min-top-v1"],
-        {
-            id: "2",
-            name: "Мінімалізм",
-            preview_image: "res1.webp",
-            component: null as any as Type<IResumeTemplate>,
-        },
-        {
-            id: "3",
-            name: "Креативний",
-            preview_image: "res2.png",
-            component: null as any as Type<IResumeTemplate>,
-        },
+        TEMPLATES["min-left-v1"],
+        TEMPLATES["min-top-v1"],
     ];
 
     public async getTemplates(): Promise<ResumeTemplateType[]> {

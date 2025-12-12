@@ -1,6 +1,6 @@
 <div class="form-education">
-    <div class="form__header">
-        <h3 class="form__title">Освіта</h3>
+    <div class="form__header">        
+        <ui-title [title]="'Освіта'" [size]="'medium'"></ui-title>
         <ui-button
             [label]="'Додати'"
             [icon]="'fa-solid fa-plus'"
@@ -11,63 +11,104 @@
     @for (edu of educations(); track edu.id) {
         <div class="education-item">
             <div class="item__header">
-                <span class="item__number">{{ $index + 1 }}</span
-                ><button class="item__remove" (click)="removeEducation(edu.id)">
+                <span class="item__number">{{ edu.institution }}</span>
+                <button class="item__remove" (click)="removeEducation(edu.id)">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
             <div class="form__row">
-                <div class="form__field">
-                    <ui-input
-                        [label]="'Заклад'"
-                        [placeholder]="'Введіть заклад'"
-                        [(value)]="edu.institution"
-                        (valueChange)="updateEducation(edu.id, 'institution', $event)"
-                    ></ui-input>
-                </div>
-                <div class="form__field">
-                    <ui-input
-                        [label]="'Ступінь'"
-                        [placeholder]="'Введіть ступінь'"
-                        [(value)]="edu.degree"
-                        (valueChange)="updateEducation(edu.id, 'degree', $event)"
-                    ></ui-input>
-                </div>
+                <ui-input
+                    [label]="'Заклад'"
+                    [placeholder]="'Введіть заклад'"
+                    [(value)]="edu.institution"
+                    (valueChange)="updateEducation(edu.id, 'institution', $event.toString())"
+                ></ui-input>
+                <ui-input
+                    [label]="'Ступінь'"
+                    [placeholder]="'Введіть ступінь'"
+                    [(value)]="edu.degree"
+                    (valueChange)="updateEducation(edu.id, 'degree', $event.toString())"
+                ></ui-input>
             </div>
             <div class="form__field">
                 <ui-input
                     [label]="'Спеціальність'"
                     [placeholder]="'Введіть наукову галузь'"
                     [value]="edu.field_of_study ?? ''"
-                    (valueChange)="updateEducation(edu.id, 'field_of_study', $event)"
+                    (valueChange)="updateEducation(edu.id, 'field_of_study', $event.toString())"
                 ></ui-input>
             </div>
+
             <div class="form__row">
                 <div class="form__field">
-                    <label class="field__label">Початок</label
-                    ><input
-                        type="month"
-                        class="field__input"
-                        [value]="edu.start_date"
-                        (input)="updateEducation(edu.id, 'start_date', $event.target.value)"
-                    />
+                    <ui-select
+                        [label]="'Початок (місяць)'"
+                        [value]="parseDate(edu.start_date).month"
+                        (valueChange)="onDatePartChange(edu.id, 'start_date', 'month', $event)"
+                    >
+                        @for (month of months; track month.value) {
+                            <option 
+                                [value]="month.value"
+                                [disabled]="parseDate(edu.start_date).year && isOptionDisabled(edu, 'start_date', month.value, parseDate(edu.start_date).year)"
+                            >{{ month.label }}</option>
+                        }
+                    </ui-select>
                 </div>
                 <div class="form__field">
-                    <label class="field__label">Кінець</label
-                    ><input
-                        type="month"
-                        class="field__input"
-                        [value]="edu.end_date"
-                        [disabled]="edu.is_current"
-                        (input)="updateEducation(edu.id, 'end_date', $event.target.value)"
-                    />
+                    <ui-select
+                        [label]="'Рік'"
+                        [value]="parseDate(edu.start_date).year"
+                        (valueChange)="onDatePartChange(edu.id, 'start_date', 'year', $event)"
+                    >
+                        @for (year of years; track year) {
+                            <option 
+                                [value]="year"
+                                [disabled]="parseDate(edu.start_date).month && isOptionDisabled(edu, 'start_date', parseDate(edu.start_date).month, year)"
+                            >{{ year }}</option>
+                        }
+                    </ui-select>
                 </div>
             </div>
+
+            <div class="form__row">
+                <div class="form__field">
+                    <ui-select
+                        [label]="'Кінець (місяць)'"
+                        [value]="parseDate(edu.end_date).month"
+                        [isDisabled]="edu.is_current ?? false"
+                        (valueChange)="onDatePartChange(edu.id, 'end_date', 'month', $event)"
+                    >
+                        @for (month of months; track month.value) {
+                            <option 
+                                [value]="month.value"
+                                [disabled]="parseDate(edu.end_date).year && isOptionDisabled(edu, 'end_date', month.value, parseDate(edu.end_date).year)"
+                            >{{ month.label }}</option>
+                        }
+                    </ui-select>
+                </div>
+                <div class="form__field">
+                    <ui-select
+                        [label]="'Рік'"
+                        [value]="parseDate(edu.end_date).year"
+                        [isDisabled]="edu.is_current ?? false"
+                        (valueChange)="onDatePartChange(edu.id, 'end_date', 'year', $event)"
+                    >
+                        @for (year of years; track year) {
+                            <option 
+                                [value]="year"
+                                [disabled]="parseDate(edu.end_date).month && isOptionDisabled(edu, 'end_date', parseDate(edu.end_date).month, year)"
+                            >{{ year }}</option>
+                        }
+                    </ui-select>
+                </div>
+            </div>
+
             <div class="form__field form-field__checkbox-wrapper">
                 <ui-checkbox
+                    class="form__checkbox"
                     [label]="'Навчаюсь зараз'"
-                    [value]="edu.is_current"
-                    (onChange)="updateCheckboxEducation(edu.id, 'is_current', $event)"
+                    [value]="edu.is_current ?? false"
+                    (change)="updateEducation(edu.id, 'is_current', $event)"
                 ></ui-checkbox>
             </div>
         </div>
