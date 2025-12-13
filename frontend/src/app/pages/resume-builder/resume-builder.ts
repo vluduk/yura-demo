@@ -6,14 +6,12 @@ import {
     inject,
     Input,
     OnDestroy,
-    OnInit,
     Signal,
     signal,
     Type,
     viewChild,
     WritableSignal,
 } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
 import {
     ResumeDataType,
     PersonalInfoType,
@@ -61,7 +59,7 @@ type TabType = {
     templateUrl: "./resume-builder.html",
     styleUrl: "./resume-builder.css",
 })
-export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
+export class ResumeBuilder implements AfterViewInit, OnDestroy {
     protected readonly currentResumeId: WritableSignal<string> = signal<string>("");
     protected readonly currentTemplateId: WritableSignal<string> = signal<string>("");
 
@@ -123,7 +121,6 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
 
     protected readonly resumeContainer: Signal<ElementRef> = viewChild.required<ElementRef>("resumeContainer");
 
-    private readonly httpClient: HttpClient = inject(HttpClient);
     private readonly templateService: ResumeTemplateService = inject(ResumeTemplateService);
     private readonly resumeService: ResumeService = inject(ResumeService);
 
@@ -140,14 +137,6 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         this.currentTemplateId.set(id);
         if (id) {
             this.loadTemplate(id);
-        }
-    }
-
-    ngOnInit(): void {
-        // If we have a resumeId, loadResume is called by the setter.
-        // If not, we might need to create one or wait.
-        if (!this.currentTemplateId()) {
-            this.loadTemplate("1");
         }
     }
 
@@ -172,11 +161,9 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
     }
 
     private async loadTemplate(id: string): Promise<void> {
-        const template = await this.templateService.getTemplateById(id);
-        console.log("Loaded template:", template);
-        if (template) {
+        await this.templateService.getTemplateById(id).then((template) => {
             this.template.set(template);
-        }
+        });
     }
 
     calculateScale() {
@@ -193,8 +180,10 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
     private async loadResume(id: string): Promise<void> {
         this.isLoading.set(true);
         try {
-            const resume = await this.resumeService.getResumeById(id);
-            this.resume.set(resume);
+            await this.resumeService.getResumeById(id).then((resume) => {
+                this.resumeService.currentResume.set(resume);
+                this.resume.set(resume);
+            });
         } catch (e) {
             console.error("Failed to load resume", e);
         } finally {
@@ -212,6 +201,16 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
         this.resume.set(this.resumeService.currentResume());
     }
 
+    // Helper метод для конвертації Date в формат YYYY-MM
+    private convertDateValue(value: any): any {
+        if (value instanceof Date) {
+            const year = value.getFullYear();
+            const month = String(value.getMonth() + 1).padStart(2, '0');
+            return `${year}-${month}`;
+        }
+        return value;
+    }
+
     public addExperience(): void {
         const newExp: ExperienceType = {
             id: crypto.randomUUID(),
@@ -223,7 +222,8 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
     }
 
     public updateExperience(id: string, field: keyof ExperienceType, value: any): void {
-        this.resumeService.updateExperience(id, { [field]: value });
+        const convertedValue = (field === 'start_date' || field === 'end_date') ? this.convertDateValue(value) : value;
+        this.resumeService.updateExperience(id, { [field]: convertedValue });
         this.resume.set(this.resumeService.currentResume());
     }
 
@@ -243,7 +243,8 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
     }
 
     public updateEducation(id: string, field: keyof EducationType, value: any): void {
-        this.resumeService.updateEducation(id, { [field]: value });
+        const convertedValue = (field === 'start_date' || field === 'end_date') ? this.convertDateValue(value) : value;
+        this.resumeService.updateEducation(id, { [field]: convertedValue });
         this.resume.set(this.resumeService.currentResume());
     }
 
@@ -297,7 +298,8 @@ export class ResumeBuilder implements OnInit, AfterViewInit, OnDestroy {
     }
 
     public updateExtraActivity(id: string, field: keyof ExtraActivityType, value: any): void {
-        this.resumeService.updateExtraActivity(id, { [field]: value });
+        const convertedValue = (field === 'start_date' || field === 'end_date') ? this.convertDateValue(value) : value;
+        this.resumeService.updateExtraActivity(id, { [field]: convertedValue });
         this.resume.set(this.resumeService.currentResume());
     }
 

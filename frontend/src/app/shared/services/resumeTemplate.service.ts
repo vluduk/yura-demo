@@ -28,7 +28,7 @@ export class ResumeTemplateService {
     }
 
     public async getTemplateById(id: string): Promise<ResumeTemplateType | null> {
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        console.log(this.MOCK_TEMPLATES.find((t) => t.id === id))
         return this.MOCK_TEMPLATES.find((t) => t.id === id) || null;
     }
 

@@ -59,11 +59,11 @@
 
                         <div class="experience-entry-header__meta experience-entry-meta entry-meta">
                             <span class="entry-meta__date">
-                                {{ job.start_date }}
+                                {{ formatDate(job.start_date) }}
                                 @if (job.start_date) {
                                     —
                                 }
-                                {{ job.is_current ? "теперішній час" : job.end_date }}
+                                {{ job.is_current ? "теперішній час" : formatDate(job.end_date) }}
                             </span>
                         </div>
                     </div>
@@ -95,11 +95,11 @@
 
                         <div class="extra-activity-entry-header__meta extra-activity-entry-meta entry-meta">
                             <span class="entry-meta__date">
-                                {{ act.start_date }}
+                                {{ formatDate(act.start_date) }}
                                 @if (act.start_date) {
                                     —
                                 }
-                                {{ act.is_current ? "теперішній час" : act.end_date }}
+                                {{ act.is_current ? "теперішній час" : formatDate(act.end_date) }}
                             </span>
                         </div>
                     </div>
@@ -124,11 +124,11 @@
                         </span>
                         <div class="education-entry-header__meta education-entry-meta entry-meta">
                             <span class="entry-meta__date">
-                                {{ edu.start_date }}
+                                {{ formatDate(edu.start_date) }}
                                 @if (edu.start_date) {
                                     —
                                 }
-                                {{ edu.is_current ? "теперішній час" : edu.end_date }}
+                                {{ edu.is_current ? "теперішній час" : formatDate(edu.end_date) }}
                             </span>
                         </div>
                     </div>

@@ -4,11 +4,13 @@ import { Router, RouterModule } from "@angular/router";
 import { ResumeService } from "@shared/services/resume.service";
 import { ResumeDataType } from "@shared/types/ResumeDataType";
 import { Button } from "@shared/components/button/button";
+import { TEMPLATES } from "@shared/types/ResumeTemplateType";
+import { Title } from "@shared/components/title/title";
 
 @Component({
     selector: "app-resume-library",
     standalone: true,
-    imports: [CommonModule, RouterModule, Button],
+    imports: [CommonModule, RouterModule, Button, Title],
     templateUrl: "./library.html",
     styleUrl: "./library.css",
 })
@@ -23,8 +25,8 @@ export class Library implements OnInit {
     }
 
     private async loadResumes(): Promise<void> {
-        // const list = await this.resumeService.getResumes();
-        // this.resumes.set(list);
+        const list = await this.resumeService.getResumes();
+        this.resumes.set(list);
     }
 
     protected createNew(): void {
@@ -32,13 +34,20 @@ export class Library implements OnInit {
     }
 
     protected viewResume(id: string): void {
-        this.router.navigate(["/resume-builder"], { queryParams: { resumeId: id } });
+        const resume = this.resumes().find(r => r.id === id);
+        if (resume) {
+            this.resumeService.currentResume.set(resume);
+        }
+        this.router.navigate(["/resume-builder", id], { queryParams: { templateId: this.getTemplateId(id) } });
     }
 
-    protected getInitials(resume: ResumeDataType): string {
-        const first = resume.personal_info?.first_name?.charAt(0) || "";
-        const last = resume.personal_info?.last_name?.charAt(0) || "";
-        return (first + last).toUpperCase() || "R";
+    protected getTemplateName(templateId: string): string {
+        return TEMPLATES[templateId]?.name || "Невідомий шаблон";
+    }
+
+    protected getTemplateId(resumeId: string): string {
+        const resume = this.resumes().find(r => r.id === resumeId);
+        return TEMPLATES[resume!.template_id].id;
     }
 
     protected formatDate(dateStr?: string | Date): string {

@@ -1,6 +1,6 @@
 <div class="library">
     <div class="library__header">
-        <h1 class="library__title">Мої резюме</h1>
+        <ui-title [title]="'Бібліотека резюме'" [size]="'large'"></ui-title>
         <ui-button [label]="'Створити нове'" [icon]="'fa-solid fa-plus'" [type]="'secondary'" [size]="'medium'"
             (click)="createNew()">
         </ui-button>
@@ -10,18 +10,68 @@
     <div class="library__grid">
         @for (resume of resumes(); track resume.id) {
         <div class="library__card" (click)="viewResume(resume.id)">
-            <div class="library__card-preview">
-                <div class="library__card-initials">{{ getInitials(resume) }}</div>
-            </div>
             <div class="library__card-content">
-                <h3 class="library__card-title">{{ resume.title }}</h3>
-                <span class="library__card-info">
-                    {{ resume.personal_info?.first_name }} {{ resume.personal_info?.last_name }}
-                </span>
-                <span class="library__card-date">
-                    Оновлено: {{ formatDate(resume.updated_at) }}
-                </span>
+                <div class="library__card-header">
+                    <h3 class="library__card-title">{{ resume.title }}</h3>
+                    <!-- @if (resume.is_primary) {
+                        <span class="library__card-badge">Основне</span>
+                    } -->
+                </div>
+                
+                <div class="library__card-details">
+                    <!-- @if (resume.personal_info?.profession) {
+                        <div class="library__card-profession">
+                            <i class="fa-solid fa-briefcase"></i>
+                            <span>{{ resume.personal_info?.profession }}</span>
+                        </div>
+                    } -->
+                    
+                    @if (resume.experience && resume.experience.length > 0) {
+                        <div class="library__card-experience library-card">
+                            <i class="fa-solid fa-briefcase"></i>
+                            <span>Досвід: {{ resume.experience.length }}</span>
+                        </div>
+                    }
+
+                    @if (resume.education && resume.education.length > 0) {
+                        <div class="library__card-education library-card">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Освіта: {{ resume.education[0].institution }}</span>
+                        </div>
+                    }
+                    
+                    @if (resume.skills && resume.skills.length > 0) {
+                        <div class="library__card-skills library-card">
+                            <i class="fa-solid fa-tools"></i>
+                            <span>Навички: {{ resume.skills.length }}</span>
+                        </div>
+                    }
+                    
+                    @if (resume.languages && resume.languages.length > 0) {
+                        <div class="library__card-languages library-card">
+                            <i class="fa-solid fa-language"></i>
+                            <span>Мови: {{ resume.languages.length }}</span>
+                        </div>
+                    }
+                    
+                    @if (resume.extra_activities && resume.extra_activities.length > 0) {
+                        <div class="library__card-activities library-card">
+                            <i class="fa-solid fa-star"></i>
+                            <span>Активності: {{ resume.extra_activities.length }}</span>
+                        </div>
+                    }
+                </div>
+                
+                <div class="library__card-footer">
+                    <span class="library__card-template">
+                        Шаблон: {{ getTemplateName(resume.template_id) }}
+                    </span>
+                    <span class="library__card-date">
+                        {{ formatDate(resume.updated_at) }}
+                    </span>
+                </div>
             </div>
+            
             <div class="library__card-actions">
                 <ui-button [icon]="'fa-solid fa-pen'" [type]="'icon'" [theme]="'dark'"></ui-button>
             </div>
@@ -29,8 +79,6 @@
         }
     </div>
     } @else {
-    <div class="library__empty">
-        <span>У вас ще немає резюме.</span>
-    </div>
+    <span class="library__empty">У вас ще немає резюме.</span>
     }
 </div>

@@ -176,7 +176,11 @@ export class ResumeFormExperience {
             experience_description: experience.description || '',
         });
         if (content) {
-            this.onUpdate.emit({ id: resume.id, field: 'description', value: content });
+            this.updateExperience(expId, 'description', content);
+        } else {
+            const reserveContent = "Автоматично згенероване резюме. Будь ласка, відредагуйте його відповідно до ваших навичок та досвіду.";
+            
+            this.updateExperience(expId, 'description', reserveContent);
         }
     }
 }

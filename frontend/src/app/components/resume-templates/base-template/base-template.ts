@@ -14,4 +14,16 @@ export abstract class BaseTemplate implements IResumeTemplate {
     ngAfterContentInit(): void {
         console.log(this.data());
     }
+
+    protected formatDate(date: Date | string | undefined): string {
+        if (!date) return '';
+        
+        if (date instanceof Date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            return `${year}-${month}`;
+        }
+        
+        return date.toString();
+    }
 }

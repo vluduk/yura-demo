@@ -18,6 +18,199 @@ import {
 export class ResumeService {
     private httpClient = inject(HttpClient);
     public readonly currentResume: WritableSignal<ResumeDataType | null> = signal<ResumeDataType | null>(null);
+    public readonly isLoading: WritableSignal<boolean> = signal<boolean>(false);
+
+    // Mock data for resume library
+    private readonly MOCK_RESUMES: ResumeDataType[] = [
+        {
+            id: "resume-1",
+            template_id: "min-left-v1",
+            title: "Frontend Developer",
+            is_primary: true,
+            created_at: new Date("2024-01-15"),
+            updated_at: new Date("2024-12-01"),
+            personal_info: {
+                first_name: "Олександр",
+                last_name: "Петренко",
+                profession: "Frontend Developer",
+                email: "o.petrenko@example.com",
+                phone: "+380501234567",
+                city: "Київ",
+                country: "Україна",
+                summary: "Досвідчений frontend розробник з 3+ роками досвіду роботи з React, Angular та Vue.js. Спеціалізуюся на створенні адаптивних та користувацьких інтерфейсів."
+            },
+            experience: [
+                {
+                    id: "exp-1",
+                    job_title: "Senior Frontend Developer",
+                    employer: "TechCorp Ukraine",
+                    city: "Київ",
+                    start_date: new Date("2022-03-01"),
+                    end_date: new Date("2024-12-01"),
+                    is_current: true,
+                    description: "Розробка та підтримка веб-додатків з використанням Angular 15+, TypeScript та RxJS. Оптимізація продуктивності додатків та впровадження best practices."
+                }
+            ],
+            education: [
+                {
+                    id: "edu-1",
+                    institution: "Київський політехнічний інститут",
+                    degree: "Бакалавр",
+                    field_of_study: "Комп'ютерна інженерія",
+                    start_date: new Date("2018-09-01"),
+                    end_date: new Date("2022-06-30"),
+                    is_current: false
+                }
+            ],
+            skills: [
+                { id: "skill-1", name: "Angular", level: "Expert" },
+                { id: "skill-2", name: "TypeScript", level: "Advanced" },
+                { id: "skill-3", name: "JavaScript", level: "Expert" },
+                { id: "skill-4", name: "HTML/CSS", level: "Expert" }
+            ],
+            languages: [
+                { id: "lang-1", language: "Українська", proficiency: "native" },
+                { id: "lang-2", language: "Англійська", proficiency: "b2" },
+                { id: "lang-3", language: "Польська", proficiency: "a2" }
+            ],
+            extra_activities: []
+        },
+        {
+            id: "resume-2",
+            template_id: "min-top-v1",
+            title: "Project Manager",
+            is_primary: false,
+            created_at: new Date("2024-02-20"),
+            updated_at: new Date("2024-11-15"),
+            personal_info: {
+                first_name: "Марія",
+                last_name: "Коваленко",
+                profession: "IT Project Manager",
+                email: "m.kovalenko@example.com",
+                phone: "+380677654321",
+                city: "Львів",
+                country: "Україна",
+                summary: "Досвідчений проектний менеджер з 5+ роками роботи в IT сфері. Експертиза в Agile/Scrum методологіях та управлінні командами до 15 осіб."
+            },
+            experience: [
+                {
+                    id: "exp-2",
+                    job_title: "Senior Project Manager",
+                    employer: "SoftServe",
+                    city: "Львів",
+                    start_date: new Date("2021-01-15"),
+                    end_date: new Date("2024-11-15"),
+                    is_current: true,
+                    description: "Управління проектами розробки мобільних та веб додатків. Координація роботи розподілених команд та взаємодія з міжнародними клієнтами."
+                },
+                {
+                    id: "exp-3",
+                    job_title: "Project Manager",
+                    employer: "EPAM Systems",
+                    city: "Київ",
+                    start_date: new Date("2019-06-01"),
+                    end_date: new Date("2020-12-31"),
+                    is_current: false,
+                    description: "Планування та контроль виконання проектів в галузі фінтеху. Впровадження Agile практик та оптимізація процесів розробки."
+                }
+            ],
+            education: [
+                {
+                    id: "edu-2",
+                    institution: "Львівський національний університет",
+                    degree: "Магістр",
+                    field_of_study: "Менеджмент організацій",
+                    start_date: new Date("2016-09-01"),
+                    end_date: new Date("2018-06-30"),
+                    is_current: false
+                }
+            ],
+            skills: [
+                { id: "skill-5", name: "Scrum/Agile", level: "Expert" },
+                { id: "skill-6", name: "Jira", level: "Advanced" },
+                { id: "skill-7", name: "Risk Management", level: "Advanced" },
+                { id: "skill-8", name: "Team Leadership", level: "Expert" }
+            ],
+            languages: [
+                { id: "lang-4", language: "Українська", proficiency: "native" },
+                { id: "lang-5", language: "Англійська", proficiency: "c1" },
+                { id: "lang-6", language: "Німецька", proficiency: "b1" }
+            ],
+            extra_activities: [
+                {
+                    id: "act-1",
+                    title: "Ментор стартапів",
+                    organization: "Львів IT Кластер",
+                    start_date: new Date("2022-01-01"),
+                    is_current: true,
+                    description: "Консультування молодих стартапів з питань планування проектів та побудови команд."
+                }
+            ]
+        },
+        {
+            id: "resume-3",
+            template_id: "min-left-v1",
+            title: "UX/UI Designer",
+            is_primary: false,
+            created_at: new Date("2024-03-10"),
+            updated_at: new Date("2024-10-20"),
+            personal_info: {
+                first_name: "Анна",
+                last_name: "Мельник",
+                profession: "UX/UI Designer",
+                email: "a.melnyk@example.com",
+                phone: "+380631234567",
+                city: "Харків",
+                country: "Україна",
+                summary: "Креативний UX/UI дизайнер з пристрастю до створення інтуїтивних інтерфейсів. 4+ роки досвіду в дизайні мобільних та веб додатків."
+            },
+            experience: [
+                {
+                    id: "exp-4",
+                    job_title: "UX/UI Designer",
+                    employer: "Design Studio Pro",
+                    city: "Харків",
+                    start_date: new Date("2021-08-01"),
+                    end_date: new Date("2024-10-20"),
+                    is_current: true,
+                    description: "Дизайн користувацьких інтерфейсів для e-commerce платформ. Проведення UX досліджень та тестування юзабіліті."
+                }
+            ],
+            education: [
+                {
+                    id: "edu-3",
+                    institution: "Харківський національний університет",
+                    degree: "Бакалавр",
+                    field_of_study: "Графічний дизайн",
+                    start_date: new Date("2017-09-01"),
+                    end_date: new Date("2021-06-30"),
+                    is_current: false
+                }
+            ],
+            skills: [
+                { id: "skill-9", name: "Figma", level: "Expert" },
+                { id: "skill-10", name: "Adobe Creative Suite", level: "Advanced" },
+                { id: "skill-11", name: "Prototyping", level: "Advanced" },
+                { id: "skill-12", name: "User Research", level: "Intermediate" }
+            ],
+            languages: [
+                { id: "lang-7", language: "Українська", proficiency: "native" },
+                { id: "lang-8", language: "Англійська", proficiency: "b2" }
+            ],
+            extra_activities: []
+        }
+    ];
+
+    public async getResumes(): Promise<ResumeDataType[]> {
+        this.isLoading.set(true);
+        try {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+            return [...this.MOCK_RESUMES];
+        } finally {
+            this.isLoading.set(false);
+        }
+    }
 
     private createEmptyResume(id: string, templateId: string): ResumeDataType {
         return {
@@ -29,6 +222,8 @@ export class ResumeService {
     }
 
     public async getResumeById(id: string): Promise<ResumeDataType> {
+        return this.MOCK_RESUMES.find(resume => resume.id === id) || this.createEmptyResume(id, "1");
+        
         try {
             const response = await firstValueFrom(
                 this.httpClient.get<any>(`${environment.serverURL}/resumes/${id}/`, {

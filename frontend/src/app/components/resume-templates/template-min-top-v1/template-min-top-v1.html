@@ -52,11 +52,11 @@
                         <div class="item__header">
                             <span class="item__title">{{ exp.job_title }}</span>
                             <span class="item__date">
-                                {{ exp.start_date }}
+                                {{ formatDate(exp.start_date) }}
                                 @if (exp.start_date) {
                                     —
                                 }
-                                {{ exp.is_current ? "теперішній час" : exp.end_date }}
+                                {{ exp.is_current ? "теперішній час" : formatDate(exp.end_date) }}
                             </span>
                         </div>
                         <span class="item__subtitle">{{ exp.employer }}</span>
@@ -78,11 +78,11 @@
                         <div class="item__header">
                             <span class="item__title">{{ edu.degree }}</span>
                             <span class="item__date">
-                                {{ edu.start_date }}
+                                {{ formatDate(edu.start_date) }}
                                 @if (edu.start_date) {
                                     —
                                 }
-                                {{ edu.is_current ? "теперішній час" : edu.end_date }}
+                                {{ edu.is_current ? "теперішній час" : formatDate(edu.end_date) }}
                             </span>
                         </div>
                         <span class="item__subtitle">{{ edu.institution }}</span>
@@ -126,11 +126,11 @@
                         <div class="item__header">
                             <span class="item__title">{{ act.title }}</span>
                             <span class="item__date">
-                                {{ act.start_date }}
+                                {{ formatDate(act.start_date) }}
                                 @if (act.start_date) {
                                     —
                                 }
-                                {{ act.is_current ? "теперішній час" : act.end_date }}
+                                {{ act.is_current ? "теперішній час" : formatDate(act.end_date) }}
                             </span>
                         </div>
                         <span class="item__subtitle">{{ act.organization }}</span>
