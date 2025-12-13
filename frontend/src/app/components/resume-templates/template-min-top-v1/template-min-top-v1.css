@@ -21,12 +21,15 @@
 }
 
 .header__name {
-    margin: 0 0 4mm;
     font-size: 22pt;
     font-weight: 400;
     color: #222222;
     text-transform: uppercase;
     letter-spacing: 1pt;
+}
+
+.header__profession {
+    margin-bottom: 4mm;
 }
 
 .header__contacts {

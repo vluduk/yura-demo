@@ -72,19 +72,17 @@
                     }
                     @case ("summary") {
                         <app-resume-form-summary [data]="resume()!" (onUpdate)="updateSummary($event)"></app-resume-form-summary>
+                        
+                        <ui-button
+                            [label]="'Зберегти'"
+                            [icon]="'fa-solid fa-save'"
+                            [type]="'primary'"
+                            [isLoading]="isLoading()"
+                            (click)="saveResume()"
+                        ></ui-button>
                     }
                 }
             }
-
-            <div class="form__actions">
-                <ui-button
-                    [label]="'Зберегти'"
-                    [icon]="'fa-solid fa-save'"
-                    [type]="'primary'"
-                    [isLoading]="isLoading()"
-                    (click)="saveResume()"
-                ></ui-button>
-            </div>
         </div>
 
         <div class="content__preview-wrapper" #resumeContainer>

@@ -1,6 +1,6 @@
 import { Component, inject, input, InputSignal, output, OutputEmitterRef } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { ExtraActivityType } from "@shared/types/ResumeDataType";
+import { ExtraActivityType, ResumeDataType } from "@shared/types/ResumeDataType";
 import { Button } from "@shared/components/button/button";
 import { Input } from "@shared/components/input/input";
 import { Select } from "@shared/components/select/select";
@@ -159,11 +159,21 @@ export class ResumeFormExtraActivities {
         return { month: month || '', year: year || '' };
     }
 
-    protected async generateSummary(): Promise<void> {
-        const resume = this.resumeService.currentResume();
-        if (!resume) return;
+    protected async generateDescription(actId: string): Promise<void> {
+        if (!this.resumeService.currentResume()) {
+            return;
+        }
 
-        const content = await this.resumeService.generateAIContent(resume.id, 'summary');
+        const resume: ResumeDataType = this.resumeService.currentResume()!;
+
+        const activity: ExtraActivityType = this.resumeService.currentResume()?.extra_activities!.find(act => act.id === actId)!;
+
+        const content = await this.resumeService.generateAIContent(resume.id, 'description', {
+            activity_title: activity.title,
+            activity_organization: activity.organization,
+            activity_description: activity.description || '',
+        });
+
         if (content) {
             this.onUpdate.emit({ id: resume.id, field: 'description', value: content });
         }

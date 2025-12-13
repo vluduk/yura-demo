@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, InputSignal, output, OutputEmitterRef, Signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { CommonModule, DatePipe } from "@angular/common";
-import { ExperienceType } from "@shared/types/ResumeDataType";
+import { ExperienceType, ResumeDataType } from "@shared/types/ResumeDataType";
 import { Button } from "@shared/components/button/button";
 import { Title } from "@shared/components/title/title";
 import { Input } from "@shared/components/input/input";
@@ -161,11 +161,20 @@ export class ResumeFormExperience {
         this.onRemove.emit(id);
     }
 
-    protected async generateSummary(): Promise<void> {
-        const resume = this.resumeService.currentResume();
-        if (!resume) return;
+    protected async generateDescription(expId: string): Promise<void> {
+        if (!this.resumeService.currentResume()) {
+            return;
+        }
 
-        const content = await this.resumeService.generateAIContent(resume.id, 'summary');
+        const resume: ResumeDataType = this.resumeService.currentResume()!;
+
+        const experience: ExperienceType = this.resumeService.currentResume()?.experience!.find(exp => exp.id === expId)!;
+
+        const content = await this.resumeService.generateAIContent(resume.id, 'description', {
+            experience_job_title: experience.job_title,
+            experience_employer: experience.employer,
+            experience_description: experience.description || '',
+        });
         if (content) {
             this.onUpdate.emit({ id: resume.id, field: 'description', value: content });
         }

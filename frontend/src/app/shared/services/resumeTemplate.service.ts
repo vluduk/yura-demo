@@ -33,28 +33,39 @@ export class ResumeTemplateService {
     }
 
     public async createResume(templateId: string): Promise<ResumeDataType> {
-        // Create on backend
+        // Create with mock data
         this.isLoading.set(true);
         try {
-            const response = await firstValueFrom(
-                this.httpClient.post<any>(
-                    `${environment.serverURL}/resumes/`,
-                    { template_id: templateId },
-                    { withCredentials: true },
-                ),
-            );
+            // Simulate API delay
+            await new Promise((resolve) => setTimeout(resolve, 500));
 
-            // Map backend response to frontend ResumeDataType
-            const resume: ResumeDataType = {
-                id: response.id,
-                template_id: response.template?.id,
-                title: response.title,
-                is_primary: response.is_primary,
-                created_at: response.created_at,
-                updated_at: response.updated_at,
+            // Mock response data
+            const mockResume: ResumeDataType = {
+                id: crypto.randomUUID(),
+                template_id: templateId,
+                title: "Нове резюме",
+                is_primary: false,
+                created_at: new Date(),
+                updated_at: new Date(),
+                personal_info: {
+                    first_name: "",
+                    last_name: "",
+                    profession: "",
+                    email: "",
+                    phone: "",
+                    city: "",
+                    country: "",
+                    address: "",
+                    summary: "",
+                },
+                experience: [],
+                education: [],
+                skills: [],
+                languages: [],
+                extra_activities: [],
             };
 
-            return resume;
+            return mockResume;
         } finally {
             this.isLoading.set(false);
         }
