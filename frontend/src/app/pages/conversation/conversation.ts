@@ -17,6 +17,7 @@ import { ConversationService } from "@shared/services/conversation.service";
 import { ConversationTypeEnum } from "@shared/types/ConversationTypeEnum";
 import { Button } from "@shared/components/button/button";
 import { MarkdownModule } from "ngx-markdown";
+import { Router } from "@angular/router";
 
 @Component({
     selector: "chat-conversation",
@@ -46,6 +47,7 @@ export class Conversation {
     protected readonly messagesContainer: Signal<ElementRef> = viewChild.required<ElementRef>("scrollContainer");
 
     private readonly conversationService: ConversationService = inject(ConversationService);
+    private readonly router: Router = inject(Router);
 
     @Input()
     set conversationId(id: string) {
@@ -88,8 +90,13 @@ export class Conversation {
         this.conversationService
             .getMessagesByConversationId(this.currentConversationId())
             .then((response: MessageType[]) => {
+                if (response.length === 0) {
+                    this.router.navigate(['/conversation']);
+                    return;
+                }
+
                 this.messages.set(response);
-            });
+            })
     }
 
     protected async getResponse(message?: ChatInputMessage): Promise<void> {

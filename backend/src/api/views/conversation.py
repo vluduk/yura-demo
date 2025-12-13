@@ -31,7 +31,14 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Only return conversations owned by the authenticated user."""
-        return Conversation.objects.filter(user=self.request.user).order_by('-last_active_at')
+        queryset = Conversation.objects.filter(user=self.request.user).order_by('-last_active_at')
+        
+        # Filter by conversation type if provided
+        conv_type = self.request.query_params.get('type')
+        if conv_type:
+            queryset = queryset.filter(conv_type=conv_type)
+            
+        return queryset
 
     def perform_create(self, serializer):
         """Create a conversation owned by the requesting user with optional initial AI message."""

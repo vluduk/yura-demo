@@ -168,7 +168,7 @@ export class ResumeFormExtraActivities {
 
         const activity: ExtraActivityType = this.resumeService.currentResume()?.extra_activities!.find(act => act.id === actId)!;
 
-        const content = await this.resumeService.generateAIContent(resume.id, 'description', {
+        const content = await this.resumeService.generateAIContent(resume.id, 'experience_description', {
             activity_title: activity.title,
             activity_organization: activity.organization,
             activity_description: activity.description || '',

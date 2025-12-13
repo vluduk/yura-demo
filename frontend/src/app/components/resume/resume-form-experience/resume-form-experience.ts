@@ -170,7 +170,7 @@ export class ResumeFormExperience {
 
         const experience: ExperienceType = this.resumeService.currentResume()?.experience!.find(exp => exp.id === expId)!;
 
-        const content = await this.resumeService.generateAIContent(resume.id, 'description', {
+        const content = await this.resumeService.generateAIContent(resume.id, 'experience_description', {
             experience_job_title: experience.job_title,
             experience_employer: experience.employer,
             experience_description: experience.description || '',
