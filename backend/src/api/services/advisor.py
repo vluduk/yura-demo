@@ -5,7 +5,7 @@ import logging
 import google.generativeai as genai
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned
-from api.models.user_assesment import UserAssessment, ASSESSMENT_QUESTIONS
+from api.models.user_assesment import UserAssessment, ASSESSMENT_QUESTIONS, DEFAULT_LANGUAGE
 from api.models.conversation import ConversationType
 
 class AdvisorService:
@@ -24,9 +24,9 @@ class AdvisorService:
         if assessment and assessment.preferred_language:
             return AdvisorService.LANGUAGE_INSTRUCTIONS.get(
                 assessment.preferred_language, 
-                AdvisorService.LANGUAGE_INSTRUCTIONS['uk']
+                AdvisorService.LANGUAGE_INSTRUCTIONS[DEFAULT_LANGUAGE]
             )
-        return AdvisorService.LANGUAGE_INSTRUCTIONS['uk']
+        return AdvisorService.LANGUAGE_INSTRUCTIONS[DEFAULT_LANGUAGE]
 
     # System prompts for each conversation type
     SYSTEM_PROMPTS = {

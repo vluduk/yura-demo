@@ -1,11 +1,18 @@
 import logging
 import google.generativeai as genai
 from django.conf import settings
-from api.models.user_assesment import UserAssessment
+from api.models.user_assesment import UserAssessment, DEFAULT_LANGUAGE
 
 logger = logging.getLogger(__name__)
 
 class ResumeAIService:
+    # Language instruction mapping (shared with AdvisorService pattern)
+    LANGUAGE_INSTRUCTIONS = {
+        'uk': 'ВАЖЛИВО: Відповідайте українською мовою.',
+        'en': 'IMPORTANT: Respond in English.',
+        'ru': 'ВАЖНО: Отвечайте на русском языке.',
+    }
+
     @staticmethod
     def generate_summary(user, resume_data, extra_instructions=None):
         """
@@ -32,7 +39,7 @@ class ResumeAIService:
 
             # 2. Fetch User Assessment
             assessment_text = "Дані оцінювання відсутні."
-            preferred_language = "uk"  # Default to Ukrainian
+            preferred_language = DEFAULT_LANGUAGE
             try:
                 assessment = UserAssessment.objects.filter(user=user).latest('created_at')
                 if assessment:
@@ -46,13 +53,11 @@ class ResumeAIService:
             except Exception as e:
                 logger.warning(f"Error fetching assessment: {e}")
             
-            # Language mapping for prompts
-            language_instructions = {
-                'uk': 'ВАЖЛИВО: Відповідайте українською мовою.',
-                'en': 'IMPORTANT: Respond in English.',
-                'ru': 'ВАЖНО: Отвечайте на русском языке.',
-            }
-            lang_instruction = language_instructions.get(preferred_language, language_instructions['uk'])
+            # Get language instruction
+            lang_instruction = ResumeAIService.LANGUAGE_INSTRUCTIONS.get(
+                preferred_language, 
+                ResumeAIService.LANGUAGE_INSTRUCTIONS[DEFAULT_LANGUAGE]
+            )
 
             # 3. Format Resume Data
             experience_text = "Досвід роботи:\n"

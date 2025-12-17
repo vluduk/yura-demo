@@ -4,10 +4,37 @@ from api.models.resume import (
     SocialLink, SkillEntry, LanguageEntry
 )
 from django.db import transaction
+import re
+from datetime import date
 
+
+class FlexibleDateField(serializers.DateField):
+    """
+    Custom DateField that accepts both YYYY-MM and YYYY-MM-DD formats.
+    When YYYY-MM is provided, it defaults to the first day of the month.
+    """
+    def to_internal_value(self, value):
+        if isinstance(value, date):
+            return value
+        if isinstance(value, str):
+            # Check if it's YYYY-MM format
+            if re.match(r'^\d{4}-\d{2}$', value):
+                value = f"{value}-01"  # Add first day of month
+        return super().to_internal_value(value)
+
+    def to_representation(self, value):
+        if value is None:
+            return None
+        # Return YYYY-MM format for frontend
+        if isinstance(value, date):
+            return value.strftime('%Y-%m')
+        return value
 
 
 class ExperienceEntrySerializer(serializers.ModelSerializer):
+    start_date = FlexibleDateField(required=False, allow_null=True)
+    end_date = FlexibleDateField(required=False, allow_null=True)
+
     class Meta:
         model = ExperienceEntry
         fields = ('id', 'resume', 'job_title', 'employer', 'city', 'start_date', 'end_date', 'is_current', 'description', 'display_order')
@@ -15,6 +42,9 @@ class ExperienceEntrySerializer(serializers.ModelSerializer):
 
 
 class EducationEntrySerializer(serializers.ModelSerializer):
+    start_date = FlexibleDateField(required=False, allow_null=True)
+    end_date = FlexibleDateField(required=False, allow_null=True)
+
     class Meta:
         model = EducationEntry
         fields = ('id', 'resume', 'institution', 'degree', 'field_of_study', 'start_date', 'end_date', 'is_current', 'description', 'display_order')
@@ -22,6 +52,9 @@ class EducationEntrySerializer(serializers.ModelSerializer):
 
 
 class ExtraActivityEntrySerializer(serializers.ModelSerializer):
+    start_date = FlexibleDateField(required=False, allow_null=True)
+    end_date = FlexibleDateField(required=False, allow_null=True)
+
     class Meta:
         model = ExtraActivityEntry
         fields = ('id', 'resume', 'title', 'organization', 'start_date', 'end_date', 'is_current', 'description', 'display_order')

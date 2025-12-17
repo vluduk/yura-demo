@@ -4,6 +4,16 @@ import uuid
 from django.utils import timezone
 
 
+# Supported language choices for AI responses
+LANGUAGE_CHOICES = [
+	('uk', 'Українська'),
+	('en', 'English'),
+	('ru', 'Русский'),
+]
+
+DEFAULT_LANGUAGE = 'uk'
+
+
 # Assessment questions oriented for Ukrainian veterans transitioning to civilian careers.
 # Each entry: id, question, type, optional choices. Keep content generic and optional
 # to respect privacy; all fields are optional in the model.
@@ -72,7 +82,12 @@ class UserAssessment(models.Model):
 	support_needs = models.TextField(blank=True, null=True)
 
 	# Language preference for AI responses
-	preferred_language = models.CharField(max_length=50, blank=True, null=True, default='uk')
+	preferred_language = models.CharField(
+		max_length=10, 
+		choices=LANGUAGE_CHOICES, 
+		default=DEFAULT_LANGUAGE,
+		blank=True
+	)
 
 	completed = models.BooleanField(default=False)
 
