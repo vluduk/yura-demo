@@ -31,7 +31,7 @@ class ResumeAIService:
             model = genai.GenerativeModel(model_name)
 
             # 2. Fetch User Assessment
-            assessment_text = "No assessment data available."
+            assessment_text = "Дані оцінювання відсутні."
             preferred_language = "uk"  # Default to Ukrainian
             try:
                 assessment = UserAssessment.objects.filter(user=user).latest('created_at')
@@ -40,7 +40,7 @@ class ResumeAIService:
                         preferred_language = assessment.preferred_language
                     if assessment.answers:
                         formatted_answers = "\n".join([f"- {k}: {v}" for k, v in assessment.answers.items()])
-                        assessment_text = f"User Assessment Data:\n{formatted_answers}"
+                        assessment_text = f"Дані оцінювання користувача:\n{formatted_answers}"
             except UserAssessment.DoesNotExist:
                 pass
             except Exception as e:
@@ -48,41 +48,41 @@ class ResumeAIService:
             
             # Language mapping for prompts
             language_instructions = {
-                'uk': 'IMPORTANT: Respond in Ukrainian (українською мовою).',
+                'uk': 'ВАЖЛИВО: Відповідайте українською мовою.',
                 'en': 'IMPORTANT: Respond in English.',
-                'ru': 'IMPORTANT: Respond in Russian (на русском языке).',
+                'ru': 'ВАЖНО: Отвечайте на русском языке.',
             }
             lang_instruction = language_instructions.get(preferred_language, language_instructions['uk'])
 
             # 3. Format Resume Data
-            experience_text = "Work Experience:\n"
+            experience_text = "Досвід роботи:\n"
             experience_entries = resume_data.get('experience_entries') or resume_data.get('experience') or []
             
             for exp in experience_entries:
-                experience_text += f"- {exp.get('job_title', 'N/A')} at {exp.get('employer', 'N/A')} ({exp.get('start_date', '')} - {exp.get('end_date', '')})\n"
+                experience_text += f"- {exp.get('job_title', 'N/A')} в {exp.get('employer', 'N/A')} ({exp.get('start_date', '')} - {exp.get('end_date', '')})\n"
                 if exp.get('description'):
-                    experience_text += f"  Description: {exp.get('description')}\n"
+                    experience_text += f"  Опис: {exp.get('description')}\n"
             
             # 4. Construct Prompt
             prompt = f"""
-            You are an expert professional resume writer.
-            Your task is to write a compelling, professional summary for a resume (Profile/Summary section).
+            Ви — експерт зі складання професійних резюме.
+            Ваше завдання — написати переконливе професійне резюме (розділ Профіль/Короткий зміст).
             
             {lang_instruction}
             
-            CONTEXT:
-            The user is likely a veteran transitioning to civilian life or looking for new opportunities.
+            КОНТЕКСТ:
+            Користувач, ймовірно, є ветераном, який переходить до цивільного життя або шукає нові можливості.
             
             {assessment_text}
             
             {experience_text}
             
-            USER INSTRUCTIONS:
-            {extra_instructions if extra_instructions else "Create a strong professional summary highlighting key skills and experience."}
+            ІНСТРУКЦІЇ КОРИСТУВАЧА:
+            {extra_instructions if extra_instructions else "Створіть сильне професійне резюме, підкреслюючи ключові навички та досвід."}
             
-            OUTPUT:
-            Provide ONLY the summary text. Do not include "Here is the summary" or quotes.
-            KEEP IT VERY SHORT AND CONCISE. Maximum 3 sentences. No fluff.
+            ВИВІД:
+            Надайте ТІЛЬКИ текст резюме. Не включайте "Ось резюме" або лапки.
+            ЗРОБІТЬ ЙОГО ДУЖЕ КОРОТКИМ І ЛАКОНІЧНИМ. Максимум 3 речення. Без зайвих слів.
             """
 
             # 5. Call Gemini
