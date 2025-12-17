@@ -80,7 +80,7 @@ html {
     }
 }
 
-::ng-deep markdown ul {
+markdown ul {
     display: flex;
     flex-direction: column;
 }
