@@ -12,7 +12,12 @@
         <div class="library__card" (click)="viewResume(resume.id)">
             <div class="library__card-content">
                 <div class="library__card-header">
-                    <h3 class="library__card-title">{{ resume.title }}</h3>
+                    <h3 class="library__card-title" 
+                        contenteditable="true" 
+                        (click)="$event.stopPropagation()"
+                        (input)="updateTitle(resume.id, $event)">
+                        {{ resume.title }}
+                    </h3>
                     <!-- @if (resume.is_primary) {
                         <span class="library__card-badge">Основне</span>
                     } -->
@@ -73,7 +78,17 @@
             </div>
             
             <div class="library__card-actions">
-                <ui-button [icon]="'fa-solid fa-pen'" [type]="'icon'" [theme]="'dark'"></ui-button>
+                <ui-button 
+                    [icon]="'fa-solid fa-save'" 
+                    [type]="'icon'" 
+                    [theme]="'dark'"
+                    (click)="saveResume($event, resume)">
+                </ui-button>
+                <ui-button 
+                    [icon]="'fa-solid fa-pen'" 
+                    [type]="'icon'" 
+                    [theme]="'dark'">
+                </ui-button>
             </div>
         </div>
         }

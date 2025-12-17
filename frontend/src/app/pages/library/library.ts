@@ -19,6 +19,7 @@ export class Library implements OnInit {
     private readonly router = inject(Router);
 
     protected readonly resumes: WritableSignal<ResumeDataType[]> = signal<ResumeDataType[]>([]);
+    protected readonly isLoading = this.resumeService.isLoading;
 
     ngOnInit(): void {
         this.loadResumes();
@@ -47,7 +48,7 @@ export class Library implements OnInit {
 
     protected getTemplateId(resumeId: string): string {
         const resume = this.resumes().find(r => r.id === resumeId);
-        return TEMPLATES[resume!.template_id].id;
+        return TEMPLATES[resume!.template_id]?.id || "min-left-v1";
     }
 
     protected formatDate(dateStr?: string | Date): string {
@@ -60,5 +61,22 @@ export class Library implements OnInit {
             month: "short",
             year: "numeric",
         });
+    }
+
+    protected updateTitle(resumeId: string, event: Event): void {
+        const newTitle = (event.target as HTMLElement).innerText;
+        this.resumes.update(resumes =>
+            resumes.map(r => r.id === resumeId ? { ...r, title: newTitle } : r)
+        );
+    }
+
+    protected async saveResume(event: Event, resume: ResumeDataType): Promise<void> {
+        event.stopPropagation(); // Prevent navigation to builder
+        try {
+            await this.resumeService.saveResume(resume);
+            // Optional: Show success notification
+        } catch (error) {
+            console.error("Failed to save resume", error);
+        }
     }
 }

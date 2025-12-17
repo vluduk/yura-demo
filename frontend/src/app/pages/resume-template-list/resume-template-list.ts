@@ -2,6 +2,7 @@ import { Component, inject, OnInit, signal, WritableSignal } from "@angular/core
 import { Router } from "@angular/router";
 import { Title } from "@shared/components/title/title";
 import { ResumeTemplateService } from "@shared/services/resumeTemplate.service";
+import { ResumeService } from "@shared/services/resume.service";
 import { ResumeTemplateType } from "@shared/types/ResumeTemplateType";
 import { ResumeTemplateCard } from "@components/resume/resume-template-card/resume-template-card";
 
@@ -17,6 +18,7 @@ export class ResumeTemplateList implements OnInit {
     protected readonly isCreating: WritableSignal<boolean> = signal<boolean>(false);
 
     private readonly templateService: ResumeTemplateService = inject(ResumeTemplateService);
+    private readonly resumeService: ResumeService = inject(ResumeService);
     private readonly router: Router = inject(Router);
 
     ngOnInit(): void {
@@ -40,7 +42,7 @@ export class ResumeTemplateList implements OnInit {
 
         this.isCreating.set(true);
         try {
-            const resume = await this.templateService.createResume(template.id);
+            const resume = await this.resumeService.createResume(template.id);
             this.router.navigate(["/resume-builder", resume.id], {
                 queryParams: { templateId: template.id },
             });
