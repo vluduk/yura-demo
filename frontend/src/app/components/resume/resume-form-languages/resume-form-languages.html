@@ -2,13 +2,21 @@
     <ui-title [title]="'Мови'" [size]="'medium'"></ui-title>
 
     <div class="form__add">
-        <ui-input [(value)]="newLang" [label]="'Нова мова'" [placeholder]="'Українська'"
-            (keydown.enter)="addLanguage()"></ui-input>
+        <ui-input
+            [(value)]="newLang"
+            [label]="'Нова мова'"
+            [placeholder]="'Українська'"
+            (keydown.enter)="addLanguage()"
+        ></ui-input>
 
-        <ui-select class="add__level" [label]="'Рівень володіння'" [value]="newProficiency()"
-            (valueChange)="newProficiency.set($event)">
+        <ui-select
+            class="add__level"
+            [label]="'Рівень володіння'"
+            [value]="newProficiency()"
+            (valueChange)="newProficiency.set($event)"
+        >
             @for (level of proficiencies; track level.value) {
-            <option [value]="level.value">{{ level.label }}</option>
+                <option [value]="level.value">{{ level.label }}</option>
             }
         </ui-select>
 
@@ -17,11 +25,13 @@
 
     <div class="languages__list">
         @for (lang of languages(); track lang.id) {
-        <div class="lang-item" (click)="removeLanguage(lang.id)">
-            <span class="lang__name">{{ lang.language }}</span>
-            <span class="lang__level">{{ lang.proficiency.toUpperCase() }}</span>
-            <span class="lang__remove"><i class="fa-solid fa-times"></i></span>
-        </div>
-        } @empty { <p class="form__empty">Додайте мови</p> }
+            <div class="lang-item" (click)="removeLanguage(lang.id)">
+                <span class="lang__name">{{ lang.language }}</span>
+                <span class="lang__level">{{ lang.proficiency.toUpperCase() }}</span>
+                <span class="lang__remove"><i class="fa-solid fa-times"></i></span>
+            </div>
+        } @empty {
+            <p class="form__empty">Додайте мови</p>
+        }
     </div>
 </div>

@@ -26,7 +26,6 @@
     transform-origin: top center;
 }
 
-
 .template__header {
     margin-bottom: 25px;
     text-align: center;
@@ -147,6 +146,6 @@
 
 .language-item__level {
     font-size: 9pt;
-    color: var(--color-text-secondary);
     font-variant-numeric: tabular-nums;
+    color: var(--color-text-secondary);
 }

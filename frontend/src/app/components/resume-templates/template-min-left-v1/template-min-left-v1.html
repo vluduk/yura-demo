@@ -4,7 +4,6 @@
 
         <h2 class="header__profession">{{ data().personal_info?.profession }}</h2>
 
-
         <div class="header__contacts">
             @if (data().personal_info?.email) {
                 <span class="contacts__item">
@@ -40,7 +39,9 @@
     @if (data().personal_info?.summary) {
         <section class="template__section section-summary">
             <h2 class="section__title">Резюме</h2>
-            <p class="section-summary__text">{{ data().personal_info?.summary }}</p>
+            <!-- <p class="section-summary__text">{{ data().personal_info?.summary }}</p> -->
+
+            <markdown class="section-summary__text" [data]="data().personal_info?.summary"></markdown>
         </section>
     }
 
@@ -73,7 +74,8 @@
                     }
 
                     @if (job.description) {
-                        <div class="experience-entry__content">{{ job.description }}</div>
+                        <!-- <div class="experience-entry__content">{{ job.description }}</div> -->
+                        <markdown class="experience-entry__content" [data]="job.description"></markdown>
                     }
                 </div>
             }
@@ -105,7 +107,8 @@
                     </div>
 
                     @if (act.description) {
-                        <div class="extra-activity-entry__content">{{ act.description }}</div>
+                        <!-- <div class="extra-activity-entry__content">{{ act.description }}</div> -->
+                        <markdown class="extra-activity-entry__content" [data]="act.description"></markdown>
                     }
                 </div>
             }

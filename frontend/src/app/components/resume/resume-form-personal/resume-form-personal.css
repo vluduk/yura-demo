@@ -6,8 +6,8 @@
 
 .form__row {
     display: flex;
-    justify-content: space-between;
     gap: 12px;
+    justify-content: space-between;
 }
 
 .field__ai {

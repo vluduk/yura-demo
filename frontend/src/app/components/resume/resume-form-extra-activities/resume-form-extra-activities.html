@@ -1,7 +1,7 @@
 <div class="form-extra-activities">
     <div class="form__header">
         <ui-title [title]="'Додаткова активність'" [size]="'medium'"></ui-title>
-        <ui-button 
+        <ui-button
             [label]="'Додати'"
             [icon]="'fa-solid fa-plus'"
             [type]="'secondary'"
@@ -41,10 +41,15 @@
                         (valueChange)="onDatePartChange(act.id, 'start_date', 'month', $event)"
                     >
                         @for (month of months; track month.value) {
-                            <option 
+                            <option
                                 [value]="month.value"
-                                [disabled]="parseDate(act.start_date).year && isOptionDisabled(act, 'start_date', month.value, parseDate(act.start_date).year)"
-                            >{{ month.label }}</option>
+                                [disabled]="
+                                    parseDate(act.start_date).year &&
+                                    isOptionDisabled(act, 'start_date', month.value, parseDate(act.start_date).year)
+                                "
+                            >
+                                {{ month.label }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -55,10 +60,15 @@
                         (valueChange)="onDatePartChange(act.id, 'start_date', 'year', $event)"
                     >
                         @for (year of years; track year) {
-                            <option 
+                            <option
                                 [value]="year"
-                                [disabled]="parseDate(act.start_date).month && isOptionDisabled(act, 'start_date', parseDate(act.start_date).month, year)"
-                            >{{ year }}</option>
+                                [disabled]="
+                                    parseDate(act.start_date).month &&
+                                    isOptionDisabled(act, 'start_date', parseDate(act.start_date).month, year)
+                                "
+                            >
+                                {{ year }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -73,10 +83,15 @@
                         (valueChange)="onDatePartChange(act.id, 'end_date', 'month', $event)"
                     >
                         @for (month of months; track month.value) {
-                            <option 
+                            <option
                                 [value]="month.value"
-                                [disabled]="parseDate(act.end_date).year && isOptionDisabled(act, 'end_date', month.value, parseDate(act.end_date).year)"
-                            >{{ month.label }}</option>
+                                [disabled]="
+                                    parseDate(act.end_date).year &&
+                                    isOptionDisabled(act, 'end_date', month.value, parseDate(act.end_date).year)
+                                "
+                            >
+                                {{ month.label }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -88,10 +103,15 @@
                         (valueChange)="onDatePartChange(act.id, 'end_date', 'year', $event)"
                     >
                         @for (year of years; track year) {
-                            <option 
+                            <option
                                 [value]="year"
-                                [disabled]="parseDate(act.end_date).month && isOptionDisabled(act, 'end_date', parseDate(act.end_date).month, year)"
-                            >{{ year }}</option>
+                                [disabled]="
+                                    parseDate(act.end_date).month &&
+                                    isOptionDisabled(act, 'end_date', parseDate(act.end_date).month, year)
+                                "
+                            >
+                                {{ year }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -107,8 +127,13 @@
             <div class="form__field">
                 <div class="textarea__wrapper">
                     <span class="field__label">Опис</span>
-                    <ui-button [label]="'Згенерувати самарі'" [icon]="'fa-solid fa-wand-magic-sparkles'" [type]="'secondary'"
-                        (click)="generateDescription(act.id)"></ui-button>
+                    <ui-button
+                        [label]="isGenerating() ? 'Генерується...' : 'Згенерувати самарі'"
+                        [icon]="'fa-solid fa-wand-magic-sparkles'"
+                        [type]="'secondary'"
+                        [isLoading]="isGenerating()"
+                        (click)="generateDescription(act.id)"
+                    ></ui-button>
                 </div>
                 <ui-textarea
                     class="field__textarea"

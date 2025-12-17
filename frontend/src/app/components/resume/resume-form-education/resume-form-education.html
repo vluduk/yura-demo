@@ -1,5 +1,5 @@
 <div class="form-education">
-    <div class="form__header">        
+    <div class="form__header">
         <ui-title [title]="'Освіта'" [size]="'medium'"></ui-title>
         <ui-button
             [label]="'Додати'"
@@ -47,10 +47,15 @@
                         (valueChange)="onDatePartChange(edu.id, 'start_date', 'month', $event)"
                     >
                         @for (month of months; track month.value) {
-                            <option 
+                            <option
                                 [value]="month.value"
-                                [disabled]="parseDate(edu.start_date).year && isOptionDisabled(edu, 'start_date', month.value, parseDate(edu.start_date).year)"
-                            >{{ month.label }}</option>
+                                [disabled]="
+                                    parseDate(edu.start_date).year &&
+                                    isOptionDisabled(edu, 'start_date', month.value, parseDate(edu.start_date).year)
+                                "
+                            >
+                                {{ month.label }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -61,10 +66,15 @@
                         (valueChange)="onDatePartChange(edu.id, 'start_date', 'year', $event)"
                     >
                         @for (year of years; track year) {
-                            <option 
+                            <option
                                 [value]="year"
-                                [disabled]="parseDate(edu.start_date).month && isOptionDisabled(edu, 'start_date', parseDate(edu.start_date).month, year)"
-                            >{{ year }}</option>
+                                [disabled]="
+                                    parseDate(edu.start_date).month &&
+                                    isOptionDisabled(edu, 'start_date', parseDate(edu.start_date).month, year)
+                                "
+                            >
+                                {{ year }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -79,10 +89,15 @@
                         (valueChange)="onDatePartChange(edu.id, 'end_date', 'month', $event)"
                     >
                         @for (month of months; track month.value) {
-                            <option 
+                            <option
                                 [value]="month.value"
-                                [disabled]="parseDate(edu.end_date).year && isOptionDisabled(edu, 'end_date', month.value, parseDate(edu.end_date).year)"
-                            >{{ month.label }}</option>
+                                [disabled]="
+                                    parseDate(edu.end_date).year &&
+                                    isOptionDisabled(edu, 'end_date', month.value, parseDate(edu.end_date).year)
+                                "
+                            >
+                                {{ month.label }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -94,10 +109,15 @@
                         (valueChange)="onDatePartChange(edu.id, 'end_date', 'year', $event)"
                     >
                         @for (year of years; track year) {
-                            <option 
+                            <option
                                 [value]="year"
-                                [disabled]="parseDate(edu.end_date).month && isOptionDisabled(edu, 'end_date', parseDate(edu.end_date).month, year)"
-                            >{{ year }}</option>
+                                [disabled]="
+                                    parseDate(edu.end_date).month &&
+                                    isOptionDisabled(edu, 'end_date', parseDate(edu.end_date).month, year)
+                                "
+                            >
+                                {{ year }}
+                            </option>
                         }
                     </ui-select>
                 </div>

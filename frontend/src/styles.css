@@ -79,3 +79,8 @@ html {
         padding-inline: 6px;
     }
 }
+
+::ng-deep markdown ul {
+    display: flex;
+    flex-direction: column;
+}

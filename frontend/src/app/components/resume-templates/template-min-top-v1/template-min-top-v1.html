@@ -39,7 +39,9 @@
     @if (data().personal_info?.summary) {
         <section class="template__section">
             <h2 class="section__title">Про себе</h2>
-            <p class="section__text">{{ data().personal_info?.summary }}</p>
+            <!-- <p class="section__text">{{ data().personal_info?.summary }}</p> -->
+
+            <markdown class="section__text" [data]="data().personal_info?.summary"></markdown>
         </section>
     }
 
@@ -61,7 +63,8 @@
                         </div>
                         <span class="item__subtitle">{{ exp.employer }}</span>
                         @if (exp.description) {
-                            <p class="item__description">{{ exp.description }}</p>
+                            <!-- <p class="item__description">{{ exp.description }}</p> -->
+                            <markdown class="item__description" [data]="exp.description"></markdown>
                         }
                     </div>
                 }
@@ -135,7 +138,8 @@
                         </div>
                         <span class="item__subtitle">{{ act.organization }}</span>
                         @if (act.description) {
-                            <p class="item__description">{{ act.description }}</p>
+                            <!-- <p class="item__description">{{ act.description }}</p> -->
+                            <markdown class="item__description" [data]="act.description"></markdown>
                         }
                     </div>
                 }

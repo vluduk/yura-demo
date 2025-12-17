@@ -1,7 +1,7 @@
 <div class="form-experience">
     <div class="form__header">
         <ui-title [title]="'Досвід роботи'" [size]="'medium'"></ui-title>
-        <ui-button 
+        <ui-button
             [label]="'Додати'"
             [icon]="'fa-solid fa-plus'"
             [type]="'secondary'"
@@ -25,7 +25,7 @@
                     [value]="exp.employer"
                     (valueChange)="updateExperience(exp.id, 'employer', $event.toString())"
                 ></ui-input>
-                
+
                 <ui-input
                     [label]="'Посада'"
                     [placeholder]="'Введіть вашу посаду...'"
@@ -42,10 +42,15 @@
                         (valueChange)="onDatePartChange(exp.id, 'start_date', 'month', $event)"
                     >
                         @for (month of months; track month.value) {
-                            <option 
+                            <option
                                 [value]="month.value"
-                                [disabled]="parseDate(exp.start_date).year && isOptionDisabled(exp, 'start_date', month.value, parseDate(exp.start_date).year)"
-                            >{{ month.label }}</option>
+                                [disabled]="
+                                    parseDate(exp.start_date).year &&
+                                    isOptionDisabled(exp, 'start_date', month.value, parseDate(exp.start_date).year)
+                                "
+                            >
+                                {{ month.label }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -56,10 +61,15 @@
                         (valueChange)="onDatePartChange(exp.id, 'start_date', 'year', $event)"
                     >
                         @for (year of years; track year) {
-                            <option 
+                            <option
                                 [value]="year"
-                                [disabled]="parseDate(exp.start_date).month && isOptionDisabled(exp, 'start_date', parseDate(exp.start_date).month, year)"
-                            >{{ year }}</option>
+                                [disabled]="
+                                    parseDate(exp.start_date).month &&
+                                    isOptionDisabled(exp, 'start_date', parseDate(exp.start_date).month, year)
+                                "
+                            >
+                                {{ year }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -74,10 +84,15 @@
                         (valueChange)="onDatePartChange(exp.id, 'end_date', 'month', $event)"
                     >
                         @for (month of months; track month.value) {
-                            <option 
+                            <option
                                 [value]="month.value"
-                                [disabled]="parseDate(exp.end_date).year && isOptionDisabled(exp, 'end_date', month.value, parseDate(exp.end_date).year)"
-                            >{{ month.label }}</option>
+                                [disabled]="
+                                    parseDate(exp.end_date).year &&
+                                    isOptionDisabled(exp, 'end_date', month.value, parseDate(exp.end_date).year)
+                                "
+                            >
+                                {{ month.label }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -89,10 +104,15 @@
                         (valueChange)="onDatePartChange(exp.id, 'end_date', 'year', $event)"
                     >
                         @for (year of years; track year) {
-                            <option 
+                            <option
                                 [value]="year"
-                                [disabled]="parseDate(exp.end_date).month && isOptionDisabled(exp, 'end_date', parseDate(exp.end_date).month, year)"
-                            >{{ year }}</option>
+                                [disabled]="
+                                    parseDate(exp.end_date).month &&
+                                    isOptionDisabled(exp, 'end_date', parseDate(exp.end_date).month, year)
+                                "
+                            >
+                                {{ year }}
+                            </option>
                         }
                     </ui-select>
                 </div>
@@ -104,12 +124,17 @@
                 [value]="exp.is_current ?? false"
                 (change)="updateExperience(exp.id, 'is_current', $event)"
             ></ui-checkbox>
-            
+
             <div class="form__field">
                 <div class="textarea__wrapper">
                     <span class="field__label">Опис</span>
-                    <ui-button [label]="'Згенерувати самарі'" [icon]="'fa-solid fa-wand-magic-sparkles'" [type]="'secondary'"
-                        (click)="generateDescription(exp.id)"></ui-button>
+                    <ui-button
+                        [label]="isGenerating() ? 'Генерується...' : 'Згенерувати самарі'"
+                        [icon]="'fa-solid fa-wand-magic-sparkles'"
+                        [type]="'secondary'"
+                        [isLoading]="isGenerating()"
+                        (click)="generateDescription(exp.id)"
+                    ></ui-button>
                 </div>
                 <ui-textarea
                     class="field__textarea"

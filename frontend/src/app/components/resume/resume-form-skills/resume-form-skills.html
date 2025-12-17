@@ -4,10 +4,14 @@
     <div class="form__add">
         <ui-input [(value)]="newSkill" [label]="'Назва навички'" (keydown.enter)="addSkill()"></ui-input>
 
-        <ui-select class="add__level" [label]="'Рівень володіння'" [value]="newLevel()"
-            (valueChange)="newLevel.set($event)">
+        <ui-select
+            class="add__level"
+            [label]="'Рівень володіння'"
+            [value]="newLevel()"
+            (valueChange)="newLevel.set($event)"
+        >
             @for (level of levels; track level.value) {
-            <option [value]="level.value">{{ level.label }}</option>
+                <option [value]="level.value">{{ level.label }}</option>
             }
         </ui-select>
 
@@ -16,13 +20,13 @@
 
     <div class="skills__list">
         @for (skill of skills(); track skill.id) {
-        <div class="skill-item" (click)="removeSkill(skill.id)">
-            <span class="skill__name">{{ skill.name }}</span>
-            <span class="skill__level">{{ skill.level }}</span>
-            <span class="skill__remove"><i class="fa-solid fa-times"></i></span>
-        </div>
+            <div class="skill-item" (click)="removeSkill(skill.id)">
+                <span class="skill__name">{{ skill.name }}</span>
+                <span class="skill__level">{{ skill.level }}</span>
+                <span class="skill__remove"><i class="fa-solid fa-times"></i></span>
+            </div>
         } @empty {
-        <p class="form__empty">Додайте свої навички</p>
+            <p class="form__empty">Додайте свої навички</p>
         }
     </div>
 </div>

@@ -5,7 +5,6 @@ import {
     ElementRef,
     inject,
     Input,
-    OnInit,
     Signal,
     signal,
     viewChild,
@@ -91,12 +90,12 @@ export class Conversation {
             .getMessagesByConversationId(this.currentConversationId())
             .then((response: MessageType[]) => {
                 if (response.length === 0) {
-                    this.router.navigate(['/conversation']);
+                    this.router.navigate(["/conversation"]);
                     return;
                 }
 
                 this.messages.set(response);
-            })
+            });
     }
 
     protected async getResponse(message?: ChatInputMessage): Promise<void> {
@@ -318,7 +317,7 @@ export class Conversation {
                 lastUserMessage.content,
                 this.currentConversationType() || undefined,
                 undefined,
-                true
+                true,
             )
             .subscribe({
                 next: (chunk) => {

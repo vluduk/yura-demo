@@ -2,13 +2,20 @@
     <div class="summary__editor">
         <span class="editor__label">Короткий підсумок резюме</span>
 
-        <ui-button [label]="isGenerating() ? 'Генерується...' : 'Згенерувати самарі'" 
-            [icon]="isGenerating() ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'" 
+        <ui-button
+            [label]="isGenerating() ? 'Генерується...' : 'Згенерувати самарі'"
+            [icon]="'fa-solid fa-wand-magic-sparkles'"
             [type]="'secondary'"
-            [isDisabled]="isGenerating()"
-            (click)="generateSummary()"></ui-button>
+            [isLoading]="isGenerating()"
+            (click)="generateSummary()"
+        ></ui-button>
     </div>
 
-    <ui-textarea class="editor__textarea" [placeholder]="'Ваше резюме в короткому описі...'" [isFullWidth]="true"
-        [value]="summaryText()" (valueChange)="onSummaryChange($event)"></ui-textarea>
+    <ui-textarea
+        class="editor__textarea"
+        [placeholder]="'Ваше резюме в короткому описі...'"
+        [isFullWidth]="true"
+        [value]="summaryText()"
+        (valueChange)="onSummaryChange($event)"
+    ></ui-textarea>
 </div>

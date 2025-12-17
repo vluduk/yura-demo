@@ -1,4 +1,14 @@
-import { Component, input, InputSignal, signal, WritableSignal, output, OutputEmitterRef, effect, inject } from "@angular/core";
+import {
+    Component,
+    input,
+    InputSignal,
+    signal,
+    WritableSignal,
+    output,
+    OutputEmitterRef,
+    effect,
+    inject,
+} from "@angular/core";
 import { ResumeDataType } from "@shared/types/ResumeDataType";
 import { Button } from "@shared/components/button/button";
 import { Textarea } from "@shared/components/textarea/textarea";
@@ -39,21 +49,41 @@ export class ResumeFormSummary {
         }
 
         this.isGenerating.set(true);
+
         const resume: ResumeDataType = this.resumeService.currentResume()!;
 
         try {
-            // Prepare context for AI
             const context: any = {};
-            if (resume.experience) {
-                context['experience'] = resume.experience;
+
+            if (resume.personal_info) {
+                context["personal_info"] = resume.personal_info;
             }
-            // Add other fields if needed by backend
-            
-            const summary = await this.resumeService.generateSummary(context);
-            this.onSummaryChange(summary);
+            if (resume.experience) {
+                context["experience"] = resume.experience;
+            }
+            if (resume.education) {
+                context["education"] = resume.education;
+            }
+            if (resume.skills) {
+                context["skills"] = resume.skills;
+            }
+            if (resume.languages) {
+                context["languages"] = resume.languages;
+            }
+            if (resume.extra_activities) {
+                context["extra_activities"] = resume.extra_activities;
+            }
+
+            const content = await this.resumeService.generateSummary(context);
+            if (content) {
+                this.onSummaryChange(content);
+            } else {
+                this.onSummaryChange(
+                    "Автоматично згенероване резюме. Будь ласка, відредагуйте його відповідно до ваших навичок та досвіду.",
+                );
+            }
         } catch (error) {
             console.error("Failed to generate summary", error);
-            // Optionally show error notification
         } finally {
             this.isGenerating.set(false);
         }
