@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, WritableSignal } from "@angular/core";
+import { Component, OnInit, inject, signal, WritableSignal, Signal, computed } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterModule } from "@angular/router";
 import { ResumeService } from "@shared/services/resume.service";
@@ -6,20 +6,25 @@ import { ResumeDataType } from "@shared/types/ResumeDataType";
 import { Button } from "@shared/components/button/button";
 import { TEMPLATES } from "@shared/types/ResumeTemplateType";
 import { Title } from "@shared/components/title/title";
+import { Input } from "@shared/components/input/input";
 
 @Component({
     selector: "app-resume-library",
     standalone: true,
-    imports: [CommonModule, RouterModule, Button, Title],
+    imports: [CommonModule, RouterModule, Button, Title, Input],
     templateUrl: "./library.html",
     styleUrl: "./library.css",
 })
 export class Library implements OnInit {
-    private readonly resumeService = inject(ResumeService);
-    private readonly router = inject(Router);
-
     protected readonly resumes: WritableSignal<ResumeDataType[]> = signal<ResumeDataType[]>([]);
-    protected readonly isLoading = this.resumeService.isLoading;
+    protected readonly isLoading: Signal<boolean> = computed(() => this.resumeService.isLoading());
+
+    protected readonly titleEditingId: WritableSignal<string> = signal<string>("");
+
+    private debounceTimeout: ReturnType<typeof setTimeout> | null = null;
+
+    private readonly resumeService: ResumeService = inject(ResumeService);
+    private readonly router: Router = inject(Router);
 
     ngOnInit(): void {
         this.loadResumes();
@@ -35,7 +40,7 @@ export class Library implements OnInit {
     }
 
     protected viewResume(id: string): void {
-        const resume = this.resumes().find(r => r.id === id);
+        const resume = this.resumes().find((r) => r.id === id);
         if (resume) {
             this.resumeService.currentResume.set(resume);
         }
@@ -47,7 +52,7 @@ export class Library implements OnInit {
     }
 
     protected getTemplateId(resumeId: string): string {
-        const resume = this.resumes().find(r => r.id === resumeId);
+        const resume = this.resumes().find((r) => r.id === resumeId);
         return TEMPLATES[resume!.template_id]?.id || "min-left-v1";
     }
 
@@ -63,20 +68,23 @@ export class Library implements OnInit {
         });
     }
 
-    protected updateTitle(resumeId: string, event: Event): void {
-        const newTitle = (event.target as HTMLElement).innerText;
-        this.resumes.update(resumes =>
-            resumes.map(r => r.id === resumeId ? { ...r, title: newTitle } : r)
-        );
+    protected toggleTitleEditing(resumeId: string): void {
+        this.titleEditingId.set(resumeId === this.titleEditingId() ? "" : resumeId);
     }
 
-    protected async saveResume(event: Event, resume: ResumeDataType): Promise<void> {
-        event.stopPropagation(); // Prevent navigation to builder
-        try {
-            await this.resumeService.saveResume(resume);
-            // Optional: Show success notification
-        } catch (error) {
-            console.error("Failed to save resume", error);
+    protected async updateTitle(resumeId: string, newTitle: string): Promise<void> {
+        if (this.debounceTimeout) {
+            clearTimeout(this.debounceTimeout);
         }
+
+        this.debounceTimeout = setTimeout(async () => {
+            this.resumes.update((resumes) => resumes.map((r) => (r.id === resumeId ? { ...r, title: newTitle } : r)));
+
+            try {
+                await this.resumeService.saveResume(this.resumes().find((r) => r.id === resumeId)!);
+            } catch (error) {
+                console.error("Failed to save resume", error);
+            }
+        }, 500);
     }
 }

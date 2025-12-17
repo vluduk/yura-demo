@@ -23,6 +23,12 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
+    height: calc(100vh - var(--header-height) - 60px);
+    overflow: auto;
+}
+
+.library__grid::-webkit-scrollbar {
+    width: 0;
 }
 
 .library__card {
