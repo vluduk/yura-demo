@@ -2,7 +2,10 @@
     <div class="summary__editor">
         <span class="editor__label">Короткий підсумок резюме</span>
 
-        <ui-button [label]="'Згенерувати самарі'" [icon]="'fa-solid fa-wand-magic-sparkles'" [type]="'secondary'"
+        <ui-button [label]="isGenerating() ? 'Генерується...' : 'Згенерувати самарі'" 
+            [icon]="isGenerating() ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'" 
+            [type]="'secondary'"
+            [isDisabled]="isGenerating()"
             (click)="generateSummary()"></ui-button>
     </div>
 

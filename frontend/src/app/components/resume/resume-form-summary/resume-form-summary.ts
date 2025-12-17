@@ -15,6 +15,7 @@ export class ResumeFormSummary {
     public readonly onUpdate: OutputEmitterRef<string> = output();
 
     protected readonly summaryText: WritableSignal<string> = signal<string>("");
+    protected readonly isGenerating: WritableSignal<boolean> = signal<boolean>(false);
 
     private readonly resumeService: ResumeService = inject(ResumeService);
 
@@ -37,35 +38,24 @@ export class ResumeFormSummary {
             return;
         }
 
+        this.isGenerating.set(true);
         const resume: ResumeDataType = this.resumeService.currentResume()!;
 
-        this.onSummaryChange("Автоматично згенероване резюме. Будь ласка, відредагуйте його відповідно до ваших навичок та досвіду.");
-
-        const context: any = {};
-
-        if (resume.personal_info) {
-            context['personal_info'] = resume.personal_info;
-        }
-        if (resume.experience) {
-            context['experience'] = resume.experience;
-        }
-        if (resume.education) {
-            context['education'] = resume.education;
-        }
-        if (resume.skills) {
-            context['skills'] = resume.skills;
-        }
-        if (resume.languages) {
-            context['languages'] = resume.languages;
-        }
-        if (resume.extra_activities) {
-            context['extra_activities'] = resume.extra_activities;
-        }
-
-        const content = await this.resumeService.generateAIContent(resume.id, 'summary', context);
-
-        if (content) {
-            this.onSummaryChange(content);
+        try {
+            // Prepare context for AI
+            const context: any = {};
+            if (resume.experience) {
+                context['experience'] = resume.experience;
+            }
+            // Add other fields if needed by backend
+            
+            const summary = await this.resumeService.generateSummary(context);
+            this.onSummaryChange(summary);
+        } catch (error) {
+            console.error("Failed to generate summary", error);
+            // Optionally show error notification
+        } finally {
+            this.isGenerating.set(false);
         }
     }
 }

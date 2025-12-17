@@ -71,6 +71,9 @@ class UserAssessment(models.Model):
 	benefits_awareness = models.CharField(max_length=255, blank=True, null=True)
 	support_needs = models.TextField(blank=True, null=True)
 
+	# Language preference for AI responses
+	preferred_language = models.CharField(max_length=50, blank=True, null=True, default='uk')
+
 	completed = models.BooleanField(default=False)
 
 	created_at = models.DateTimeField(default=timezone.now)

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 import logging
 from api.models.resume import Resume
 from api.serializers.resume import ResumeSerializer
+from api.services.resume_ai_service import ResumeAIService
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -20,6 +21,27 @@ class ResumeViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         """Return only resumes owned by the authenticated user."""
         return Resume.objects.filter(user=self.request.user).order_by('-updated_at')
+
+    @action(detail=False, methods=['post'], url_path='generate-summary')
+    def generate_summary(self, request):
+        """Generate a resume summary using AI."""
+        try:
+            resume_data = request.data.get('resume_data', {})
+            instructions = request.data.get('instructions', '')
+            
+            summary = ResumeAIService.generate_summary(
+                user=request.user,
+                resume_data=resume_data,
+                extra_instructions=instructions
+            )
+            
+            return Response({'summary': summary}, status=status.HTTP_200_OK)
+        except Exception as e:
+            self.logger.error(f"Failed to generate summary: {e}")
+            return Response(
+                {'error': 'Failed to generate summary. Please try again.'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def perform_create(self, serializer):
         """Create a resume owned by the authenticated user."""

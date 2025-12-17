@@ -37,7 +37,7 @@ class BusinessValidationChain:
             self.available = False
             return
 
-        model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'gemini-2.0-flash-exp')
+        model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'gemin-2.5-flash')
         self.llm = ChatGoogleGenerativeAI(
             model=model_name,
             google_api_key=api_key,

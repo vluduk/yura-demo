@@ -64,6 +64,17 @@ export class ResumeService {
         }
     }
 
+    public async generateSummary(resumeData: any, instructions: string = ''): Promise<string> {
+        const response = await firstValueFrom(
+            this.httpClient.post<{ summary: string }>(
+                `${environment.serverURL}/resumes/generate-summary/`,
+                { resume_data: resumeData, instructions },
+                { withCredentials: true }
+            )
+        );
+        return response.summary;
+    }
+
     private createEmptyResume(id: string, templateId: string): ResumeDataType {
         return {
             id,

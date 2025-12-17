@@ -11,6 +11,23 @@ from api.models.conversation import ConversationType
 class AdvisorService:
     """Service to handle AI advisor logic, including prompt engineering and response processing."""
 
+    # Language instruction mapping
+    LANGUAGE_INSTRUCTIONS = {
+        'uk': 'ВАЖЛИВО: Відповідайте українською мовою.',
+        'en': 'IMPORTANT: Respond in English.',
+        'ru': 'ВАЖНО: Отвечайте на русском языке.',
+    }
+
+    @staticmethod
+    def _get_language_instruction(assessment):
+        """Get language instruction based on user's preferred language."""
+        if assessment and assessment.preferred_language:
+            return AdvisorService.LANGUAGE_INSTRUCTIONS.get(
+                assessment.preferred_language, 
+                AdvisorService.LANGUAGE_INSTRUCTIONS['uk']
+            )
+        return AdvisorService.LANGUAGE_INSTRUCTIONS['uk']
+
     # System prompts for each conversation type
     SYSTEM_PROMPTS = {
         'assessment': """
@@ -110,7 +127,7 @@ class AdvisorService:
 
         try:
             genai.configure(api_key=api_key)
-            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemini-2.0-flash-exp')
+            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemini-2.5-flash.5-flash')
             
             # Get or create assessment for the user
             try:
@@ -181,7 +198,7 @@ class AdvisorService:
 
         try:
             genai.configure(api_key=api_key)
-            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemini-2.0-flash-exp')
+            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemin-2.5-flash')
             
             # Get or create assessment for the user
             try:
@@ -338,6 +355,9 @@ ID: {question_id}
         # Add user context from assessment
         user_context = AdvisorService._format_assessment_context(assessment)
         
+        # Get language instruction
+        lang_instruction = AdvisorService._get_language_instruction(assessment)
+        
         # Add JSON extraction instructions for ALL conversation types
         json_instructions = """
 
@@ -357,6 +377,9 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
 """
         
         prompt = f"""{system_prompt}
+
+{lang_instruction}
+
 {user_context}
 {json_instructions}
 
@@ -752,7 +775,7 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
 
         try:
             genai.configure(api_key=api_key)
-            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemini-2.0-flash-exp')
+            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemin-2.5-flash')
 
             # Get or create assessment
             try:
@@ -801,7 +824,7 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
         
         try:
             genai.configure(api_key=api_key)
-            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemini-2.0-flash-exp')
+            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemin-2.5-flash')
             
             # Get the first 6 messages (3 user + 3 AI)
             from api.models.message import Message
@@ -867,7 +890,7 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
 
         try:
             genai.configure(api_key=api_key)
-            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemini-2.0-flash-exp')
+            model_name = getattr(settings, 'GOOGLE_LLM_MODEL', 'models/gemin-2.5-flash')
             
             # Get user assessment
             try:
@@ -898,7 +921,7 @@ locality, civilian_certifications, education_level, disabilities_or_limits, supp
             if field == 'summary':
                 prompt += "\nWrite a professional summary (3-5 sentences) highlighting the user's strengths and career goals."
             elif field == 'experience_description':
-                prompt += "\nWrite a detailed description of the work experience, focusing on achievements and responsibilities. Use bullet points."
+                prompt += "\nWrite a concise description of the work experience. Use MAX 3-4 bullet points. Focus on key achievements. Keep it brief."
             elif field == 'skills':
                 prompt += "\nList relevant technical and soft skills based on the profile."
             

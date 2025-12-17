@@ -24,6 +24,18 @@
                 <input type="tel" id="phone" formControlName="phone" placeholder="+380..." />
             </div>
 
+            <h2 class="settings__subtitle">Налаштування AI</h2>
+
+            <div class="settings__field">
+                <label for="preferred_language">Мова відповідей AI</label>
+                <select id="preferred_language" formControlName="preferred_language" class="settings__select">
+                    @for (lang of languageOptions; track lang.value) {
+                        <option [value]="lang.value">{{ lang.label }}</option>
+                    }
+                </select>
+                <span class="settings__hint">Оберіть мову, якою AI буде відповідати</span>
+            </div>
+
             @if (successMessage()) {
             <div class="settings__success">
                 <i class="fa-solid fa-check-circle"></i>

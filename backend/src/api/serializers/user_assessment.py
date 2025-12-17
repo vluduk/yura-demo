@@ -13,7 +13,7 @@ class UserAssessmentSerializer(serializers.ModelSerializer):
             'years_of_service', 'discharge_date', 'deployment_experience', 'leadership_experience',
             'civilian_certifications', 'disabilities_or_limits', 'security_clearance',
             'education_level', 'locality', 'benefits_awareness', 'support_needs',
-            'completed', 'created_at', 'updated_at', 'llm_context'
+            'preferred_language', 'completed', 'created_at', 'updated_at', 'llm_context'
         )
         read_only_fields = ('id', 'created_at', 'updated_at')
 
