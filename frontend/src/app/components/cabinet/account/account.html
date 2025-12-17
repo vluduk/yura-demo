@@ -6,10 +6,10 @@
         <ui-input [label]="'Прізвище'" [(value)]="userLastName" [placeholder]="'Іваненко'"
             [isDisabled]="isLoading()"></ui-input>
 
-        <ui-input [label]="'Електронна пошта'" [(value)]="userEmail" [placeholder]="'email@example.com'"
-            [isDisabled]="isLoading()"></ui-input>
-
         <ui-input [label]="'Телефон'" [(value)]="userPhone" [type]="'phone'" [isDisabled]="isLoading()"></ui-input>
+
+        <ui-input [label]="'Електронна пошта'" [(value)]="userEmail" [placeholder]="'email@example.com'"
+            [isDisabled]="true"></ui-input>
     </div>
 
     <div class="account__actions">
@@ -20,7 +20,7 @@
             }
         </div>
 
-        <ui-button [label]="'Зберегти'" [type]="'primary'" [size]="'medium'" [isDisabled]="isLoading()"
-            (click)="onSubmit()"></ui-button>
+        <ui-button [label]="isLoading() ? 'Збереження...' : 'Зберегти зміни'" [size]="'medium'"
+            [isDisabled]="isLoading()" (click)="onSubmit()"></ui-button>
     </div>
 </div>

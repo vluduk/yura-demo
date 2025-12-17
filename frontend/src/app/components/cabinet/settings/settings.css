@@ -1,0 +1,26 @@
+.settings {
+    position: relative;
+    height: 100%;
+}
+
+.settings__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: calc(100% - 64px);
+    overflow: auto;
+    padding-bottom: 10px;
+}
+
+.settings__actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    background-color: var(--background-color);
+}

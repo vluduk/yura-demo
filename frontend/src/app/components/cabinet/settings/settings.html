@@ -1,1 +1,22 @@
-<p>Розробляється...</p>
+<div class="settings">
+    <div class="settings__list">
+        <ui-select class="field__select" [label]="'Мова відповідей AI'" [value]="preferredLanguage()"
+            (valueChange)="preferredLanguage.set($event)">
+            @for (lang of languageOptions; track lang.value) {
+            <option [value]="lang.value">{{ lang.label }}</option>
+            }
+        </ui-select>
+    </div>
+    
+    <div class="settings__actions">
+        <div class="error-message">
+            @if (errorMessage()) {
+            <i class="fa-solid fa-exclamation"></i>
+            {{ errorMessage() }}
+            }
+        </div>
+
+        <ui-button [label]="isLoading() ? 'Збереження...' : 'Зберегти зміни'" [type]="'primary'" [size]="'medium'"
+            [isDisabled]="isLoading()" (click)="onSubmit()"></ui-button>
+    </div>
+</div>
